@@ -1,0 +1,45 @@
+1. Device Code Authentication Flow phishing email sent to Stevie Beavers.
+ The email from `azure-noreply@microsoft.com` (spoofed) contains the URL `https://microsoft.com/devicelogin`, which Stevie clicks, leading to a device code phishing attack.
+
+2. Stevie Beavers authenticates using Device Code Authentication Flow.
+ Threat actor gains access token for Microsoft Graph API, allowing them to upload the malicious OneNote file to Stevie's OneDrive.
+
+3. `sbeavers@peanutrecords.com` uploads/creates OneNote file on SharePoint.
+ The malicious OneNote file `FestivalDeVina.one` is created/uploaded in Stevie's OneDrive using Microsoft Graph API and PowerShell Cmdlets.
+
+4. Phishing email containing download link for OneNote file.
+ The phishing email is sent from `sbeavers@peanutrecords.com` to `lrodriguez@peanutrecords.com` with subject `Nuevos Contactos de Festival De vina 2023!`. The email contains a link to download the OneNote file from Stevie Beavers' SharePoint.
+
+5. `OneNote` file downloaded from a URL.
+ The file `FestivalDeVina.one` is downloaded to `C:\Users\lrodriguez\Downloads` folder via `msedge.exe` (browser) from the URL `defenderatevet06-my.sharepoint.com/personal/sbeavers_peanutrecords_com/_layouts/15/download.aspx`.
+
+6. OneNote.exe executes some OneNote file.
+ This execution exported an HTA (HTML Application) file named `Urukhai.hta` which is then launched by `mshta` (Microsoft HTML Application Host).
+
+7. `mshta` (Microsoft HTML Application Host) launches `mshta` (Microsoft HTML Application Host).
+   - A remote connection is initiated, the remote IP address is `192.168.3.5`, which is used to set up the C2 connection.
+   - `PowerShell` is spawned by `mshta`, potentially downloading an additional script and executing it in memory.
+
+8. `mshta` executes a process that makes a network connection.
+ Establishes a connection to remote IP address `192.168.3.5` for C2 communication, and `PowerShell` script is potentially downloading and executing an additional script in memory.
+
+9. `PowerShell` script executed.
+ Downloads a `Sliver` payload binary which gets executed and detected as malicious.
+
+10. `Sliver` binary executed.
+  `Sliver` executable (`DoorBreach.exe`) performs suspicious LDAP queries and executes commands on endpoints.
+
+11. PowerShell script executed to download and extract a file.
+  A compressed file is downloaded to the Windows Temp folder, and its contents are extracted to the ProgramData directory, containing a GPO named `ManeuverWarfare`.
+
+12. GPO named `ManeuverWarfare` imported.
+  The GPO is applied to the Domain, attaching to the `Workstations` AD organizational unit, potentially spreading settings to all endpoints in the domain.
+
+13. GPO named `BlitzSvc` imported.
+  Another GPO named `BlitzSvc` is imported and applied to all workstations, alongside `ManeuverWarfare`.
+
+14. Scheduled Task `BlitzConfig` created on all workstations.
+  `BlitzConfig` scheduled task executes a PowerShell script which disables system recovery, deletes backups, encrypts files, and displays a ransom note (`Invoke-Berserker` function).
+
+15. Group Policy forced update on workstations.
+  Threat actor uses LDAP queries to enumerate endpoints and WMI to force a Group Policy update (`gpupdate`) on all of those endpoints.

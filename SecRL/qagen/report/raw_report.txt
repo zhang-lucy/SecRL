@@ -1,0 +1,434 @@
+
+### 02 - Initial Access
+
+#### OneNote -> HTA File
+
+One of the first alerts in this incident is related to a `OneNote` file executing some code. It seems to be potentially part of the threat actor's initial access tradecraft.
+
+![](images/10-Investigation-InitialAccess-OneNote-Alert.png)
+
+We can see that the `OneNote` document exported an HTA (HTML Application) file named `Urukhai.hta` which is then launched by `mshta` (Microsoft HTML Application Host).
+
+![](images/11-Investigation-InitialAccess-OneNote-Mshta.png)
+
+We can run the following KQL query to find `OneNote` executing `mshta` across all endpoints:
+
+```
+DeviceProcessEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where InitiatingProcessVersionInfoOriginalFileName == 'OneNote.exe'
+| where ProcessVersionInfoOriginalFileName == 'MSHTA.EXE'
+```
+
+#### HTA File -> PowerShell
+
+We can see a remote session being initiated in the context of `mshta`. We can also see `PowerShell` being spawned by `mshta`. The remote IP address is `192.168.3.5`. We know that IP address is what we used to set up our C2 so we can see the outbound connection.
+
+![](images/12-Investigation-InitialAccess-Mshta-NetworkConnection.png)
+
+We can see the `PowerShell` script potentially downloading an additional script and executing it in memory.
+
+![](images/13-Investigation-InitialAccess-PowerShell-Script.png)
+
+We can use the help of `Security Copilot Script Analyzer` to get some additional information.
+
+![](images/14-Investigation-InitialAccess-PowerShell-Script-Analysis.png)
+
+We can run the following KQL query to find `mshta` which then executes another process that makes a network connection:
+
+```
+DeviceProcessEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where InitiatingProcessVersionInfoOriginalFileName == 'MSHTA.EXE'
+| join kind=inner ( 
+    DeviceNetworkEvents 
+    | where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+    | extend ProcessId = InitiatingProcessId 
+) on ProcessId
+```
+
+### 02 - Sliver Command and Control
+
+We can see a binary then being executed and detected as a `Sliver` payload.
+
+![](images/15-Investigation-InitialAccess-SliverBinary.png)
+
+We can run the following query to get more context on the `Invoke-DoorBreach` script which seems that it had to do with the new binary being executed.
+
+```
+WindowsEvent
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Provider == 'Microsoft-Windows-PowerShell'
+| where EventID == 4104
+| where EventData.Path endswith "Invoke-DoorBreach.ps1"
+| extend ScriptBlockText = tostring(EventData.ScriptBlockText)
+```
+
+![](images/16-Investigation-InitialAccess-SliverDownloader-PowerShellScript.png)
+
+### 03 - Initial Access
+
+Something that is not clear yet is how the `OneNote` file made it to the endpoint where the C2 connections was established.
+
+#### OneNote File Download
+
+Based on the parent process of `OneNote`, we can see that 
+it was launched by `msedge.exe` and the `OneNote` file involved was one from the `Downloads` folder: `C:\Users\lrodriguez\Downloads\FestivalDeVina.one`. We can then infer that the file was downloaded potentially from a link and executed directly from the browser.
+
+![](images/17-Investigation-InitialAccess-OneNoteFile-Creator.png)
+
+If we expand on the details of the file, we can see `Mark of the Web` information which tells us the URL used to download the file
+
+![](images/18-Investigation-InitialAccess-OneNoteFile-MOW.png)
+
+![](images/19-Investigation-InitialAccess-OneNoteFile-MOW.png)
+
+We can then run the following query to check what process launched the browser (`msedge`) to open that specific URL and download the `OneNote` file.
+
+```
+let url = "defenderatevet06-my.sharepoint.com/personal/sbeavers_peanutrecords_com/_layouts/15/download.aspx";
+DeviceEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where RemoteUrl has url
+```
+
+The results shows us that the link opened in the browser originated as a link in the context of `outlook.exe`. This sounds like phishing.
+
+![](images/20-Investigation-InitialAccess-OneNoteFile-BrowserLaunchedToOpenUrl.png)
+
+
+#### Phishing Email Delivery
+
+We can run the following query to validate that the link was clicked in the context of an email being delivered as part of a phishing campaign.
+
+```
+let url = "defenderatevet06-my.sharepoint.com/personal/sbeavers_peanutrecords_com/_layouts/15/download.aspx";
+UrlClickEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Workload == 'Email'
+| where ActionType == 'ClickAllowed'
+| where Url has url
+```
+
+![](images/21-Investigation-InitialAccess-Outlook-UrlClickEvents-Email.png)
+
+We can run the following query to verify the link was part of the email `body`.
+
+```
+let url = "defenderatevet06-my.sharepoint.com/personal/sbeavers_peanutrecords_com/_layouts/15/download.aspx";
+UrlClickEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Workload == 'Email'
+| where ActionType == 'ClickAllowed'
+| where Url has url
+| join kind=inner ( 
+    EmailUrlInfo 
+    | where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00)) 
+) on NetworkMessageId
+| project-reorder UrlLocation,UrlDomain,Url1
+```
+
+![](images/22-Investigation-InitialAccess-Outlook-EmailUrlInfo-Location.png)
+
+
+Finally, we can run the following query to figure out who sent the phishing e-mail with the link to download a script that eventually downloads and executes a `sliver` binary.
+
+```
+EmailEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where NetworkMessageId == '6e5740e4-5d51-4d17-574a-08db72e297c2'
+| project-reorder SenderFromAddress,RecipientEmailAddress
+```
+
+![](images/23-Investigation-InitialAccess-Outlook-EmailInfo-Sender.png)
+
+
+We can see that `sbeavers@peanutrecords.com` sent the phishing e-mail 😱 with subject `Nuevos Contactos de Festival De vina 2023!`. We can infer that `Stevie Beavers` was compromised first or it is an insider job. This explains why the sharepoint link pointed to Stevie's OneDrive (SharePoint) locations `defenderatevet06-my.sharepoint.com/personal/sbeavers_peanutrecords_com/_layouts/15/download.aspx`.
+
+### 04 - Stage Capabilities
+
+Since that link is a legitimate sharepoint link for the `peanutrecords` organization, it means that it was created under the context of `sbeavers@peanutrecords.com`. Once again, either the account was compromised first or it is an insider job.
+
+#### OneNote File Created in SharePoint
+
+We can infer that the malicious `OneNote` file `FestivalDeVina.one` was uploaded / created in the `sbeavers@peanutrecords.com` OneDrive and a download link was sent to `lrodriguez@peanutrecords.com`.
+
+We can run the following query to explore operations performed under the `Microsoft OneDrive for Business` and on Stevie's sharepoint folder.
+
+```
+CloudAppEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where ObjectName startswith 'https://defenderatevet06-my.sharepoint.com/personal/sbeavers_peanutrecords_com'
+| where Application == 'Microsoft OneDrive for Business'
+| where ObjectName endswith "FestivalDeVina.one"
+| extend EventData = parse_json(RawEventData)
+| extend Platform = EventData.Platform,ClientAppName = EventData.AppAccessContext.ClientAppName,
+    APIId = EventData.AppAccessContext.APIId
+| project-reorder TimeGenerated,ActionType,ActivityType,Platform,ClientAppName,UserAgent,APIId,ObjectName
+```
+
+![](images/24-Investigation-InitialAccess-SbeaversSharepoint-OneDriveOperations.png)
+
+We can see that the first operation was `FileModified`. This could be an indicator of a file creation depending on how the file was uploaded. If we go deeper into that event, we can see that the `Microsoft Graph` (00000003-0000-0000-c000-000000000000) API was used to perform this operation, the user agent `Mozilla/5.0 (Linux; Linux 5.4.0-1109-azure #115~18.04.1-Ubuntu SMP Mon May 22 20:06:37 UTC 2023; en-US) PowerShell/7.3.4` was used which might indicate the use of PowerShell Cmdlets to work with the API.
+
+![](images/25-Investigation-InitialAccess-SbeaversSharepoint-FileModified.png)
+
+
+### 05 - Initial Access
+
+Since the `Microsoft Graph` (00000003-0000-0000-c000-000000000000) API was used to upload / create the malicious file, it would be interesting to know all the times `sbeavers@peanutrecords.com` authenticated specifying `Microsoft Graph` as the audience and with the application `Microsoft Office`.
+
+We can run the following query to look for those sign in events:
+
+```
+CloudAppEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where ObjectName startswith 'https://defenderatevet06-my.sharepoint.com/personal/sbeavers_peanutrecords_com'
+| where Application == 'Microsoft OneDrive for Business'
+| where ObjectName endswith "FestivalDeVina.one"
+| extend EventData = parse_json(RawEventData)
+| extend Platform = EventData.Platform,ClientAppName = EventData.AppAccessContext.ClientAppName,
+    AppId = tostring(EventData.AppAccessContext.ClientAppId),APIId = tostring(EventData.AppAccessContext.APIId),
+    ClientIP = EventData.ClientIP,AuthenticationType = EventData.AuthenticationType,
+    CorrelationId = tostring(EventData.CorrelationId),OperationTimeGenerated = TimeGenerated
+| where AuthenticationType == 'OAuth'
+| join kind=inner ( 
+    SigninLogs 
+    | where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+    | where Status.errorCode == 0
+    | extend AccountId = UserId, APIId = ResourceIdentity
+    | extend AuthTimeGenerated = TimeGenerated
+) on AccountId,AppId,APIId
+| project-reorder AuthTimeGenerated,OperationTimeGenerated,AuthenticationProtocol
+```
+
+We can see in the results that the only sign in event with those characteristics was performed via the [Device Code Authentication Flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-device-code). Stevie might have been part of a [Device Code Phishing attack](https://aadinternals.com/post/phishing/#phishing-with-device-code-authentication).
+
+![](images/26-Investigation-InitialAccess-Sbeavers-SignInLogs.png)
+
+This attack requires the attacker to send the legitimate device code verification Url `https://microsoft.com/devicelogin` in the body of the phishing email so that the user goes through the [Device Code Authentication Flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-device-code). The attacker is then waiting for the user to authenticate to then retrieve the access token requested with for the `Microsoft Graph` API with the application `Microsoft Office`.
+
+We can use the following query to look for evidence of this link: `https://microsoft.com/devicelogin`
+
+```
+let url = 'https://microsoft.com/devicelogin';
+search in (EmailUrlInfo,UrlClickEvents,DeviceNetworkEvents,DeviceFileEvents,DeviceEvents)
+TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+and (RemoteUrl has url
+or FileOriginUrl has url
+or FileOriginReferrerUrl has url
+or Url has url
+)
+| take 100
+| project-reorder TimeGenerated,Type,ActionType,UrlLocation,NetworkMessageId,
+    InitiatingProcessAccountUpn,AccountUpn,InitiatingProcessFileName
+```
+
+We can see in the results that the device code verification Url was sent to `Stevie Beavers` in the body of an email, the link was clicked and `outlook` spawned a browser for the user to authenticate. This confirms that a threat actor could have used this technique get access to the organization.
+
+![](images/27-Investigation-InitialAccess-DeviceCodePhishing-Links.png)
+
+
+We can use the following query to figure out who sent the initial `Device Code Phishing Email`?
+
+```
+let url = 'https://microsoft.com/devicelogin';
+EmailUrlInfo
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Url has url
+| join kind=inner ( 
+    EmailEvents 
+    | where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+    | extend EmailDeliveryTimeGenerated = TimeGenerated
+) on NetworkMessageId
+| project-reorder EmailDeliveryTimeGenerated,SenderFromAddress,RecipientEmailAddress,Subject,
+    Url,UrlLocation,EmailDirection,DetectionMethods
+
+```
+
+We can see in the results that the initial phishing email was sent by `azure-noreply@microsoft.com`, but it was categorized as `Phish:["Spoof DMARC"]`. We found our true initial access 🎯.
+
+![](images/28-Investigation-InitialAccess-DeviceCodePhishing-Email.png)
+
+### 06 - Sliver Command and Control
+
+Now that we were able to figure out how the threat actor got initial access, we can go back to the `Sliver` executable activity.
+
+We can run the following query to explore all the network activity to IP address `192.168.3.5`
+
+```
+DeviceNetworkEvents
+| where Timestamp between (datetime(2023-09-22T00:00:00) .. datetime(2023-10-23T00:00:00))
+| where RemoteIP == '192.168.3.5'
+```
+
+### 07 - Endpoints Discovery
+
+Following the activity of the `Sliver` executable, we can see alerts about `suspicious LDAP queries`.
+
+![](images/29-Investigation-Discovery-Sliver-LDAP.png)
+
+We can use the `Security Copilot Script Analyzer` to get more context around the LDAP queries utilized.
+
+![](images/30-Investigation-Discovery-Sliver-LDAP-Analyzer.png)
+
+We can use the following query to explore all LDAP queries made by processes spawned by the `SLiver` binary `DoorBreach.exe`:
+
+```
+DeviceEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where ActionType == 'LdapSearch'
+| where InitiatingProcessParentFileName == 'DoorBreach.exe'
+```
+
+### 08 - Code Execution
+
+Next, we analyze the next script in the attack graph and we can see that a compressed file is downloaded to the Windows Temp folder and the contents extracted to the ProgramData directory.
+
+![](images/31-Investigation-Execution-Sliver-ScriptAnalyzer.png)
+
+We can run the following query to check if that folder was used in any scripts (i.e. PowerShell) on the same endpoint.
+
+```
+WindowsEvent
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Computer == 'WORKSTATION8.peanutrecords.com'
+| where Provider == 'Microsoft-Windows-PowerShell'
+| where EventID == 4104
+| extend ScriptBlockText = EventData.ScriptBlockText
+| where ScriptBlockText contains 'PRGPOs'
+| project-reorder TimeGenerated,ScriptBlockText
+```
+
+We can see in the results that the folder actually contains a backed-up Group Policy Object (GPO) named `ManeuverWarfare` that gets imported via the [Import-GPO](https://learn.microsoft.com/en-us/powershell/module/grouppolicy/import-gpo?view=windowsserver2022-ps) PowerShell Cmdlet to the Domain and attach to the `Wokstations` AD organizational unit. That tells me that the threat actor wants to spread specific settings to all endpoints in the domain 🙈.
+
+![](images/32-Investigation-Execution-Sliver-Script-PRGPO.png)
+
+### 09 - Domain Policy Modification
+
+We can run the following queries to see if the GPO was applied, at least, to the compromised endpoint.
+
+**Sysmon Events**
+
+```
+WindowsEvent
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Computer == 'WORKSTATION8.peanutrecords.com'
+| where Provider == 'Microsoft-Windows-Sysmon'
+| where EventID == 13
+| where EventData.TargetObject startswith 
+    "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\DataStore\\Machine"
+| where EventData.Details == 'ManeuverWarfare' and EventData.EventType == 'SetValue'
+```
+
+![](images/33-Investigation-Execution-Sliver-GPOImport-ManeueverWarfare-Sysmon.png)
+
+**Group Policy Events**
+
+Events 4016 and 5312 are related to the processing of Group Policies in Windows operating systems 12. Event 4016 indicates the start of processing of a group of policies, while event 5312 shows the list of policies that will be applied
+
+```
+WindowsEvent
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Computer == 'WORKSTATION8.peanutrecords.com'
+| where Provider == 'Microsoft-Windows-GroupPolicy'
+| where EventID in (4016,5312)
+| extend PolicyDescription = EventData.DescriptionString
+| where PolicyDescription contains 'ManeuverWarfare'
+| project-reorder TimeGenerated,PolicyDescription,EventID
+```
+
+![](images/34-Investigation-Execution-Sliver-GPOImport-ManeueverWarfare-GroupPolicy.png)
+
+We can try and see if the threat actor potentially force a Group Policy update with built-in commands such as [gpupdate](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/gpupdate).
+
+```
+DeviceProcessEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where DeviceName == 'workstation8.peanutrecords.com'
+| where ProcessCommandLine contains 'gpupdate'
+| where InitiatingProcessCommandLine != 'svchost.exe -k netsvcs -p -s Schedule'
+| project-reorder TimeGenerated,ProcessCommandLine,InitiatingProcessCommandLine
+```
+
+We can see in the results that the threat actor was using LDAP queries to enumerate endpoints and WMI to force a Group Policy update on all of those endpoints:
+
+![](images/35-Investigation-Execution-GroupPolicy-ForceUpdate.png)
+
+It is not clear to what the GPO did, but it can be retrieved from the Domain Controller to investigate. We know in our simulation that the threat actor disabled Defender AV via GPO settings. Following the investigation we also so another GPO named `BlitzSvc` being imported to the domain and applied to all workstations.
+
+### 10 - Malicious Scheduled Tasks
+
+Following the investigation, we can see a `Suspicious Scheduled Task Process Launched` alert which points to PowerShell executing a script. Once again, another script being downloaded and executed on a compromised endpoint.
+
+![](images/36-Investigation-Execution-ScheduledTask-Script.png)
+
+After this script is executed, we can see the `Invoke-Berserker` function being invoked. `Security Copilot Analyzer` confirms that the script is used to disable system recovery, deleting backups, encrypting files and displaying a ransom note.
+
+![](images/37-Investigation-Execution-PowerShell-RansomwareScript.png)
+
+We can get additional context on the Scheduled Tasks with the following query:
+
+```
+DeviceEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where InitiatingProcessAccountDomain == 'peanutrecords'
+| where ActionType == "ScheduledTaskCreated"
+```
+
+We can seethe `BlitzConfig` scheduled task being created on all the workstations. The name is similar to the `BltizSvc` GPO that was imported do the domain and attached to all workstation.
+
+![](images/38-Investigation-Execution-ScheduledTasks-Creation.png)
+
+
+We can get more confirmation with the following queries:
+
+**MDE Registry Events**
+
+```
+DeviceRegistryEvents
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where DeviceName == 'workstation8.peanutrecords.com'
+| where RegistryKey startswith "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\TaskCache\\"
+```
+
+**Sysmon Events**
+
+```
+WindowsEvent
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Computer == 'WORKSTATION8.peanutrecords.com'
+| where EventID in (12,13)
+| extend TargetObject = tostring(EventData.TargetObject)
+| where TargetObject startswith "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\TaskCache\\"
+    and TargetObject contains "BlitzConfig"
+| project-reorder TimeGenerated,TargetObject
+```
+
+![](images/39-Investigation-Sysmon-ScheduledTasks-Creation.png)
+
+**Windows TaskScheduler Events**
+
+```
+WindowsEvent
+| where TimeGenerated between (datetime(2023-06-22T00:00:00) .. datetime(2023-06-23T00:00:00))
+| where Computer == 'WORKSTATION8.peanutrecords.com'
+| where Provider == 'Microsoft-Windows-TaskScheduler'
+| where EventID in (
+    100, //Task Started: This event is generated when a task has started
+    101, //Task Failed to start: This event is generated when a task fails to start
+    102, //Task Completed Successfully: This event is generated when a task completes successfully
+    106, //Task Registered: This event is generated when a new task is registered in the Task Scheduler.
+    107, //Task Launched due to a trigger: This event is generated when a task is launched due to a trigger.
+    129, //indicates the process ID of a task that has run.
+    140, //Task Created: This event is generated when a task is created or a new version of a task is created.
+    141, //Task Deleted: This event is generated when a task is deleted from the Task Scheduler.
+    110, //Task Triggered: This event is generated when a task is triggered to run at the scheduled time.
+    200, //contains information about the action defined in the scheduled task.
+    201 //action completed
+    )
+| where EventData.TaskName contains 'BlitzConfig'
+| project-reorder TimeGenerated,EventID,EventData
+```
+
+![](images/40-Investigation-TaskScheduler-ScheduledTasks-Activity.png)

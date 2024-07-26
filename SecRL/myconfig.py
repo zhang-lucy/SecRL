@@ -1,0 +1,108 @@
+from azure.identity import get_bearer_token_provider, AzureCliCredential
+
+# aoai_endpoint = "https://medeina-openai-dev-011.openai.azure.com/"
+# aoai_emb_endpoint = "https://medeinaapi-dev-openai-san.openai.azure.com/"
+
+token_provider = get_bearer_token_provider(
+    AzureCliCredential(), "https://cognitiveservices.azure.com/.default"
+)
+
+
+      # "base_url": "https://medeina-openai-dev-011.openai.azure.com/",
+      # https://yadaoai.openai.azure.com/ gpt4-o
+      # gpt-4o-2024-05-13 aif-complex-tasks-west-us-3
+
+config_list_35 = [
+  {
+      "model": "gpt-35-turbo-0125",
+      "base_url": "https://yroai2.openai.azure.com/",
+      "api_type": "azure",
+      "api_version": "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider
+  }
+]
+
+config_list_4o = [
+    {
+      "model": "gpt-4o",
+      "base_url": "https://yadaoai.openai.azure.com/",
+      "api_type": "azure",
+      "api_version":  "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider
+  },
+
+  {
+      "model": "gpt-4o",
+      "base_url": "https://yroai.openai.azure.com/",
+      "api_type": "azure",
+      "api_version":  "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider
+  },
+  {
+      "model": "gpt-4o-2024-05-13",
+      "base_url": "https://yroai5.openai.azure.com/",
+      "api_type": "azure",
+      "api_version":  "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider
+  },
+    {
+      "model": "gpt-4o",
+      "base_url": "https://yroai2.openai.azure.com/",
+      "api_type": "azure",
+      "api_version":  "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider
+  },
+]
+
+config_list_4_0125 = [
+    {
+        "model": "gpt-4-0125-preview",
+        "base_url": "https://yroai.openai.azure.com/",
+        "api_type": "azure",
+        "api_version":  "2024-05-01-preview",
+        "azure_ad_token_provider": token_provider
+    }
+]
+
+config_list_4_turbo = [
+    {
+        "model": "gpt-4-turbo-2024-04-09",
+        "base_url": "https://yroai5.openai.azure.com/",
+        "api_type": "azure",
+        "api_version":  "2024-05-01-preview",
+        "azure_ad_token_provider": token_provider
+    }
+]
+
+config_list_4_combin = [
+    {
+        "model": "gpt-4-0125-preview",
+        "base_url": "https://yroai.openai.azure.com/",
+        "api_type": "azure",
+        "api_version":  "2024-05-01-preview",
+        "azure_ad_token_provider": token_provider
+    },
+    {
+        "model": "gpt-4-turbo-2024-04-09",
+        "base_url": "https://yroai5.openai.azure.com/",
+        "api_type": "azure",
+        "api_version":  "2024-05-01-preview",
+        "azure_ad_token_provider": token_provider
+    }
+]
+
+if __name__ == "__main__":
+    
+  from autogen import OpenAIWrapper
+
+  client = OpenAIWrapper(config_list=config_list_35, cache_seed=None)
+  print("Test gpt 35", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+
+  client = OpenAIWrapper(config_list=config_list_4o, cache_seed=None)
+  print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+
+  client = OpenAIWrapper(config_list=config_list_4_0125, cache_seed=None)
+  print("Test gpt4 0125", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+
+  client = OpenAIWrapper(config_list=config_list_4_turbo, cache_seed=None)
+  print("Test gpt4 turbo", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
