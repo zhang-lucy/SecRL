@@ -1,6 +1,5 @@
 CREATOR_PROMPT = """Given a question, please 
-1. identify the key word(s) from the golden answer. That is, the terms that are essential to answer the question.
-- For terms that have been mentioned in the given question and repeated in the answer, please do not include them as key workds.
+- For terms that have been mentioned in the given question and repeated in the answer, please do not include them as key words.
 2. create a rubric based on the golden answer. For each question, you can create at most 10 points of criteria.
 For each criteria, please:
 - assign a score between 0 and 1. The sum of all scores should be 1.
@@ -88,3 +87,18 @@ False
 5. The answer states that the 'Invoke-DoorBreach' function was executed.
 True
 """
+
+from textwrap import dedent
+CHECKER_PROMPT = dedent("""Given a question a submitted answer, please evaluate the submitted answer to see whether it correctly answers the question without ambiguity.
+
+If the submitted answer is an enumeration of information containing the golden answer, 
+it should be considered as false. For example, if the question ask about an IP address and the submitted answer enumerates all the IP addresses in the database.
+
+You are given:
+- A question
+- The golden answer
+- The submitted answer
+                        
+Only return "True" or "False".
+""" 
+)

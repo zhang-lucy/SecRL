@@ -13,7 +13,7 @@ def parse_requirements(filename):
 
 
 setup(
-    name="thub",
+    name="secgym",
     version="0.1",
     packages=find_packages(),
     include_package_data=True,
@@ -21,7 +21,6 @@ setup(
     install_requires=parse_requirements("requirements.txt"),
     entry_points={
         "console_scripts": [
-            # Define scripts here if necessary
         ],
     },
 )

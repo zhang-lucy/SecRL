@@ -90,8 +90,7 @@ LIST_TABLES = [
     "SecurityIncident",
     "Watchlist",
     "WindowsEvent",
-
-    "OfficeActivity",
+    "ThreatIntelligenceIndicator",
 
     # "SecurityAlert",
     # "SecurityEvent",

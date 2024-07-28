@@ -1,8 +1,8 @@
 from autogen import OpenAIWrapper
 import json
 import os
-from secbench.myconfig import config_list_4o
-from secbench.env.prompts import CREATOR_PROMPT, CHECKER_PROMPT
+from secgym.myconfig import config_list_4o
+from secgym.env.prompts import CREATOR_PROMPT, CHECKER_PROMPT
 
 def msging(msg: str, role: str="user"):
     return {"role": role, "content": msg}
@@ -49,6 +49,7 @@ class Evaluator:
             return response["score"]
     
     def check_single_response(self, question: dict, submitted_answer: str):
+
         pass
         
 

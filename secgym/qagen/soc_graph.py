@@ -7,31 +7,31 @@ class SOCGraph:
         self.G = nx.Graph()
         self.node_counter = 0
     
-    def add_activity(self, description, from_ioc_id=None):
-        # Create a new activity node with a unique ID
+    def add_investigation(self, description, from_ioc_id=None):
+        # Create a new investigation node with a unique ID
         self.node_counter += 1
-        activity_id = self.node_counter
-        self.G.add_node(activity_id, type='Activity', description=description)
+        investigation_id = self.node_counter
+        self.G.add_node(investigation_id, type='Investigation', description=description)
         
-        # If the activity is related to an existing IoC, add an edge between them
+        # If the investigation is related to an existing IoC, add an edge between them
         if from_ioc_id is not None and self.G.has_node(from_ioc_id) and self.G.nodes[from_ioc_id]['type'] == 'IoC':
-            self.G.add_edge(activity_id, from_ioc_id)
+            self.G.add_edge(investigation_id, from_ioc_id)
         
-        return activity_id
+        return investigation_id
 
-    def delete_activity(self, activity_id):
-        if self.G.has_node(activity_id) and self.G.nodes[activity_id]['type'] == 'Activity':
-            self.G.remove_node(activity_id)
+    def delete_investigation(self, investigation_id):
+        if self.G.has_node(investigation_id) and self.G.nodes[investigation_id]['type'] == 'Investigation':
+            self.G.remove_node(investigation_id)
     
-    def add_ioc(self, description, from_activity_id=None):
+    def add_ioc(self, description, from_investigation_id=None):
         # Create a new IoC node with a unique ID
         self.node_counter += 1
         ioc_id = self.node_counter
         self.G.add_node(ioc_id, type='IoC', description=description)
         
-        # If the IoC is related to an existing activity, add an edge between them
-        if from_activity_id is not None and self.G.has_node(from_activity_id) and self.G.nodes[from_activity_id]['type'] == 'Activity':
-            self.G.add_edge(ioc_id, from_activity_id)
+        # If the IoC is related to an existing investigation, add an edge between them
+        if from_investigation_id is not None and self.G.has_node(from_investigation_id) and self.G.nodes[from_investigation_id]['type'] == 'Investigation':
+            self.G.add_edge(ioc_id, from_investigation_id)
         
         return ioc_id
     
@@ -51,11 +51,11 @@ class SOCGraph:
             label = f"ID: {node}\n{wrapped_description}"
             labels[node] = label
             
-            if data.get('type') == 'Activity':
-                node_sizes.append(base_node_size)  # Size for type Activity
-                node_colors.append('#ADD8E6')  # Light blue color for type Activity
+            if data.get('type') == 'Investigation':
+                node_sizes.append(base_node_size)  # Size for type Investigation
+                node_colors.append('#ADD8E6')  # Light blue color for type Investigation
             elif data.get('type') == 'IoC':
-                node_sizes.append(base_node_size // 4)  # Smaller size for type IoC
+                node_sizes.append(base_node_size // 3)  # Smaller size for type IoC
                 node_colors.append('#FFB6C1')  # Light pink color for type IoC
 
         # Define the custom tree layout

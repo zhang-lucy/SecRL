@@ -1,6 +1,6 @@
 
 
-from env.ThuGEnv import ThuGEnv
+from secgym.env.ThuGEnv import ThuGEnv
 from agents.baseline_agent import BaselineAgent
 import json
 
