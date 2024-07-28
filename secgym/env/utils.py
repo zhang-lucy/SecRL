@@ -13,6 +13,9 @@ def msging(msg, role="user"):
 def to_abs_path(relative_path):
     return os.path.join(os.path.dirname(__file__), relative_path)
 
+def get_full_question(question_dict):
+    return f"{question_dict.get('context', '')} {question_dict['question']}".strip()
+
 def scrap_table_schema(table_name, yaml_filename, save_yaml=True):
     yaml_filename = f"data/schema/{table_name}.yaml"
     url = f"""https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/{table_name.lower()}"""

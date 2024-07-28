@@ -3,18 +3,19 @@ import gymnasium as gym
 import numpy as np
 import datetime, json, logging, os, re
 from typing import Dict, List, Tuple, Union
-import random
+import docker
 import mysql.connector
 from datetime import datetime
+from time import sleep
+
+from secgym.env.utils import to_abs_path, get_full_question
+from secgym.env.evaluator import Evaluator
+
 
 ATTACKS = {
     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
     "AAD_Comprise": "aad_comprise_qa.json",
 }
-from secbench.env.utils import to_abs_path
-
-
-import docker
 
 def start_container(container_name):
     client = docker.from_env()
@@ -24,7 +25,8 @@ def start_container(container_name):
         return container
     else:
         container.start()
-        print(f"Restarted stopped container with ID: {container.id}")
+        print(f"Restarting stopped container with ID: {container.id}...")
+        sleep(3)
         return container
 
 
@@ -32,6 +34,7 @@ class ThuGEnv(gym.Env):
     def __init__(
             self,
             attack: Union[str, int],
+            config_list: List[Dict] = None,
             noise_level: int = 0,
             max_steps: int = 15,
             container_name: str = "mysql-container",
@@ -75,10 +78,14 @@ class ThuGEnv(gym.Env):
             self._all_questions = json.load(f)
             self.num_questions = len(self._all_questions)
 
+        # saved logs
         self.step_count = 0
         self.curr_question: Union[dict, None] = None
         self.curr_trajectory = []
         self.all_logs = []
+
+        # evaluator
+        self.evaluator = Evaluator(config_list=config_list)
 
 
     def get_attack_list(self):
@@ -224,10 +231,8 @@ class ThuGEnv(gym.Env):
             "noise_level": self.noise_level,
             "qid": idx
         }
-
-        if "context" in observation:
-            return observation['context'] + " " + observation['question'], info
-        return observation['question'], info
+    
+        return get_full_question(observation), info
     
     def render(self):
         """Render the environment.
@@ -253,11 +258,10 @@ class ThuGEnv(gym.Env):
 
         return "", self._eval(answer), True, {}
 
-    def _eval(self, answer: str) -> int:
+    def _eval(self, answer: str) -> float:
         """Evaluate the answer and return the score.
-        TODO: Implement the evaluation function.
         """
-        return 0
+        return self.evaluator.checking(self.curr_question, answer)
 
 
 if __name__ == "__main__":

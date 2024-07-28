@@ -88,17 +88,3 @@ False
 True
 """
 
-from textwrap import dedent
-CHECKER_PROMPT = dedent("""Given a question a submitted answer, please evaluate the submitted answer to see whether it correctly answers the question without ambiguity.
-
-If the submitted answer is an enumeration of information containing the golden answer, 
-it should be considered as false. For example, if the question ask about an IP address and the submitted answer enumerates all the IP addresses in the database.
-
-You are given:
-- A question
-- The golden answer
-- The submitted answer
-                        
-Only return "True" or "False".
-""" 
-)
