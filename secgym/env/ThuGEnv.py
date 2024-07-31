@@ -8,13 +8,13 @@ import mysql.connector
 from datetime import datetime
 from time import sleep
 
-from secgym.env.utils import to_abs_path, get_full_question
+from secgym.utils import get_full_question
 from secgym.env.evaluator import Evaluator
 
 
 ATTACKS = {
     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
-    "AAD_Comprise": "aad_comprise_qa.json",
+    "AAD_Comprise": "aad_comprise/aad_comprise_qa.json",
 }
 
 def start_container(container_name):
@@ -74,7 +74,8 @@ class ThuGEnv(gym.Env):
         elif isinstance(attack, str):
             self.attack = attack
 
-        with open(to_abs_path(f'questions/{ATTACKS[self.attack]}'), "r") as f:
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(curr_path, f'questions/{ATTACKS[self.attack]}'), "r") as f:
             self._all_questions = json.load(f)
             self.num_questions = len(self._all_questions)
 

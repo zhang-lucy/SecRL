@@ -1,0 +1,74 @@
+Given: There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.
+
+----------------------------------------------------------------------------------------------------------------------------
+## Investigation 1: Check table `OfficeActivity` with Graph API's id for mail read events.
+```kql
+OfficeActivity
+| where Operation == "MailItemsAccessed" and AppId == "00000003-0000-0000-c000-000000000000"
+```
+```sql
+SELECT *
+FROM OfficeActivity
+WHERE Operation = 'MailItemsAccessed' AND AppId = '00000003-0000-0000-c000-000000000000'
+```
+
+### I1.IoC
+1. ClientAppId: bb77fe0b-52af-4f26-9bc7-19aa48854ebf
+2. MailboxOwnerUPN: mmelendez@DefenderATEVET17.onmicrosoft.com
+   - the user's mailbox who was accessed.
+
+----------------------------------------------------------------------------------------------------------------------------
+## Investigation 2: Check table `SecurityExposureManagement` to find more information about the client app with that ID.
+### I2.IoC 
+1. ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0
+
+----------------------------------------------------------------------------------------------------------------------------
+## Investigation 3: Check `AADServicePrincipalSignInLogs` to identify the last time this client app with `ClientAppId` was authenticated.
+- From I1.IoC1
+```kql
+AADServicePrincipalSignInLogs
+| where AppId == "bb77fe0b-52af-4f26-9bc7-19aa48854ebf"
+```
+
+### I3.IoC
+1. IPAddress: 72.43.121.34
+    - From the above query, we identify a new IOC: The IPAdress where the service principal authenticated from is found 72.43.121.34
+
+----------------------------------------------------------------------------------------------------------------------------
+## Investigation 4: Check `SigninLogs` for other authentication events from the same IP address.
+- From A3.IoC1
+```kql
+let ipAddress = "72.43.121.43";
+SigninLogs
+    | where IPAddress == ipAddress
+    | project TimeGenerated, IPAddress, UserPrincipalName, ResultType, ResultDescription, AuthenticationRequirement, ConditionalAccessStatus,  ResourceDisplayName, AppDisplayName, ResourceIdentity, ClientAppUsed, RiskLevelAggregated, RiskLevelDuringSignIn, RiskState, RiskEventTypes
+```
+### I4.IoC
+- Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated from this account: mvelazco@defenderatevet17.onmicrosoft.com.
+
+
+----------------------------------------------------------------------------------------------------------------------------
+## Investigation 5: Check `AuditLogs` for the latest actions that have occurred to this application registration: modifications, updates, etc.
+- From I2.IoC1
+
+```kql
+AuditLogs
+| mv-expand TargetResource = TargetResources
+| extend TargetResourceJson = parse_json(TargetResource)
+| where TargetResourceJson.id == "47dee0a2-d662-4664-acfa-a28bb62bdbc0"
+```
+
+### IoC
+- We learn that there were certain changes made against the application. Specifically, new credentials were added to the application registration right before it authenticated.
+
+----------------------------------------------------------------------------------------------------------------------------
+## Investigation 6: We check other activities with the same IP address, like Microsoft Graph API requests.
+- From I3.IoC1
+```kql
+MicrosoftGraphActivityLogs
+| where RequestUri endswith "/users" or RequestUri endswith "/applications"  
+| where  IPAddress == "72.43.121.43"
+```
+
+### I6.IoC
+- We find that the same IP address is making requests to the Microsoft Graph API for both users and applications. 

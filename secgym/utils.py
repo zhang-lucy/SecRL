@@ -6,15 +6,29 @@ import json
 import yaml
 import os
 import Levenshtein
+import autogen
 
 def msging(msg, role="user"): 
     return {"role": role, "content": msg}
 
-def to_abs_path(relative_path):
-    return os.path.join(os.path.dirname(__file__), relative_path)
-
 def get_full_question(question_dict):
     return f"{question_dict.get('context', '')} {question_dict['question']}".strip()
+
+
+def LLM_call(instruction: str, task: str, config_list: list, **args) -> str:
+    client = autogen.OpenAIWrapper(
+        config_list=config_list,
+        cache_seed=41,
+        **args
+    )
+    response = client.create(
+        messages = [
+            {'role': 'system', 'content': instruction},
+            {'role': 'user', 'content': task}
+        ]
+    )
+    return response.choices[0].message.content
+
 
 def scrap_table_schema(table_name, yaml_filename, save_yaml=True):
     yaml_filename = f"data/schema/{table_name}.yaml"
@@ -70,7 +84,7 @@ def scrap_table_schema(table_name, yaml_filename, save_yaml=True):
 
 
 def load_yaml(yaml_filename):
-    with open(to_abs_path(yaml_filename), 'r', encoding='utf-8') as file:
+    with open(yaml_filename, 'r', encoding='utf-8') as file:
         data = yaml.load(file, Loader=yaml.FullLoader)
     return data
 

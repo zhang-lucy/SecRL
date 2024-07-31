@@ -1,7 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
 import time
-from utils import to_abs_path
 import os
 import json
 import docker
@@ -10,6 +9,9 @@ import pandas as pd
 from secbench.env.utils import find_most_similar
 import argparse
 
+
+def to_abs_path(path):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), path)
 
 def create_container_per_attack(attack):
     # TODO
@@ -128,7 +130,6 @@ def process_csv(csv_folder):
 
             break
 
-import chardet  
 def create_sql_file_from_csv_folder(csv_folder, sql_file_path, database_name):
     """Create a single .sql file from a folder of CSV and .meta files."""
     sql_statements = [

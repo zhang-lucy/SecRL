@@ -1,0 +1,976 @@
+[
+    {
+        "difficulty": "Easy",
+        "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
+        "question": "Which user's mailbox was accessed during this suspicious email reading event?",
+        "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
+        "tables": [
+            "OfficeActivity"
+        ],
+        "start_node": "1",
+        "end_node": "4",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Easy",
+        "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
+        "question": "What is the ID of the client application?",
+        "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+        "tables": [
+            "OfficeActivity"
+        ],
+        "start_node": "1",
+        "end_node": "3",
+        "hop": 1
+    },
+    {
+        "difficulty": "Medium",
+        "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
+        "question": "What is the IP address of the user that performed this email reading activity?",
+        "answer": "72.43.121.34",
+        "solution": [
+            "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This client application authenticated from IP address: 72.43.121.34."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "AADServicePrincipalSignInLogs"
+        ],
+        "start_node": "1",
+        "end_node": "8",
+        "hop": 2
+    },
+    {
+        "difficulty": "Hard",
+        "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
+        "question": "Which technique did this attacker used to gain initial access to the tenant?",
+        "answer": "password spray attack",
+        "solution": [
+            "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This ID logged in from IP address 72.43.121.34.",
+            "3. Multiple users attempted to authenticate from this IP address, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded. The attacker used password spray attack to gain access to the tenant."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "AADServicePrincipalSignInLogs",
+            "SigninLogs"
+        ],
+        "start_node": "1",
+        "end_node": "10",
+        "hop": 3,
+        "human modified": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "A suspicious client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf has been identified.",
+        "question": "What is the IP address where this application authenticated from?",
+        "answer": "72.43.121.34",
+        "tables": [
+            "AADServicePrincipalSignInLogs"
+        ],
+        "start_node": "3",
+        "end_node": "8",
+        "hop": 1,
+        "human modified": true
+    },
+    {
+        "difficulty": "Hard",
+        "context": "A suspicious client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf has been identified.",
+        "question": "Which technique did this attacker used to gain initial access to the tenant?",
+        "answer": "password spray attack",
+        "solution": [
+            "1. The client application authenticated from IP address: 72.43.121.34.",
+            "2. Multiple users attempted to authenticate from this IP, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded. This indicates that the attacker used a password spray attack to gain initial access to the tenant."
+        ],
+        "tables": [
+            "AADServicePrincipalSignInLogs",
+            "SigninLogs"
+        ],
+        "start_node": "3",
+        "end_node": "10",
+        "hop": 2,
+        "human modified": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "A suspicious IP address has been identified: 72.43.121.34.",
+        "question": "What is the username of the account that successfully authenticated from the same IP address?",
+        "answer": "mvelazco@defenderatevet17.onmicrosoft.com",
+        "solution": [
+            "1. Multiple users attempted to authenticate from IP address: 72.43.121.34, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded."
+        ],
+        "tables": [
+            "SigninLogs"
+        ],
+        "start_node": "8",
+        "end_node": "10",
+        "hop": 1,
+        "human modified": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
+        "question": "What is the Object ID associated with this suspicious client application?",
+        "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "solution": [
+            "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "SecurityExposureManagement"
+        ],
+        "start_node": "1",
+        "end_node": "6",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
+        "question": "What changes were made to the application registration right before the suspicious activity?",
+        "answer": "New credentials were added",
+        "solution": [
+            "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "3. Check AuditLogs for recent changes to this application registration.",
+            "4. New credentials were added to the application registration right before it authenticated."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "SecurityExposureManagement",
+            "AuditLogs"
+        ],
+        "start_node": "1",
+        "end_node": "12",
+        "hop": "3",
+        "additional modification": true
+    },
+    {
+        "difficulty": "Easy",
+        "context": "The client application ID was identified.",
+        "question": "What is the Object ID associated with this client application?",
+        "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "tables": [
+            "SecurityExposureManagement"
+        ],
+        "start_node": "3",
+        "end_node": "6",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "The client application ID was identified.",
+        "question": "What changes were made to the application registration before the suspicious activity?",
+        "answer": "New credentials were added",
+        "solution": [
+            "1. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "2. Check AuditLogs for recent changes to this application registration.",
+            "3. New credentials were added to the application registration right before it authenticated."
+        ],
+        "tables": [
+            "SecurityExposureManagement",
+            "AuditLogs"
+        ],
+        "start_node": "3",
+        "end_node": "12",
+        "hop": "2",
+        "additional modification": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "The Object ID of the suspicious application was identified.",
+        "question": "What changes were made to the application registration before the suspicious activity?",
+        "answer": "New credentials were added",
+        "solution": [
+            "1. Check AuditLogs for recent changes to this application registration: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "2. New credentials were added to the application registration right before it authenticated."
+        ],
+        "tables": [
+            "AuditLogs"
+        ],
+        "start_node": "6",
+        "end_node": "12",
+        "hop": "1",
+        "additional modification": true
+    },
+    {
+        "difficulty": "Hard",
+        "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
+        "question": "What other suspicious activity was performed by the same client application?",
+        "answer": "Enumerate users and applications using Microsoft Graph API",
+        "solution": [
+            "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This ID is logged in with IP address: 72.43.121.34.",
+            "3. The same IP address is making requests to the Microsoft Graph API for both users and applications."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "AADServicePrincipalSignInLogs",
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "1",
+        "end_node": "14",
+        "hop": "3",
+        "human modified": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "There is a suspicious email reading event by a client application with ID bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+        "question": "What other suspicious activity was performed by the same client application?",
+        "answer": "Enumerate users and applications using Microsoft Graph API",
+        "solution": [
+            "1. The client application is logging in from IP address 72.43.121.34.",
+            "2. The same IP address is making requests to the Microsoft Graph API for both users and applications."
+        ],
+        "tables": [
+            "AADServicePrincipalSignInLogs",
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "3",
+        "end_node": "14",
+        "hop": "2",
+        "human modified": true
+    },
+    {
+        "difficulty": "Easy",
+        "context": "There is a suspicious email reading event with IP address 72.43.121.34.",
+        "question": "what other activities are being observed from the same IP address?",
+        "answer": "The same IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "tables": [
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "8",
+        "end_node": "14",
+        "hop": "1",
+        "human modified": true
+    },
+    {
+        "difficulty": "Easy",
+        "context": "There is a suspicious access to this email: mmelendez@DefenderATEVET17.onmicrosoft.com.",
+        "question": "What Microsoft service was used to access this email box?",
+        "answer": "Microsoft Graph API",
+        "tables": [
+            "OfficeActivity"
+        ],
+        "start_node": "4",
+        "end_node": "1",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Easy",
+        "context": "There is a suspicious access to this email: mmelendez@DefenderATEVET17.onmicrosoft.com with a client application.",
+        "question": "What is the ID of the client application that accessed the mailbox?",
+        "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+        "tables": [
+            "OfficeActivity"
+        ],
+        "start_node": "4",
+        "end_node": "3",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "There is a suspicious access to this email: mmelendez@DefenderATEVET17.onmicrosoft.com with a client application.",
+        "question": "What is the IP address from which the client application accessed the mailbox?",
+        "answer": "72.43.121.34",
+        "solution": [
+            "1. The email is accessed by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This ID is logged in with IP address: 72.43.121.34."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "AADServicePrincipalSignInLogs"
+        ],
+        "start_node": "4",
+        "end_node": "8",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "There is a suspicious access to this email: mmelendez@DefenderATEVET17.onmicrosoft.com.",
+        "question": "Which technique did this attacker used to gain initial access to the tenant?",
+        "answer": "password spray attack",
+        "solution": [
+            "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This ID logged in from IP address 72.43.121.34.",
+            "3. Multiple users attempted to authenticate from this IP address, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded. The attacker used password spray attack to gain access to the tenant."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "AADServicePrincipalSignInLogs",
+            "SigninLogs"
+        ],
+        "start_node": "4",
+        "end_node": "10",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "There is a suspicious access to this email: mmelendez@DefenderATEVET17.onmicrosoft.com with a client application.",
+        "question": "What is the Object ID associated with the suspicious client application?",
+        "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "solution": [
+            "1. The client's application ID is found from the email read events related to mmelendez@DefenderATEVET17.onmicrosoft.com.",
+            "2. Further investigation into the client application's characteristics reveals its Object ID."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "SecurityExposureManagement"
+        ],
+        "start_node": "4",
+        "end_node": "6",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "The user's mailbox who was accessed: mmelendez@DefenderATEVET17.onmicrosoft.com.",
+
+        "question": "What significant change was observed in the application registration before it authenticated?",
+        "answer": "New credentials were added.",
+        "solution": [
+            "1. The client's application ID is found from the email read events related to mmelendez@DefenderATEVET17.onmicrosoft.com.",
+            "2. Investigation into further details about the client application reveals its Object ID.",
+            "3. AuditLogs shows the latest actions that occurred to the application registration, identifying that new credentials were added before authentication."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "SecurityExposureManagement",
+            "AuditLogs"
+        ],
+        "start_node": "4",
+        "end_node": "12",
+        "hop": "3",
+        "additional modification": true
+    },
+    {
+        "difficulty": "Hard",
+        "context": "A client application is used to access this email: mmelendez@DefenderATEVET17.onmicrosoft.com.",
+        "question": "What other suspicious activity was performed by the same client application?",
+        "answer": "Enumerate users and applications using Microsoft Graph API",
+        "solution": [
+            "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. This ID is logged in with IP address: 72.43.121.34.",
+            "3. The same IP address is making requests to the Microsoft Graph API for both users and applications."
+        ],
+        "tables": [
+            "OfficeActivity",
+            "AADServicePrincipalSignInLogs",
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "4",
+        "end_node": "14",
+        "hop": "4"
+    },
+    {
+        "difficulty": "Easy",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
+        "question": "What is the IP address associated with the authentication events?",
+        "answer": "72.43.121.34",
+        "tables": [
+            "SigninLogs"
+        ],
+        "start_node": "10",
+        "end_node": "8",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
+        "question": "A client application is authenticatd from the IP address, what is the Client Application ID?",
+        "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+        "solution": [
+            "1. Identify the IP address to be 72.43.121.34",
+            "2. Identify Client Application ID from OfficeActivity as 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf'."
+        ],
+        "tables": [
+            "SigninLogs",
+            "AADServicePrincipalSignInLogs",
+            "OfficeActivity"
+        ],
+        "start_node": "10",
+        "end_node": "3",
+        "hop": "3",
+        "human modified": true
+    },
+    {
+        "difficulty": "Hard",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
+        "question": "From the same IP address, a client application is using a Microsoft service to access the mailbox. What is that service?",
+        "answer": "Microsoft Graph API",
+        "solution": [
+            "1. Identify the IP address to be 72.43.121.34.",
+            "2. Identify Client Application ID to be 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf' from the same IP address.",
+            "3. Check OfficeActivity to find that `Microsoft Graph API` is used to access the mailbox."
+        ],
+        "tables": [
+            "SigninLogs",
+            "AADServicePrincipalSignInLogs",
+            "OfficeActivity"
+        ],
+        "start_node": "10",
+        "end_node": "1",
+        "hop": "3",
+        "human modified": true
+    },
+    {
+        "difficulty": "Easy",
+        "context": "The IP address where a suspicious client application authenticated from was: 72.43.121.34",
+        "question": "What is the Client Application ID associated with this suspicious activity?",
+        "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+        "tables": [
+            "AADServicePrincipalSignInLogs"
+        ],
+        "start_node": "8",
+        "end_node": "3",
+        "hop": "1",
+        "human modified": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "The IP address where a suspicious client application authenticated from was: 72.43.121.34",
+        "question": "From the same IP address, a client application is using a Microsoft service to access the mailbox. What is that service?",
+        "answer": "Microsoft Graph API",
+        "solution": [
+            "1. Identify Client Application ID to be 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf' from the same IP address.",
+            "2. Check OfficeActivity to find that `Microsoft Graph API` is used to access the mailbox."
+        ],
+        "tables": [
+            "AADServicePrincipalSignInLogs",
+            "OfficeActivity"
+        ],
+        "start_node": "8",
+        "end_node": "1",
+        "hop": "2",
+        "human modified": true
+    },
+    {
+        "difficulty": "Easy",
+        "context": "A suspicious client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf has been identified to read emails with a Microsoft service.",
+        "question": "What is the service used?",
+        "answer": "Microsoft Graph API",
+        "tables": [
+            "OfficeActivity"
+        ],
+        "start_node": "3",
+        "end_node": "1",
+        "hop": "1",
+        "human modified": true
+    },
+    {
+        "difficulty": "Hard",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
+        "question": "There is a supsicious email reading event associated with this password spray attack. What is the email address of the mailbox that was accessed?",
+        "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
+        "solution": [
+            "1. Check SigninLogs for the same IP address: 72.43.121.34.",
+            "2. Identify ClientAppId: bb77fe0b-52af-4f26-9bc7-19aa48854ebf for this IP address.",
+            "3. Check OfficeActivity for Graph API mail read events using ClientAppId.",
+            "4. The user's mailbox accessed is mmelendez@DefenderATEVET17.onmicrosoft.com."
+        ],
+        "tables": [
+            "SigninLogs",
+            "AADServicePrincipalSignInLogs",
+            "OfficeActivity"
+        ],
+        "start_node": "10",
+        "end_node": "4",
+        "hop": 3
+    },
+    {
+        "difficulty": "Medium",
+        "context": "There is likely a passowrd spray attack from IP address 72.43.121.34.",
+        "question": "From this IP address, whose mailbox was accessed?",
+        "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
+        "solution": [
+            "1. Check AADServicePrincipalSignInLogs for ClientAppId: bb77fe0b-52af-4f26-9bc7-19aa48854ebf for IP address 72.43.121.34.",
+            "2. Check OfficeActivity for Graph API mail read events using this ClientAppId.",
+            "3. The user's mailbox accessed is mmelendez@DefenderATEVET17.onmicrosoft.com."
+        ],
+        "tables": [
+            "AADServicePrincipalSignInLogs",
+            "OfficeActivity"
+        ],
+        "start_node": "8",
+        "end_node": "4",
+        "hop": 2
+    },
+    {
+        "difficulty": "Easy",
+        "context": "The client application ID used in the investigation is bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+        "question": "Which user's mailbox was accessed using this client application ID?",
+        "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
+        "tables": [
+            "OfficeActivity"
+        ],
+        "start_node": "3",
+        "end_node": "4",
+        "hop": 1
+    },
+    {
+        "difficulty": "Medium",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
+        "question": "From the same IP address, a client application was authenticated. What is the object ID associated with this client application?",
+        "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "solution": [
+            "1. The authenticated account was associated with IP address 72.43.121.34.",
+            "2. The IP address corresponds to the ClientAppId bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. The ClientAppId is linked to ObjectId 47dee0a2-d662-4664-acfa-a28bb62bdbc0."
+        ],
+        "tables": [
+            "SigninLogs",
+            "AADServicePrincipalSignInLogs",
+            "SecurityExposureManagement"
+        ],
+        "start_node": "10",
+        "end_node": "6",
+        "hop": "3",
+        "human modified": true
+    },
+    {
+        "difficulty": "Hard",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
+        "question": "Were there any changes made to the application registration right before it authenticated?",
+        "answer": "New credentials were added",
+        "solution": [
+            "1. The authenticated account was associated with IP address 72.43.121.34.",
+            "2. The IP address corresponds to the ClientAppId bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. The ClientAppId is linked to ObjectId 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "4. Check AuditLogs for the latest actions that have occurred to this application registration and find that new credentials were added."
+        ],
+        "tables": [
+            "SigninLogs",
+            "AADServicePrincipalSignInLogs",
+            "SecurityExposureManagement",
+            "AuditLogs"
+        ],
+        "start_node": "10",
+        "end_node": "12",
+        "hop": "4",
+        "additional modification": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "The IP address where a suspicious client application authenticated from is 72.43.121.34.",
+        "question": "What is the ObjectId of this client application?",
+        "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "solution": [
+            "1. The IP address 72.43.121.34 corresponds to the ClientAppId bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. The ClientAppId is linked to ObjectId 47dee0a2-d662-4664-acfa-a28bb62bdbc0."
+        ],
+        "tables": [
+            "AADServicePrincipalSignInLogs",
+            "SecurityExposureManagement"
+        ],
+        "start_node": "8",
+        "end_node": "6",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "The IP address where a suspicious client application authenticated from is 72.43.121.34.",
+        "question": "Were there any changes made to the application right before it authenticated?",
+        "answer": "New credentials were added",
+        "solution": [
+            "1. The IP address 72.43.121.34 corresponds to the ClientAppId bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. The ClientAppId is linked to ObjectId 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "3. Check AuditLogs for the latest actions that have occurred to this application registration and find that new credentials were added."
+        ],
+        "tables": [
+            "AADServicePrincipalSignInLogs",
+            "SecurityExposureManagement",
+            "AuditLogs"
+        ],
+        "start_node": "8",
+        "end_node": "12",
+        "hop": "3",
+        "additional modification": true
+    },
+    {
+
+        "difficulty": "Medium",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successf with this IP address.",
+        "question": "What other suspicious activities are being performed from the same IP address?",
+        "answer": "The same IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "solution": [
+            "1. Multiple users are authenticating from the same IP address but failed. One account successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
+            "2. Investigate IP address 72.43.121.34 for additional suspicious activities in SignInLogs.",
+            "3. The same IP address is making requests to the Microsoft Graph API for both users and applications."
+        ],
+        "tables": [
+            "SigninLogs",
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "10",
+        "end_node": "14",
+        "hop": "3",
+        "human modified": true
+    },
+    {
+        "difficulty": "Medium",
+        "context": "New credentials were added to a application registration right before it authenticated.",
+        "question": "What is the ObjectId associated with the application that had changes made to its registration?",
+        "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "tables": [
+            "AuditLogs"
+        ],
+        "start_node": "12",
+        "end_node": "6",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "New credentials were added to a application registration right before it authenticated.",
+        "question": "What is the ClientAppId associated with the application where changes were made to its registration?",
+        "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+        "solution": [
+            "1. Identify the ObjectId associated with the application to be 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "2. Use the ObjectId to find the ClientAppId associated with this application: bb77fe0b-52af-4f26-9bc7-19aa48854ebf."
+        ],
+        "tables": [
+            "AuditLogs",
+            "SecurityExposureManagement"
+        ],
+        "start_node": "12",
+        "end_node": "3",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "New credentials were added to the application registration right before it authenticated.",
+        "question": "What suspicious activity was noted involving the application with new credentials added to its registration?",
+        "answer": "Suspicious email reading event using Graph API through a previously unknown application registration.",
+        "solution": [
+            "1. Find the latest actions in the AuditLogs for the application registration.",
+            "2. Identify the ObjectId associated with the application.",
+            "3. Query the SecurityExposureManagement table to find more information about the client app with that ObjectId.",
+            "4. Determine the ClientAppId for the application.",
+            "5. Check the OfficeActivity table for mail read events involving the ClientAppId.",
+            "6. Identify any suspicious activity related to the ClientAppId."
+        ],
+        "tables": [
+            "AuditLogs",
+            "SecurityExposureManagement",
+            "OfficeActivity"
+        ],
+        "start_node": "12",
+        "end_node": "1",
+        "hop": "3",
+        "Need Review": true
+    },
+    {
+        "difficulty": "Easy",
+        "context": "ObjectId associated with the application where changes were made to its registration.",
+        "question": "What is the ClientAppId associated with the application with ObjectId 47dee0a2-d662-4664-acfa-a28bb62bdbc0?",
+        "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+        "tables": [
+            "SecurityExposureManagement"
+        ],
+        "start_node": "6",
+        "end_node": "3",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "New credentials were added to an application with ID bb77fe0b-52af-4f26-9bc7-19aa48854ebf right before it authenticated. And then it was used to read emails with a Microsoft service.",
+        "question": "What is that service?",
+        "answer": "Microsoft Graph API",
+        "solution": [
+            "1. Identify Client Application ID to be 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf' associated with the object ID.",
+            "2. Check OfficeActivity to find that `Microsoft Graph API` is used to access the mailbox."
+        ],
+
+        "tables": [
+            "OfficeActivity"
+        ],
+        "start_node": "6",
+        "end_node": "1",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "We learn that certain changes were made against the application. Specifically, new credentials were added to the application registration right before it authenticated.",
+        "question": "The same application was used to read emails. Who is the mailbox owner whose account was accessed during this incident?",
+        "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
+        "solution": [
+            "1. Check `AuditLogs` for actions related to application registration changes to find the ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "3. Further investigation into this client's app reveals its Client ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "4. Mail reading activity linked to Graph API's app reveals the owner's mailbox UPN: mmelendez@DefenderATEVET17.onmicrosoft.com."
+        ],
+        "tables": [
+            "AuditLogs",
+            "SecurityExposureManagement",
+            "OfficeActivity"
+        ],
+        "start_node": "12",
+        "end_node": "4",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "A client applicaton with object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0 is found to perform a suspicious email reading event.",
+        "question": "Who is the mailbox owner whose account was accessed during this incident?",
+        "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
+        "solution": [
+            "1. Find the associated client app ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. Mail reading activity linked to Graph API's app reveals the mailbox owner UPN: mmelendez@DefenderATEVET17.onmicrosoft.com."
+        ],
+        "tables": [
+            "SecurityExposureManagement",
+            "OfficeActivity"
+        ],
+        "start_node": "6",
+        "end_node": "4",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "Certain changes were made against the application, including the addition of new credentials right before it authenticated.",
+        "question": "what is the IP address involved in the suspicious activities detected in the application changes?",
+        "answer": "72.43.121.34",
+        "solution": [
+            "1. Identify modifications or updates to the application registration from AuditLogs to find the client application's Object ID is 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "2. Identify the corresponding `ClientAppId` to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. Check authentication of the client application and find the IP address is 72.43.121.34."
+        ],
+        "tables": [
+            "AuditLogs",
+            "SecurityExposureManagement",
+            "AADServicePrincipalSignInLogs"
+        ],
+        "start_node": "12",
+        "end_node": "8",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "Certain changes were made against an application, including the addition of new credentials right before it authenticated.",
+        "question": "Which technique did this attacker used to gain initial access to the tenant?",
+        "answer": "password spray attack",
+        "solution": [
+            "1. Identify modifications or updates to the application registration from AuditLogs to find the client application's Object ID is 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
+            "2. Identify the corresponding `ClientAppId` to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. The IP address for the authentication of the client app is 72.43.121.34.",
+            "4. Multiple users attempted to authenticate from this IP address, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded. The attacker used password spray attack to gain access to the tenant."
+        ],
+        "tables": [
+            "AuditLogs",
+            "SecurityExposureManagement",
+            "AADServicePrincipalSignInLogs",
+            "SigninLogs"
+        ],
+        "start_node": "12",
+        "end_node": "10",
+        "hop": "4"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "We learn that certain changes were made against the application with ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0. Specifically, new credentials were added to the application registration right before it authenticated.",
+        "question": "what is the IP address involved in the authentication of this application?",
+        "answer": "72.43.121.34",
+        "solution": [
+            "1. Find the `ClientAppId` to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. The IP address for that authentication is 72.43.121.34."
+        ],
+        "tables": [
+            "SecurityExposureManagement",
+            "AADServicePrincipalSignInLogs"
+        ],
+        "start_node": "6",
+        "end_node": "8",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "We learn that certain changes were made against the application with ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0. Specifically, new credentials were added to the application registration right before it authenticated.",
+        
+        "question": "Which technique did this attacker used to gain initial access to the tenant?",
+        "answer": "password spray attack",
+        "solution": [
+            "1. Identify the corresponding `ClientAppId` to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "2. The IP address for the authentication of the client app is 72.43.121.34.",
+            "3. Multiple users attempted to authenticate from this IP address, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded. The attacker used password spray attack to gain access to the tenant."
+        ],
+        "tables": [
+            "SecurityExposureManagement",
+            "AADServicePrincipalSignInLogs",
+            "SigninLogs"
+        ],
+        "start_node": "6",
+        "end_node": "10",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "We learn that certain changes were made against the application. Specifically, new credentials were added to the application registration right before it authenticated.",
+        "question": "What kind of suspicious activities were performed by the same IP address that made changes to the application?",
+        "answer": "The same IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "solution": [
+            "1. Check the audit logs to identify modifications to the application registration.",
+            "2. Obtain the ObjectId related to the client app.",
+            "3. Use the ObjectId to find more information about the client app from the SecurityExposureManagement table.",
+            "4. Identify the ClientAppId associated with suspicious activities.",
+            "5. Check for the latest authentication events from the AADServicePrincipalSignInLogs.",
+            "6. Identify the IP address used for these authentication events.",
+            "7. Investigate Microsoft Graph API requests from the same IP address."
+        ],
+        "tables": [
+            "AuditLogs",
+            "SecurityExposureManagement",
+            "AADServicePrincipalSignInLogs",
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "12",
+        "end_node": "14",
+        "hop": "4",
+        "additional modification": true
+    },
+    {
+        "difficulty": "Hard",
+        "context": "ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "question": "What kind of suspicious activities were performed by the same IP address associated with ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0?",
+        "answer": "The same IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "solution": [
+            "1. Use the ObjectId to find more information about the client app from the SecurityExposureManagement table.",
+            "2. Identify the ClientAppId associated with suspicious activities.",
+            "3. Check for the latest authentication events from the AADServicePrincipalSignInLogs.",
+            "4. Identify the IP address used for these authentication events.",
+            "5. Investigate Microsoft Graph API requests from the same IP address."
+        ],
+        "tables": [
+            "SecurityExposureManagement",
+            "AADServicePrincipalSignInLogs",
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "6",
+        "end_node": "14",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "The same IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "question": "What is the IP address of the user that is involved in the suspicious activity?",
+        "answer": "72.43.121.34",
+        "solution": [
+            "1. The IP address used for multiple requests to the Microsoft Graph API is *found in the same IP activity* logs.",
+            "The IP address is identified: 72.43.121.34."
+        ],
+        "tables": [
+            "MicrosoftGraphActivityLogs"
+        ],
+        "start_node": "14",
+        "end_node": "8",
+        "hop": "1"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "The same IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "question": "What is the Client Application ID that authenticated from the suspicious IP address in use for Microsoft Graph API?",
+        "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+        "solution": [
+            "1. The IP address used for multiple requests to the Microsoft Graph API is identified: 72.43.121.34.",
+            "2. Using the `AADServicePrincipalSignInLogs`, the ClientAppId of the suspicious activity is found: bb77fe0b-52af-4f26-9bc7-19aa48854ebf."
+        ],
+        "tables": [
+            "MicrosoftGraphActivityLogs",
+            "AADServicePrincipalSignInLogs"
+        ],
+        "start_node": "14",
+        "end_node": "3",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "The same IP address is making requests to the Microsoft Graph API for both users and applications through a client application.",
+        "question": "What other suspicious activity was performed by the same client application?",
+        "answer": "Emails read with Graph API through a previously unknown application registration.",
+        "solution": [
+            "1. The IP address used for multiple requests to the Microsoft Graph API is identified: 72.43.121.34.",
+            "2. Using the `AADServicePrincipalSignInLogs`, the ClientAppId of the suspicious activity is found: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. Check table `OfficeActivity` for activities involving mail reading: The suspicious activity is identified as an unknown application registration reading emails through Graph API."
+        ],
+        "tables": [
+            "MicrosoftGraphActivityLogs",
+            "AADServicePrincipalSignInLogs",
+            "OfficeActivity"
+        ],
+        "start_node": "14",
+        "end_node": "1",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "The same IP address is making requests to the Microsoft Graph API for both users and applications through a client application.",
+        "question": "The client application is also used in a suspicious email reading event. What is the email address of the mailbox that was accessed?",
+        "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
+        "solution": [
+            "1. Identify the IP address making requests: 72.43.121.34.",
+            "2. Review the authentication events for this IP address and identify the client application ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. Use the identified ClientAppId to query mail read events and find the relevant mailbox owner's UPN: mmelendez@DefenderATEVET17.onmicrosoft.com."
+        ],
+        "tables": [
+            "MicrosoftGraphActivityLogs",
+            "AADServicePrincipalSignInLogs",
+            "OfficeActivity"
+        ],
+        "start_node": "14",
+        "end_node": "4",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "One suspicious IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "question": "From the same IP address, which technique did this attacker used to gain initial access to the tenant?",
+        "answer": "password spray attack",
+        "solution": [
+            "1. This ID logged in from IP address 72.43.121.34.",
+            "2. Multiple users attempted to authenticate from this IP address, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded. The attacker used password spray attack to gain access to the tenant."
+        ],
+        "tables": [
+            "MicrosoftGraphActivityLogs",
+            "SigninLogs"
+        ],
+        "start_node": "14",
+        "end_node": "10",
+        "hop": "2"
+    },
+    {
+        "difficulty": "Medium",
+        "context": "One IP address is making requests to the Microsoft Graph API for both users and applications. It was laso used to authenticate a client application.",
+        "question": "What is the ObjectId associated with the application that had changes made to its registration?",
+        "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
+        "solution": [
+            "1. The IP address involved is 72.43.121.34, which is making these suspicious requests.",
+            "2. This activity is associated with a client application ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
+            "3. Further investigation reveals more information about this client application ID, including the ObjectId."
+        ],
+        "tables": [
+            "MicrosoftGraphActivityLogs",
+            "AADServicePrincipalSignInLogs",
+            "SecurityExposureManagement"
+        ],
+        "start_node": "14",
+        "end_node": "6",
+        "hop": "3"
+    },
+    {
+        "difficulty": "Hard",
+        "context": "The same IP address is making requests to the Microsoft Graph API for both users and applications.",
+        "question": "What specific changes were made to the application registration that used the suspicious IP?",
+        "answer": "New credentials were added to the application registration right before it authenticated.",
+        "solution": [
+            "1. The IP address involved is 72.43.121.34, which is making these suspicious requests.",
+            "2. This activity is associated with a client application ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
+            "3. Further investigation reveals more information about this client application ID, including the ObjectId.",
+            "4. Finally, checking the audit logs for modifications or updates right before the authentication leads to discovering that new credentials were added to the application registration."
+        ],
+        "tables": [
+            "MicrosoftGraphActivityLogs",
+            "AADServicePrincipalSignInLogs",
+            "SecurityExposureManagement",
+            "AuditLogs"
+        ],
+        "start_node": "14",
+        "end_node": "12",
+        "hop": "4"
+    }
+]

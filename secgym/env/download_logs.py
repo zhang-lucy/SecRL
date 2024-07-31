@@ -5,7 +5,6 @@ from datetime import timedelta, datetime, timezone
 from azure.monitor.query import LogsQueryClient, LogsQueryStatus
 from azure.core.exceptions import HttpResponseError
 from azure.identity import DefaultAzureCredential
-from utils import to_abs_path
 
 credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
@@ -99,7 +98,7 @@ LIST_TABLES = [
 
 if __name__ == "__main__":
 
-    file_path = to_abs_path("data/addcomp_jul25")
+    file_path = os.path.join(os.path.dirname(__file__), "data/addcomp_jul25")
     start_time = datetime(2024, 7, 25, 15, 0, 0, 0, tzinfo=timezone.utc)
 
     # for 3 hours
