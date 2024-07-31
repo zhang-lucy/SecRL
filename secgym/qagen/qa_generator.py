@@ -1,87 +1,8 @@
-# <node id="1">
-#   <data key="d0">IoC</data>
-#   <data key="d1">There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.</data>
-# </node>
-# <node id="2">
-#   <data key="d0">Investigation</data>
-#   <data key="d1">Check table `OfficeActivity` with Graph API's id for mail read events.</data>
-#   <data key="d2">OfficeActivity</data>
-#   <data key="d3">OfficeActivity | where Operation == 'MailItemsAccessed' and AppId == '00000003-0000-0000-c000-000000000000'</data>
-# </node>
-# <node id="3">
-#   <data key="d0">IoC</data>
-#   <data key="d1">ClientAppId: bb77fe0b-52af-4f26-9bc7-19aa48854ebf</data>
-# </node>
-# <node id="4">
-#   <data key="d0">IoC</data>
-#   <data key="d1">MailboxOwnerUPN: mmelendez@DefenderATEVET17.onmicrosoft.com</data>
-#   <data key="d4">The user's mailbox who was accessed.</data>
-# </node>
-# <node id="5">
-#   <data key="d0">Investigation</data>
-#   <data key="d1">Check table `SecurityExposureManagement` to find more information about the client app with that ID.</data>
-#   <data key="d2">SecurityExposureManagement</data>
-# </node>
-# <node id="6">
-#   <data key="d0">IoC</data>
-#   <data key="d1">ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0</data>
-# </node>
-# <node id="7">
-#   <data key="d0">Investigation</data>
-#   <data key="d1">Check `AADServicePrincipalSignInLogs` to identify the last time this client app with `ClientAppId` was authenticated.</data>
-#   <data key="d2">AADServicePrincipalSignInLogs</data>
-#   <data key="d3">AADServicePrincipalSignInLogs | where AppId == 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf'</data>
-# </node>
-# <node id="8">
-#   <data key="d0">IoC</data>
-#   <data key="d1">IPAddress: 72.43.121.34</data>
-#   <data key="d4">The IP Address where the service principal authenticated from.</data>
-# </node>
-# <node id="9">
-#   <data key="d0">Investigation</data>
-#   <data key="d1">Check `SigninLogs` for other authentication events from the same IP address.</data>
-#   <data key="d2">SigninLogs</data>
-#   <data key="d3">
-#     let ipAddress = "72.43.121.34";
-#     SigninLogs
-#         | where IPAddress == ipAddress
-#         | project TimeGenerated, IPAddress, UserPrincipalName, ResultType, ResultDescription, AuthenticationRequirement, ConditionalAccessStatus,  ResourceDisplayName, AppDisplayName, ResourceIdentity, ClientAppUsed, RiskLevelAggregated, RiskLevelDuringSignIn, RiskState, RiskEventTypes
-#     </data>
-# </node>
-# <node id="10">
-#   <data key="d0">IoC</data>
-#   <data key="d1">Multiple users are authenticating from the same IP address but failed. One account successfully authenticated: mvelazco@defender...</data>
-# </node>
-# <node id="11">
-#   <data key="d0">Investigation</data>
-#   <data key="d1">Check `AuditLogs` for the latest actions that have occurred to this application registration: modifications, updates, etc.</data>
-#   <data key="d2">AuditLogs</data>
-#   <data key="d3">
-#     AuditLogs
-#     | mv-expand TargetResource = TargetResources
-#     | extend TargetResourceJson = parse_json(TargetResource)
-#     | where TargetResourceJson.id == '47dee0a2-d662-4664-acfa-a28bb62bdbc0'
-#     </data>
-# </node>
-# <node id="12">
-#   <data key="d0">IoC</data>
-#   <data key="d1">We learn that there were certain changes made against the application, specifically new credentials were added to the application registration right before it authenticated.</data>
-# </node>
-# <node id="13">
-#   <data key="d0">Investigation</data>
-#   <data key="d1">Check other activities with the same IP address, like Microsoft Graph API requests.</data>
-#   <data key="d2">MicrosoftGraphActivityLogs</data>
-#   <data key="d3">
-#     MicrosoftGraphActivityLogs
-#     | where RequestUri endswith '/users' or RequestUri endswith '/applications'  
-#     | where IPAddress == '72.43.121.34'
-#     </data>
-# </node>
-# <node id="14">
-#   <data key="d0">IoC</data>
-#   <data key="d1">We find that the same IP address is making requests to the Microsoft Graph API for both users and applications.</data>
-# </node>
-
+from secgym.utils import LLM_call
+from textwrap import dedent
+import networkx as nx
+import json
+import os
 
 QAGEN_PROMPT = """Given an investigation path, please generate a list of questions from it.
 The path is consists of a series of nodes with two types: Investigation and IoC. 
@@ -191,11 +112,6 @@ Your Response
 }
 """
 
-from secgym.utils import LLM_call
-from textwrap import dedent
-import networkx as nx
-import json
-import os
 
 class QAGenerator:
     def __init__(self, graphml_file, question_file, config_list):
@@ -301,15 +217,3 @@ class QAGenerator:
                     with open(self.question_file, 'w') as file:
                         json.dump(self.questions_list, file, indent=4)
 
-# Usage Example
-from secgym.myconfig import config_list_4o
-graphml_file = './aad_comprise/graph.graphml'
-config_list = []
-
-qa_generator = QAGenerator(
-    graphml_file=graphml_file,
-    question_file='./aad_comprise_qa.json',
-    config_list=config_list_4o
-)
-questions_dict = qa_generator.generate_questions()
-print(questions_dict)

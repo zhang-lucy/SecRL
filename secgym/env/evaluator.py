@@ -3,7 +3,7 @@ import json
 import os
 import re
 from secgym.myconfig import config_list_4o
-from secgym.env.utils import msging, to_abs_path, get_full_question
+from secgym.utils import msging, get_full_question
 
 from textwrap import dedent
 CHECK_ANSWER_PROMPT = dedent("""Given a golden answer and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
@@ -81,7 +81,11 @@ class Evaluator:
                 if b == "True":
                     return score
                 score *= discount_factor
-            
+
+            # 1 2 3 4
+            # False  False False True -> 1
+            # False False True  False -> 0.3
+            # True True True False -> 0.3     # 0.3 + 0.09 + 0.027 = 0.417
             # all false
             return 0
 
@@ -123,19 +127,20 @@ class Evaluator:
 
 
 
-if __name__ == '__main__':
-    print('***** Run Evaluator *****')
-    qa_path = to_abs_path("../env/questions/aad_comprise_qa.json")
-    with open(qa_path, "r") as f:
-        qas = json.load(f)
-    for q in qas:
-        if q['type'] == "single response":
-            continue
-        criteria = criteria_creator(q)
-        if criteria:
-            print(criteria)
-            q.update(criteria)
-        print("=="*50)
+# if __name__ == '__main__':
+#     print('***** Run Evaluator *****')
+#     curr_path = os.path.dirname(__file__)
+#     qa_path = os.path.join(curr_path, "../env/questions/aad_comprise_qa.json")
+#     with open(qa_path, "r") as f:
+#         qas = json.load(f)
+#     for q in qas:
+#         if q['type'] == "single response":
+#             continue
+#         criteria = criteria_creator(q)
+#         if criteria:
+#             print(criteria)
+#             q.update(criteria)
+#         print("=="*50)
 
-    with open(qa_path, "w") as f:
-        json.dump(qas, f, indent=4)
+#     with open(qa_path, "w") as f:
+#         json.dump(qas, f, indent=4)
