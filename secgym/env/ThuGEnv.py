@@ -36,22 +36,26 @@ class ThuGEnv(gym.Env):
             attack: Union[str, int],
             config_list: List[Dict] = None,
             noise_level: int = 0,
+            save_file: Union[str, bool] = True,
             max_steps: int = 15,
             container_name: str = "mysql-container",
             dataset_name: str = "env_monitor_db",
-            save_file = None,
             port: str = "3306",
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
 
-        if not save_file:
-            os.makedirs("results", exist_ok=True)
-            # + datetime.now().strftime("%Y%m%d%H%M%S")
-            curr_time = datetime.now().strftime("%Y%m%d-%H%M%S")
-            self.save_file = f"results/{attack}_noise_{noise_level}_{curr_time}.json"
+        if save_file is False:
+            print("Warning: No save file provided. Logging will not be saved.")
         else:
-            self.save_file = save_file
+            if isinstance(save_file, bool):            
+                os.makedirs("results", exist_ok=True)
+                # + datetime.now().strftime("%Y%m%d%H%M%S")
+                curr_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+                self.save_file = f"results/{attack}_noise_{noise_level}_{curr_time}.json"
+            else:
+                self.save_file = save_file
+        print(self.save_file)
 
         # set up container
         self.container_name = container_name
@@ -87,7 +91,6 @@ class ThuGEnv(gym.Env):
 
         # evaluator
         self.evaluator = Evaluator(config_list=config_list)
-
 
     def get_attack_list(self):
         """Get the list of attacks.
@@ -129,8 +132,9 @@ class ThuGEnv(gym.Env):
         }
     
     def save_logging(self):
-        with open(self.save_file, "w") as f:
-            json.dump(self.all_logs, f, indent=4)
+        if self.save_file:
+            with open(self.save_file, "w") as f:
+                json.dump(self.all_logs, f, indent=4)
 
 
     def execute_query(self, query: str) -> Tuple[np.ndarray, bool]:

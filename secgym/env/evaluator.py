@@ -68,10 +68,14 @@ class Evaluator:
             # print(f"Question: {question.get('context', '')} {question['question']}\n")
             response = self.client.create(messages=messages, response_format= { "type": "json_object" })
             response = response.choices[0].message.content
+            
+            print("Ground Truth Solution:")
+            for k in question["solution"]:
+                print(k)
             print(f"-----> Solution Evaluation Result:\n {response}\n--------------------")
             response = json.loads(response)
 
-            discount_factor = 0.5
+            discount_factor = 0.4
             # reverse the response
             score = 1
 
@@ -96,7 +100,7 @@ class Evaluator:
             msging(EVAL_ANSWER_TEMPLATE.format(question=get_full_question(question), golden_answer=question["answer"], submitted_answer=submitted_answer), role="user")
         ])
         response = response.choices[0].message.content
-
+        print("Ground Truth Answer:", question["answer"])
         print(f"-----> Answer Evaluation Result: {response}")
         if response == "True":
             return 1
