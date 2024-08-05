@@ -133,11 +133,11 @@
         "difficulty": "Hard",
         "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
         "question": "New credentials were added to the application registration before it authenticated. What is the last time this application' credentials were modified?",
-        "answer": "7/25/2024, 16:17:21.9706",
+        "answer": "7/25/2024, 16:17:21.970600+00:00",
         "solution": [
             "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
             "2. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
-            "3. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.9706."
+            "3. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.970600+00:00."
         ],
         "tables": [
             "OfficeActivity",
@@ -168,10 +168,10 @@
         "difficulty": "Medium",
         "context": "The client application ID was identified to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
         "question": "New credentials were added to the application registration before it authenticated. What is the last time this application' credentials were modified?",
-        "answer": "7/25/2024, 16:17:21.9706",
+        "answer": "7/25/2024, 16:17:21.970600+00:00",
         "solution": [
             "1. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
-            "2. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.9706."
+            "2. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.970600+00:00."
         ],
         "tables": [
             "SecurityExposureManagement",
@@ -187,7 +187,7 @@
         "difficulty": "Easy",
         "context": "The Object ID of the suspicious application was identified to be 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
         "question": "New credentials were added to the application registration before it authenticated. What is the last time this application' credentials were modified?",
-        "answer": "7/25/2024, 16:17:21.9706",
+        "answer": "7/25/2024, 16:17:21.970600+00:00",
         "tables": [
             "AuditLogs"
         ],
@@ -267,7 +267,7 @@
     {
         "difficulty": "Easy",
         "context": "There is a suspicious access to this email: mmelendez@DefenderATEVET17.onmicrosoft.com with a client application.",
-        "question": "What is the ID of the client application that accessed the mailbox?",
+        "question": "What is the client ID of the client application that accessed the mailbox?",
         "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
         "tables": [
             "OfficeActivity"
@@ -275,7 +275,7 @@
         "start_node": 4,
         "end_node": 3,
         "hop": 1,
-        "hint": "1. Check `OfficeActivity` with the AppId of Microsoft Graph API for mail read events.\n2. Filter the results by the MailboxOwnerUPN to identify the client application that accessed the mailbox."
+        "hint": "1. Check `OfficeActivity` with the AppId of Microsoft Graph API for mail read events, filter the results by the MailboxOwnerUPN to identify the client application id."
     },
     {
         "difficulty": "Medium",
@@ -313,7 +313,7 @@
         "start_node": 4,
         "end_node": 10,
         "hop": 3,
-        "hint": "1. Check `OfficeActivity` for mail read events to find the `ClientAppId` used in the suspicious access.\n2. With the `ClientAppId`, check `AADServicePrincipalSignInLogs` to identify the IP address where the client app authenticated.\n3. Check `SigninLogs` to find other authentication events from the same IP address, and summarize the authentication methods and attempts used."
+        "hint": "1. Check `OfficeActivity` for mail read events to find the `ClientAppId` used in the suspicious access.\n2. With the `ClientAppId`, check `AADServicePrincipalSignInLogs` to identify the IP address where the client app authenticated.\n3. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
     },
     {
         "difficulty": "Medium",
@@ -337,11 +337,11 @@
         "difficulty": "Hard",
         "context": "A client application was used to access the user's mailbox: mmelendez@DefenderATEVET17.onmicrosoft.com.",
         "question": "New credentials were added to the application registration before this email reading event. What is the last time this application' credentials were modified?",
-        "answer": "7/25/2024, 16:17:21.970600+00:00",
+        "answer": "7/25/2024, 16:17:21.970600+00:0000+00:00",
         "solution": [
             "1. The client's application ID is found from the email read events to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
             "2. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
-            "3. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.9706."
+            "3. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.970600+00:00."
         ],
         "tables": [
             "OfficeActivity",
@@ -553,12 +553,12 @@
         "difficulty": "Hard",
         "context": "Multiple users are authenticating from the same IP address but failed. The same IP address is used to authenticate a client application.",
         "question": "New credentials were added to the application registration before this email reading event. What is the last time this application's credentials were modified?",
-        "answer": "7/25/2024, 16:17:21.9706",
+        "answer": "7/25/2024, 16:17:21.970600+00:00",
         "solution": [
             "1. The authenticated account was associated with IP address 72.43.121.43.",
             "2. The client's application ID is found from the email read events to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
             "3. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
-            "4. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.9706."
+            "4. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.970600+00:00."
         ],
         "tables": [
             "SigninLogs",
@@ -594,11 +594,11 @@
         "difficulty": "Hard",
         "context": "The IP address where a suspicious client application authenticated from is 72.43.121.43.",
         "question": "New credentials were added to the application registration before this email reading event. What is the last time this application's credentials were modified?",
-        "answer": "7/25/2024, 16:17:21.9706",
+        "answer": "7/25/2024, 16:17:21.970600+00:00",
         "solution": [
             "1. The IP address 72.43.121.43 corresponds to the ClientAppId bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
             "2. The ClientAppId is linked to ObjectId 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
-            "3. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.9706."
+            "3. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.970600+00:00."
         ],
         "tables": [
             "AADServicePrincipalSignInLogs",
