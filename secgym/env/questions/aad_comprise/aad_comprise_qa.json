@@ -41,7 +41,7 @@
         "start_node": 1,
         "end_node": 8,
         "hop": 2,
-        "hint": "1. Check the `OfficeActivity` table to identify mail read events by Graph API using the provided AppId for Graph API ('00000003-0000-0000-c000-000000000000'). This will help identify the ClientAppId associated with the suspicious email reading.\n2. Use the `ClientAppId` to query the `AADServicePrincipalSignInLogs` table to find authentication events for the client application.\n3. From the `AADServicePrincipalSignInLogs`, extract the IP address associated with these authentication events."
+        "hint": "1. Check the `OfficeActivity` table to identify mail read events by Graph API using the provided AppId for Graph API ('00000003-0000-0000-c000-000000000000'). This will help identify the ClientAppId associated with the suspicious email reading.\n2. Use client app id to query the `AADServicePrincipalSignInLogs` table to find authentication events for the client application.\n3. From the `AADServicePrincipalSignInLogs`, extract the IP address associated with these authentication events."
     },
     {
         "difficulty": "Hard",
@@ -62,7 +62,7 @@
         "end_node": 10,
         "hop": 3,
         "human modified": true,
-        "hint": "1. Check the `OfficeActivity` table to find the client app's `ClientAppId` of the suspicious email reading event.\n2. Use the `ClientAppId` to check the `AADServicePrincipalSignInLogs` to identify the IP address where the client app authenticated.\n3. Investigate the `SigninLogs` to check for other authentication events from the same IP address.\n4. Determine if multiple users are attempting to authenticate from the same IP address. Identify the patterns and any successful authentication logs to understand the technique used by the attacker.\n\n"
+        "hint": "1. Check the `OfficeActivity` table to find the client app's `ClientAppId` of the suspicious email reading event.\n2. Use the client app's id to check the `AADServicePrincipalSignInLogs` to identify the IP address where the client app authenticated.\n3. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
     },
     {
         "difficulty": "Easy",
@@ -76,7 +76,7 @@
         "end_node": 8,
         "hop": 1,
         "human modified": true,
-        "hint": "1. Check `AADServicePrincipalSignInLogs` to identify the last time the client app with `ClientAppId` was authenticated.\n2. Investigate the event to find the IP address used during the authentication."
+        "hint": "1. Check `AADServicePrincipalSignInLogs` to identify the last time the client app with client app id was authenticated.\n2. Investigate the event to find the IP address used during the authentication."
     },
     {
         "difficulty": "Hard",
@@ -95,7 +95,7 @@
         "end_node": 10,
         "hop": 2,
         "human modified": true,
-        "hint": "1. Check `AADServicePrincipalSignInLogs` using the ClientAppId to find the IP address where the client application was authenticated.\n2. Use the identified IP address to check `SigninLogs` for other authentication events from the same IP address.\n3. Verify if multiple users are authenticating from the same IP address and investigate the successful authentication events."
+        "hint": "1. Check `AADServicePrincipalSignInLogs` using the ClientAppId to find the IP address where the client application was authenticated.\n3. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
     },
     {
         "difficulty": "Easy",
@@ -122,17 +122,17 @@
         ],
         "tables": [
             "OfficeActivity",
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 1,
         "end_node": 6,
         "hop": 2,
-        "hint": "1. Check the `OfficeActivity` table for mail read events using the Graph API's ID (`00000003-0000-0000-c000-000000000000`).\n2. Identify the `ClientAppId` associated with the suspicious email reading event.\n3. Use the identified `ClientAppId` to check the `SecurityExposureManagement` table for more information about the client application, including the `ObjectId`."
+        "hint": "1. Check the `OfficeActivity` table for mail read events using the Graph API's ID (`00000003-0000-0000-c000-000000000000`).\n2. Identify the `ClientAppId` associated with the suspicious email reading event.\n3. Use the identified client app id to check the `AppRegistrationList` table for more information about the client application, including the `ObjectId`."
     },
     {
         "difficulty": "Hard",
         "context": "There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.",
-        "question": "New credentials were added to the application registration before it authenticated. What is the last time this application' credentials were modified?",
+        "question": "New credentials were added to the application registration before it authenticated. What is the last time this application's certificates were modified?",
         "answer": "7/25/2024, 16:17:21.970600+00:00",
         "solution": [
             "1. The email is read by client application with ID: bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
@@ -141,14 +141,14 @@
         ],
         "tables": [
             "OfficeActivity",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AuditLogs"
         ],
         "start_node": 1,
         "end_node": 12,
         "hop": 3,
         "human modified": true,
-        "hint": "1. Check the `OfficeActivity` table for mail read events using the AppId of the Microsoft Graph API.\n2. Locate the ClientAppId from the mail read events.\n3. Use the `SecurityExposureManagement` table to find more information about the client app with the identified ClientAppId.\n4. With the ObjectId obtained, check the `AuditLogs` table for the latest actions such as modifications or updates to the application registration."
+        "hint": "1. Check the `OfficeActivity` table for mail read events using the AppId of the Microsoft Graph API.\n2. Locate the ClientAppId from the mail read events.\n3. Use the `AppRegistrationList` table to find more information about the client app with the identified ClientAppId.\n4. With the ObjectId obtained, check the `AuditLogs` table for the latest actions such as modifications or updates to the application registration."
     },
     {
         "difficulty": "Easy",
@@ -156,37 +156,37 @@
         "question": "What is the Object ID associated with this client application?",
         "answer": "47dee0a2-d662-4664-acfa-a28bb62bdbc0",
         "tables": [
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 3,
         "end_node": 6,
         "hop": 1,
         "human modified": true,
-        "hint": "1. Check the table `SecurityExposureManagement` to find more information about the client application with the ID 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf'.\n2. Look for the associated ObjectId in the results."
+        "hint": "1. Check the table `AppRegistrationList` to find more information about the client application with the ID 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf'.\n2. Look for the associated ObjectId in the results."
     },
     {
         "difficulty": "Medium",
         "context": "The client application ID was identified to be bb77fe0b-52af-4f26-9bc7-19aa48854ebf.",
-        "question": "New credentials were added to the application registration before it authenticated. What is the last time this application' credentials were modified?",
+        "question": "New credentials were added to the application registration before it authenticated. What is the last time this application's certificates were modified?",
         "answer": "7/25/2024, 16:17:21.970600+00:00",
         "solution": [
             "1. This client application ID is associated with Object ID: 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
             "2. Check AuditLogs for recent changes to this application registration, and find that new credentials were added to the application registration at 7/25/2024, 16:17:21.970600+00:00."
         ],
         "tables": [
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AuditLogs"
         ],
         "start_node": 3,
         "end_node": 12,
         "hop": 2,
         "human modified": true,
-        "hint": "1. Check `SecurityExposureManagement` to find the object ID of the client application using the ClientAppId.\n2. With the object ID, check `AuditLogs` for the latest actions such as modifications or updates to the application registration."
+        "hint": "1. Check `AppRegistrationList` to find the object ID of the client application using the ClientAppId.\n2. With the object ID, check `AuditLogs` for the latest actions such as modifications or updates to the application registration."
     },
     {
         "difficulty": "Easy",
         "context": "The Object ID of the suspicious application was identified to be 47dee0a2-d662-4664-acfa-a28bb62bdbc0.",
-        "question": "New credentials were added to the application registration before it authenticated. What is the last time this application' credentials were modified?",
+        "question": "New credentials were added to the application registration before it authenticated. What is the last time this application's certificates were modified?",
         "answer": "7/25/2024, 16:17:21.970600+00:00",
         "tables": [
             "AuditLogs"
@@ -293,7 +293,7 @@
         "start_node": 4,
         "end_node": 8,
         "hop": 2,
-        "hint": "1. Check `OfficeActivity` table to identify the `ClientAppId` associated with the mail read events for the mailbox.\n2. With the `ClientAppId`, check `AADServicePrincipalSignInLogs` to find the IP address from which the client application authenticated."
+        "hint": "1. Check `OfficeActivity` table to identify the `ClientAppId` associated with the mail read events for the mailbox.\n2. With the client app id, check `AADServicePrincipalSignInLogs` to find the IP address from which the client application authenticated."
     },
     {
         "difficulty": "Hard",
@@ -313,7 +313,7 @@
         "start_node": 4,
         "end_node": 10,
         "hop": 3,
-        "hint": "1. Check `OfficeActivity` for mail read events to find the `ClientAppId` used in the suspicious access.\n2. With the `ClientAppId`, check `AADServicePrincipalSignInLogs` to identify the IP address where the client app authenticated.\n3. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
+        "hint": "1. Check `OfficeActivity` for mail read events to find the `ClientAppId` used in the suspicious access.\n2. With the client app id, check `AADServicePrincipalSignInLogs` to identify the IP address where the client app authenticated.\n3. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
     },
     {
         "difficulty": "Medium",
@@ -326,12 +326,12 @@
         ],
         "tables": [
             "OfficeActivity",
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 4,
         "end_node": 6,
         "hop": 2,
-        "hint": "1. Check `OfficeActivity` to find the client application's ClientAppId for the mail read events.\n2. With the ClientAppId from the previous step, check `SecurityExposureManagement` to find the ObjectId associated with the client application."
+        "hint": "1. Check `OfficeActivity` to find the client application's ClientAppId for the mail read events.\n2. With the ClientAppId from the previous step, check `AppRegistrationList` to find the ObjectId associated with the client application."
     },
     {
         "difficulty": "Hard",
@@ -345,14 +345,14 @@
         ],
         "tables": [
             "OfficeActivity",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AuditLogs"
         ],
         "start_node": 4,
         "end_node": 12,
         "hop": 3,
         "human modified": true,
-        "hint": "1. Check the `OfficeActivity` table for mail read events with the Graph API's AppId ('00000003-0000-0000-c000-000000000000').\n2. Identify the `ClientAppId` used for the mailbox access event.\n3. Check the `SecurityExposureManagement` table to find more information about the client app using the `ClientAppId`.\n4. Use the `ObjectId` from the previous step to query the `AuditLogs` table.\n5. Look for the latest actions, modifications, or updates related to the application registration, specifically focusing on the addition of new credentials."
+        "hint": "1. Check the `OfficeActivity` table for mail read events with the Graph API's AppId ('00000003-0000-0000-c000-000000000000').\n2. Identify the `ClientAppId` used for the mailbox access event.\n3. Check the `AppRegistrationList` table to find more information about the client app using the client app's id.\n4. Use the `ObjectId` from the previous step to query the `AuditLogs` table.\n5. Look for the latest actions, modifications, or updates related to the application registration, specifically focusing on the addition of new credentials."
     },
     {
         "difficulty": "Hard",
@@ -372,7 +372,7 @@
         "start_node": 4,
         "end_node": 14,
         "hop": 4,
-        "hint": "1. Check `OfficeActivity` for mail read events using the Graph API's id ('00000003-0000-0000-c000-000000000000').\n2. Once you have identified the `ClientAppId`, check `AADServicePrincipalSignInLogs` to find where and when this client app was authenticated.\n3. Investigate `MicrosoftGraphActivityLogs` for other activities performed by the same client application, filtered by the identified IP address."
+        "hint": "1. Check `OfficeActivity` for mail read events using the Graph API's id ('00000003-0000-0000-c000-000000000000') with the id.\n2. Once you have identified the client app's id, check `AADServicePrincipalSignInLogs` to find where and when this client app was authenticated.\n3. Investigate `MicrosoftGraphActivityLogs` for other activities performed by the same client application, filtered by the identified IP address."
     },
     {
         "difficulty": "Easy",
@@ -541,13 +541,13 @@
         "tables": [
             "SigninLogs",
             "AADServicePrincipalSignInLogs",
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 10,
         "end_node": 6,
         "hop": 3,
         "human modified": true,
-        "hint": "1. Check `SigninLogs` to identify the IP address where multiple users are authenticating but failing and find if any user successfully authenticated.\n2. Use the identified IP address to check `AADServicePrincipalSignInLogs` and find the `ClientAppId` of the client application that authenticated from that IP address.\n3. With the `ClientAppId`, check `SecurityExposureManagement` to find the associated object ID of the client application."
+        "hint": "1. Check `SigninLogs` to identify the IP address where multiple users are authenticating but failing and find if any user successfully authenticated.\n2. Use the identified IP address to check `AADServicePrincipalSignInLogs` and find the `ClientAppId` of the client application that authenticated from that IP address.\n3. With the `ClientAppId`, check `AppRegistrationList` to find the associated object ID of the client application."
     },
     {
         "difficulty": "Hard",
@@ -563,14 +563,14 @@
         "tables": [
             "SigninLogs",
             "AADServicePrincipalSignInLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AuditLogs"
         ],
         "start_node": 10,
         "end_node": 12,
         "hop": 4,
         "human modified": true,
-        "hint": "1. Check `SigninLogs` for authentication events from a specified IP address where multiple users failed to authenticate.\n2. Check `AADServicePrincipalSignInLogs` using the `ClientAppId` to determine when this client app last authenticated.\n3. Check `SecurityExposureManagement` using the `ClientAppId` to gather more information about the client app.\n4. Finally, examine `AuditLogs` for the latest modifications, updates, or credential changes associated with the application registration using the `ObjectId`."
+        "hint": "1. Check `SigninLogs` for authentication events from a specified IP address where multiple users failed to authenticate.\n2. Check `AADServicePrincipalSignInLogs` using the `ClientAppId` to determine when this client app last authenticated.\n3. Check `AppRegistrationList` using the `ClientAppId` to gather more information about the client app.\n4. Finally, examine `AuditLogs` for the latest modifications, updates, or credential changes associated with the application registration using the `ObjectId`."
     },
     {
         "difficulty": "Medium",
@@ -583,12 +583,12 @@
         ],
         "tables": [
             "AADServicePrincipalSignInLogs",
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 8,
         "end_node": 6,
         "hop": 2,
-        "hint": "1. Check the `AADServicePrincipalSignInLogs` table to identify the `ClientAppId` of the client application that authenticated from IP address 72.43.121.43.\n2. With the `ClientAppId`, check the `SecurityExposureManagement` table to find more information, including the `ObjectId`, about the client application."
+        "hint": "1. Check the `AADServicePrincipalSignInLogs` table to identify the `ClientAppId` of the client application that authenticated from IP address 72.43.121.43.\n2. With the `ClientAppId`, check the `AppRegistrationList` table to find more information, including the `ObjectId`, about the client application."
     },
     {
         "difficulty": "Hard",
@@ -602,14 +602,14 @@
         ],
         "tables": [
             "AADServicePrincipalSignInLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AuditLogs"
         ],
         "start_node": 8,
         "end_node": 12,
         "hop": 3,
         "human modified": true,
-        "hint": "1. Check `AADServicePrincipalSignInLogs` to identify when the client app with the specified `ClientAppId` was authenticated.\n2. Use the `ClientAppId` to check `SecurityExposureManagement` for more details about the client application.\n3. Obtain the `ObjectId` of the client application from `SecurityExposureManagement`.\n4. Use the `ObjectId` to review `AuditLogs` for any recent modifications or updates to the application registration, such as newly added credentials."
+        "hint": "1. Check `AADServicePrincipalSignInLogs` to identify when the client app with the specified `ClientAppId` was authenticated.\n2. Use the `ClientAppId` to check `AppRegistrationList` for more details about the client application.\n3. Obtain the `ObjectId` of the client application from `AppRegistrationList`.\n4. Use the `ObjectId` to review `AuditLogs` for any recent modifications or updates to the application registration, such as newly added credentials."
     },
     {
         "difficulty": "Medium",
@@ -655,12 +655,12 @@
         ],
         "tables": [
             "AuditLogs",
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 12,
         "end_node": 3,
         "hop": 2,
-        "hint": "1. Check `AuditLogs` to identify the latest changes made to the application registration, focusing on modifications or updates tied to the provided ObjectId.\n2. Use `SecurityExposureManagement` to find further information about the client app using the identified ObjectId."
+        "hint": "1. Check `AuditLogs` to identify the latest changes made to the application registration, focusing on modifications or updates tied to the provided ObjectId.\n2. Use `AppRegistrationList` to find further information about the client app using the identified ObjectId."
     },
     {
         "difficulty": "Hard",
@@ -670,21 +670,21 @@
         "solution": [
             "1. Find the latest actions in the AuditLogs for the application registration.",
             "2. Identify the ObjectId associated with the application.",
-            "3. Query the SecurityExposureManagement table to find more information about the client app with that ObjectId.",
+            "3. Query the AppRegistrationList table to find more information about the client app with that ObjectId.",
             "4. Determine the ClientAppId for the application.",
             "5. Check the OfficeActivity table for mail read events involving the ClientAppId.",
             "6. Identify any suspicious activity related to the ClientAppId."
         ],
         "tables": [
             "AuditLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "OfficeActivity"
         ],
         "start_node": 12,
         "end_node": 1,
         "hop": 3,
         "Need Review": true,
-        "hint": "1. Check `AuditLogs` for the latest actions involving the application registration with `ObjectId`.\n2. Check `OfficeActivity` to find email reading events using the Graph API.\n3. Check `SecurityExposureManagement` to gather more information about the client app with the provided `ClientAppId`."
+        "hint": "1. Check `AuditLogs` for the latest actions involving the application registration with `ObjectId`.\n2. Check `OfficeActivity` to find email reading events using the Graph API.\n3. Check `AppRegistrationList` to gather more information about the client app with the provided `ClientAppId`."
     },
     {
         "difficulty": "Easy",
@@ -692,12 +692,12 @@
         "question": "What is the ClientAppId associated with the application with ObjectId 47dee0a2-d662-4664-acfa-a28bb62bdbc0?",
         "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
         "tables": [
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 6,
         "end_node": 3,
         "hop": 1,
-        "hint": "1. Check `SecurityExposureManagement` to find more information about the application with ObjectId `47dee0a2-d662-4664-acfa-a28bb62bdbc0`.\n2. Identify the ClientAppId associated with the application from the results in `SecurityExposureManagement`."
+        "hint": "1. Check `AppRegistrationList` to find more information about the application with ObjectId `47dee0a2-d662-4664-acfa-a28bb62bdbc0`.\n2. Identify the ClientAppId associated with the application from the results in `AppRegistrationList`."
     },
     {
         "difficulty": "Medium",
@@ -709,13 +709,13 @@
             "2. Check OfficeActivity to find that the app ID is '00000003-0000-0000-c000-000000000000'."
         ],
         "tables": [
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "OfficeActivity"
         ],
         "start_node": 6,
         "end_node": 1,
         "hop": 2,
-        "hint": "1. Check `SecurityExposureManagement` to find more information about the client app with the given object ID.\n2. Check `OfficeActivity` for mail read events and find the App ID of the Microsoft service used."
+        "hint": "1. Check `AppRegistrationList` to find more information about the client app with the given object ID.\n2. Check `OfficeActivity` for mail read events and find the App ID of the Microsoft service used."
     },
     {
         "difficulty": "Hard",
@@ -729,13 +729,13 @@
         ],
         "tables": [
             "AuditLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "OfficeActivity"
         ],
         "start_node": 12,
         "end_node": 4,
         "hop": 3,
-        "hint": "1. Check `AuditLogs` to find the latest actions that have occurred to the application registration with the ObjectId provided.\n2. Using the `ObjectId` from `AuditLogs`, check the `SecurityExposureManagement` table for more information about the client app.\n3. Identify the `ClientAppId` associated with the application registration.\n4. With the `ClientAppId`, check the `OfficeActivity` table with Microsoft Graph API's id (00000003-0000-0000-c000-000000000000) to find mail read events.\n5. Check for the `MailboxOwnerUPN` to identify the mailbox owner whose account was accessed during this incident."
+        "hint": "1. Check `AuditLogs` to find the latest actions that have occurred to the application registration with the ObjectId provided.\n2. Using the `ObjectId` from `AuditLogs`, check the `AppRegistrationList` table for more information about the client app.\n3. Identify the `ClientAppId` associated with the application registration.\n4. With the `ClientAppId`, check the `OfficeActivity` table with Microsoft Graph API's id (00000003-0000-0000-c000-000000000000) to find mail read events.\n5. Check for the `MailboxOwnerUPN` to identify the mailbox owner whose account was accessed during this incident."
     },
     {
         "difficulty": "Medium",
@@ -747,13 +747,13 @@
             "3. Mail reading activity linked to Graph API's app reveals the mailbox owner UPN: mmelendez@DefenderATEVET17.onmicrosoft.com."
         ],
         "tables": [
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "OfficeActivity"
         ],
         "start_node": 6,
         "end_node": 4,
         "hop": 2,
-        "hint": "1. Check the `SecurityExposureManagement` table to find the ClientAppId associated with the object ID.\n2. With the ClientAppId, check the `OfficeActivity` table for MailItemsAccessed events using Graph API's AppId.\n3. Look for the MailboxOwnerUPN in the retrieved events."
+        "hint": "1. Check the `AppRegistrationList` table to find the ClientAppId associated with the object ID.\n2. With the ClientAppId, check the `OfficeActivity` table for MailItemsAccessed events using Graph API's AppId.\n3. Look for the MailboxOwnerUPN in the retrieved events."
     },
     {
         "difficulty": "Medium",
@@ -767,13 +767,13 @@
         ],
         "tables": [
             "AuditLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AADServicePrincipalSignInLogs"
         ],
         "start_node": 12,
         "end_node": 8,
         "hop": 3,
-        "hint": "1. Check `AuditLogs` to identify the latest actions, such as modifications or updates, to the application registration using its `ObjectId`.\n2. Check `SecurityExposureManagement` to find more information about the client app with the `ObjectId`.\n3. Check `AADServicePrincipalSignInLogs` to identify the last time this client app authenticated using the `ClientAppId`.\n4. Identify the IP address involved in these authentication events."
+        "hint": "1. Check `AuditLogs` to identify the latest actions, such as modifications or updates, to the application registration using its `ObjectId`.\n2. Check `AppRegistrationList` to find more information about the client app with the `ObjectId`.\n3. Check `AADServicePrincipalSignInLogs` to identify the last time this client app authenticated using the `ClientAppId`.\n4. Identify the IP address involved in these authentication events."
     },
     {
         "difficulty": "Hard",
@@ -788,14 +788,14 @@
         ],
         "tables": [
             "AuditLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AADServicePrincipalSignInLogs",
             "SigninLogs"
         ],
         "start_node": 12,
         "end_node": 10,
         "hop": 4,
-        "hint": "1. Check `AuditLogs` for the latest actions that have occurred to this application registration, including modifications and updates.\n2. Use `SecurityExposureManagement` to find more details about the client application using the identified ObjectId.\n3. Check `AADServicePrincipalSignInLogs` to see the last time the client application authenticated and to match it with the ClientAppId.\n4. Investigate `SigninLogs` to trace back authentication events from the same IP address.\n5. Identify if there were multiple failed authentication attempts from the same IP address, and relate the successful authentication attempt to the attacker's technique."
+        "hint": "1. Check `AuditLogs` for the latest actions that have occurred to this application registration, including modifications and updates.\n2. Use `AppRegistrationList` to find client app id of the client application using the identified ObjectId.\n3. Check `AADServicePrincipalSignInLogs` to see the last time the client application authenticated and to match it with the client app id.\n4. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
     },
     {
         "difficulty": "Medium",
@@ -807,13 +807,13 @@
             "2. The IP address for that authentication is 72.43.121.43."
         ],
         "tables": [
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AADServicePrincipalSignInLogs"
         ],
         "start_node": 6,
         "end_node": 8,
         "hop": 2,
-        "hint": "1. Check the `SecurityExposureManagement` table to find more information about the client app with ObjectId `47dee0a2-d662-4664-acfa-a28bb62bdbc0`.\n2. Use the information found to identify the `ClientAppId`.\n3. Check the `AADServicePrincipalSignInLogs` table to find authentication logs associated with the identified `ClientAppId`.\n4. From the sign-in logs, identify the IP address involved in the application's authentication."
+        "hint": "1. Check the `AppRegistrationList` table to find more information about the client app with ObjectId `47dee0a2-d662-4664-acfa-a28bb62bdbc0`.\n2. Use the information found to identify the `ClientAppId`.\n3. Check the `AADServicePrincipalSignInLogs` table to find authentication logs associated with the identified `ClientAppId`.\n4. From the sign-in logs, identify the IP address involved in the application's authentication."
     },
     {
         "difficulty": "Hard",
@@ -826,14 +826,14 @@
             "3. Multiple users attempted to authenticate from this IP address, but only mvelazco@defenderatevet17.onmicrosoft.com succeeded. The attacker used password spray attack to gain access to the tenant."
         ],
         "tables": [
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AADServicePrincipalSignInLogs",
             "SigninLogs"
         ],
         "start_node": 6,
         "end_node": 10,
         "hop": 3,
-        "hint": "1. Check the `SecurityExposureManagement` table to gather detailed information about the client app using the provided `ObjectId`.\n2. Identify the `ClientAppId` from the results to proceed with the investigation.\n3. Use the `AADServicePrincipalSignInLogs` to determine the last authentication instance of the client app by correlating it with the `ClientAppId`.\n4. Investigate the `SigninLogs` table to explore other authentication events associated with the same IP address used by the client application.\n5. Summarize the logs to understand the attack pattern and identify which technique was used by the attacker to gain initial access to the tenant."
+        "hint": "1. Check the `AppRegistrationList` table to find the client app id using the provided `ObjectId`.\n2. Identify the `ClientAppId` from the results to proceed with the investigation.\n3. Use the `AADServicePrincipalSignInLogs` to determine the last authentication instance of the client app by correlating with the client app id.\n4. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
     },
     {
         "difficulty": "Hard",
@@ -848,7 +848,7 @@
         ],
         "tables": [
             "AuditLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AADServicePrincipalSignInLogs",
             "MicrosoftGraphActivityLogs"
         ],
@@ -864,25 +864,25 @@
         "question": "What kind of suspicious activities were performed by the same IP address associated with ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0?",
         "answer": "A single IP address is using the Microsoft Graph API to make various requests for retrieving information about both users and applications.",
         "solution": [
-            "1. Use the ObjectId to find more information about the client app from the SecurityExposureManagement table.",
+            "1. Use the ObjectId to find more information about the client app from the AppRegistrationList table.",
             "2. Identify the ClientAppId associated with suspicious activities.",
             "3. Check for the latest authentication events from the AADServicePrincipalSignInLogs.",
             "4. Identify the IP address used for these authentication events.",
             "5. Investigate Microsoft Graph API requests from the same IP address."
         ],
         "tables": [
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AADServicePrincipalSignInLogs",
             "MicrosoftGraphActivityLogs"
         ],
         "start_node": 6,
         "end_node": 14,
         "hop": 3,
-        "hint": "1. Check the `SecurityExposureManagement` table to find more information about the client app with the given ObjectId.\n2. After identifying the `ClientAppId` from the `SecurityExposureManagement`, check the `AADServicePrincipalSignInLogs` table to find the IP address where the client app authenticated.\n3. Using the identified IP address, check the `MicrosoftGraphActivityLogs` table to identify other activities performed by the same IP address, focusing on Microsoft Graph API requests."
+        "hint": "1. Check the `AppRegistrationList` table to find more information about the client app with the given ObjectId.\n2. After identifying the `ClientAppId` from the `AppRegistrationList`, check the `AADServicePrincipalSignInLogs` table to find the IP address where the client app authenticated.\n3. Using the identified IP address, check the `MicrosoftGraphActivityLogs` table to identify other activities performed by the same IP address, focusing on Microsoft Graph API requests."
     },
     {
         "difficulty": "Medium",
-        "context": "A single IP address is using the Microsoft Graph API to make various requests for retrieving information about both users and applications.",
+        "context": "From one IP adress, two types of requests are made using Microsoft Graph API: to retrieve info about users, and to retrieve info about appliactions",
         "question": "What is the IP address of the user that is involved in the suspicious activity?",
         "answer": "72.43.121.43",
         "tables": [
@@ -895,7 +895,7 @@
     },
     {
         "difficulty": "Hard",
-        "context": "A single IP address is using the Microsoft Graph API to make various requests for retrieving information about both users and applications.",
+        "context": "From one IP adress, two types of requests are made using Microsoft Graph API: to retrieve info about users, and to retrieve info about appliactions",
         "question": "What is the Client Application ID that authenticated from the suspicious IP address in use for Microsoft Graph API?",
         "answer": "bb77fe0b-52af-4f26-9bc7-19aa48854ebf",
         "solution": [
@@ -967,7 +967,7 @@
         "start_node": 14,
         "end_node": 10,
         "hop": 2,
-        "hint": "1. Check `MicrosoftGraphActivityLogs` to find the details of the requests made by the suspicious IP address.\n2. Check `SigninLogs` to identify any authentication events (success or failure) associated with the same IP address.\n\n"
+        "hint": "1. Check `MicrosoftGraphActivityLogs` to find the the suspicious IP address that making these requests.\n2. Check `SigninLogs` to analyze authentication events from the same IP address to identify the attack technique used."
     },
     {
         "difficulty": "Medium",
@@ -982,16 +982,16 @@
         "tables": [
             "MicrosoftGraphActivityLogs",
             "AADServicePrincipalSignInLogs",
-            "SecurityExposureManagement"
+            "AppRegistrationList"
         ],
         "start_node": 14,
         "end_node": 6,
         "hop": 3,
-        "hint": "1. Check `MicrosoftGraphActivityLogs` to find API requests made by the identified IP address.\n2. Check `AADServicePrincipalSignInLogs` with the `ClientAppId` of the client application to confirm authentication events from the identified IP address.\n3. Use `ClientAppId` to investigate `SecurityExposureManagement` for details about the client application.\n4. Verify changes to the application registration by checking `AuditLogs` associated with the identified client application."
+        "hint": "1. Check `MicrosoftGraphActivityLogs` to find API requests made by the identified IP address.\n2. Check `AADServicePrincipalSignInLogs` with the `ClientAppId` of the client application to confirm authentication events from the identified IP address.\n3. Use `ClientAppId` to investigate `AppRegistrationList` for details about the client application.\n4. Verify changes to the application registration by checking `AuditLogs` associated with the identified client application."
     },
     {
         "difficulty": "Hard",
-        "context": "A single IP address is using the Microsoft Graph API to make various requests for retrieving information about both users and applications.",
+        "context": "From one IP adress, two types of requests are made using Microsoft Graph API: to retrieve info about users, and to retrieve info about appliactions",
         "question": "What specific changes were made to the application registration that used the suspicious IP?",
         "answer": "New credentials were added to the application registration right before it authenticated.",
         "solution": [
@@ -1003,12 +1003,12 @@
         "tables": [
             "MicrosoftGraphActivityLogs",
             "AADServicePrincipalSignInLogs",
-            "SecurityExposureManagement",
+            "AppRegistrationList",
             "AuditLogs"
         ],
         "start_node": 14,
         "end_node": 12,
         "hop": 4,
-        "hint": "1. Check `MicrosoftGraphActivityLogs` to find activities involving the suspicious IP address related to users and applications.\n2. Check `AADServicePrincipalSignInLogs` to identify when the client app with the `ClientAppId` last authenticated.\n3. Check `SecurityExposureManagement` to gather more information on the client app using the `ClientAppId`.\n4. Check `AuditLogs` for the latest actions related to the application registration, focusing on modifications and updates using the `ObjectId`."
+        "hint": "1. Check `MicrosoftGraphActivityLogs` to find the suspicious IP address.\n2. Check `AADServicePrincipalSignInLogs` to find the client app id that was last authenticated with the ip address.\n3. Check `AppRegistrationList` to find corresponding object id.\n4. Check `AuditLogs` for the latest actions related to the application registration, and answer the question."
     }
 ]
