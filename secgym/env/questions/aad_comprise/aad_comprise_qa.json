@@ -426,7 +426,7 @@
         "end_node": 1,
         "hop": 3,
         "human modified": true,
-        "hint": "1. Check `SigninLogs` for other authentication events from the same IP address.\n2. Identify the client app id of the client application from `AADServicePrincipalSignInLogs`.\n3. With the id, check `OfficeActivity` for mail read events to find the AppID of the Microsoft service used to access the mailbox."
+        "hint": "1. Check `SigninLogs` to identify this IP address. \n2. Identify the app id of the client application from `AADServicePrincipalSignInLogs`.\n3. With the client app id, check `OfficeActivity` to find the MailboxOwnerUPN."
     },
     {
         "difficulty": "Easy",
@@ -477,8 +477,8 @@
     },
     {
         "difficulty": "Hard",
-        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.",
-        "question": "There is a supsicious email reading event associated with this password spray attack. What is the email address of the mailbox that was accessed?",
+        "context": "Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com. This is likely a password spray attack.",
+        "question": "There is a supsicious email reading event associated with this attack. What is the email address of the mailbox that was accessed?",
         "answer": "mmelendez@DefenderATEVET17.onmicrosoft.com",
         "solution": [
             "1. Check SigninLogs for the same IP address: 72.43.121.43.",
@@ -493,7 +493,7 @@
         "start_node": 10,
         "end_node": 4,
         "hop": 3,
-        "hint": "1. Check `SigninLogs` to identify an IP address where multiple users have authentication failures and one successful authentication.\n2. Identify the client app id of the client application from `AADServicePrincipalSignInLogs`.\n3. Once you have the client app id, check `OfficeActivity` for mail read events using the Graph API's id, look for `MailboxOwnerUPN` in the `OfficeActivity` table to identify the accessed mailbox's email address."
+        "hint": "1. Check `SigninLogs` to identify this IP address. \n2. Identify the app id of the client application from `AADServicePrincipalSignInLogs`.\n3. Once you have the client app id, check `OfficeActivity` to find `MailboxOwnerUPN` to identify the accessed mailbox's email address."
     },
     {
         "difficulty": "Medium",
@@ -683,7 +683,7 @@
         "end_node": 1,
         "hop": 3,
         "Need Review": true,
-        "hint": "1. Check `AuditLogs` for the latest actions involving the application registration with `ObjectId`.\n2. Check `OfficeActivity` to find email reading events using the Graph API.\n3. Check `AppRegistrationList` to gather more information about the client app with the provided `ClientAppId`."
+        "hint": "1. Check `AuditLogs` for actions such as modifications or updates that have occurred to the application registration to find the object id of this application. In this case, the id of the target.\n2. Check `OfficeActivity` to find email reading events using the Graph API.\n3. Check `AppRegistrationList` to gather more information about the client app with the provided `ClientAppId`."
     },
     {
         "difficulty": "Easy",
@@ -890,7 +890,7 @@
         "start_node": 14,
         "end_node": 8,
         "hop": 1,
-        "hint": "1. Check the `MicrosoftGraphActivityLogs` table to find a IP address that making requests to retrieve info for 'users' and 'applications'."
+        "hint": "Check the `MicrosoftGraphActivityLogs` table to find the one IP address that making requests to retrieve info about both 'users' and 'applications'."
     },
     {
         "difficulty": "Hard",

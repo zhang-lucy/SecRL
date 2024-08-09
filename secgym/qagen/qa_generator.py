@@ -112,10 +112,145 @@ Your Response
 }
 """
 
+HINT_PROMPT = dedent("""Given a question and a investigation path, please generate the golden hint for the question. 
+The hint should include what tables to be investigated, but should not include the answer, or any key intermediate information.
+                                 
+Example:
+######################
+Question:
+There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration. Which user's mailbox was accessed during this suspicious email reading event?
+
+Investigation Path:
+#ID: 2
+#Type: Investigation
+#Description: Check table `OfficeActivity` with Graph API's id for mail read events.
+#Table: OfficeActivity
+#KQLQuery: OfficeActivity | where Operation == 'MailItemsAccessed' and AppId == '00000003-0000-0000-c000-000000000000'
+
+#ID: 4
+#Type: IoC
+#Description: MailboxOwnerUPN: mmelendez@DefenderATEVET17.onmicrosoft.com
+#AdditionalInfo: The user's mailbox who was accessed.
+######################                         
+Your Response:
+1. Check table `OfficeActivity` with Operation == 'MailItemsAccessed', and AppId of Microsoft Graph API is '00000003-0000-0000-c000-000000000000'.
+2. Check for MailboxOwnerUPN.
+######################
+######################
+Question:
+Multiple users are authenticating from the same IP address but failed. The same IP address is used to authenticate a client application. New credentials were added to the application registration before this email reading event. What is the last time this application's credentials were modified?
+
+Investigation Path:
+#ID: 10
+#Type: IoC
+#Description: Multiple users are authenticating from the same IP address but failed. There is one account that successfully authenticated: mvelazco@defenderatevet17.onmicrosoft.com.
+
+#ID: 9
+#Type: Investigation
+#Description: Check `SigninLogs` for other authentication events from the same IP address.
+#Table: SigninLogs
+#KQLQuery: SigninLogs | where IPAddress == '72.43.121.34' | project TimeGenerated, IPAddress, UserPrincipalName, ResultType, ResultDescription, AuthenticationRequirement, ConditionalAccessStatus, ResourceDisplayName, AppDisplayName, ResourceIdentity, ClientAppUsed, RiskLevelAggregated, RiskLevelDuringSignIn, RiskState, RiskEventTypes
+
+#ID: 8
+#Type: IoC
+#Description: IPAddress: 72.43.121.34
+#AdditionalInfo: The IP address where the service principal authenticated from.
+
+#ID: 7
+#Type: Investigation
+#Description: Check `AADServicePrincipalSignInLogs` to identify the last time this client app with `ClientAppId` was authenticated.
+#Table: AADServicePrincipalSignInLogs
+#KQLQuery: AADServicePrincipalSignInLogs | where AppId == 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf'
+
+#ID: 3
+#Type: IoC
+#Description: ClientAppId: bb77fe0b-52af-4f26-9bc7-19aa48854ebf
+
+#ID: 5
+#Type: Investigation
+#Description: Check table `SecurityExposureManagement` to find more information about the client app with that ID.
+#Table: SecurityExposureManagement
+
+#ID: 6
+#Type: IoC
+#Description: ObjectId: 47dee0a2-d662-4664-acfa-a28bb62bdbc0
+
+#ID: 11
+#Type: Investigation
+#Description: Check `AuditLogs` for the latest actions that have occurred to this application registration: modifications, updates, etc.
+#Table: AuditLogs
+#KQLQuery: AuditLogs | mv-expand TargetResource = TargetResources | extend TargetResourceJson = parse_json(TargetResource) | where TargetResourceJson.id == '47dee0a2-d662-4664-acfa-a28bb62bdbc0'
+
+#ID: 12
+#Type: IoC
+#Description: We learn that certain changes were made against the application. Specifically, new credentials were added to the application registration right before it authenticated.
+######################
+Your Response:
+1. check `SigninLogs` to find one IP address where multiple users authenticated but failed.
+2. After we find the IP address, we check `AADServicePrincipalSignInLogs` to find the `ClientAppId` of a client app that authenticated from that IP address.
+3. With the `ClientAppId`, we check `SecurityExposureManagement` to get the object id of the client app.
+4. Finally, we check `AuditLogs` to check the latest actions where a credential was added to the application registration with the object id.    
+######################
+######################
+Question:
+There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration. What other suspicious activity was performed by the same client application?
+
+Investigation Path:
+#ID: 1
+#Type: IoC
+#Description: There is a suspicious email reading event, where the emails are read with Graph API through a previously unknown application registration.
+
+#ID: 2
+#Type: Investigation
+#Description: Check table `OfficeActivity` with Graph API's id for mail read events.
+#Table: OfficeActivity
+#KQLQuery: OfficeActivity | where Operation == 'MailItemsAccessed' and AppId == '00000003-0000-0000-c000-000000000000'
+
+#ID: 3
+#Type: IoC
+#Description: ClientAppId: bb77fe0b-52af-4f26-9bc7-19aa48854ebf
+
+#ID: 7
+#Type: Investigation
+#Description: Check `AADServicePrincipalSignInLogs` to identify the last time this client app with `ClientAppId` was authenticated.
+#Table: AADServicePrincipalSignInLogs
+#KQLQuery: AADServicePrincipalSignInLogs | where AppId == 'bb77fe0b-52af-4f26-9bc7-19aa48854ebf'
+
+#ID: 8
+#Type: IoC
+#Description: IPAddress: 72.43.121.34
+#AdditionalInfo: The IP address where the service principal authenticated from.
+
+#ID: 13
+#Type: Investigation
+#Description: Check other activities with the same IP address, such as Microsoft Graph API requests.
+#Table: MicrosoftGraphActivityLogs
+#KQLQuery: MicrosoftGraphActivityLogs | where RequestUri endswith '/users' or RequestUri endswith '/applications' | where IPAddress == '72.43.121.34'
+
+#ID: 14
+#Type: IoC
+#Description: The same IP address is making requests to the Microsoft Graph API for both users and applications.
+######################
+Your Response:
+1. Check `OfficeActivity` to find the client app's ClientAppId.
+2. With the `ClientAppId`, check `AADServicePrincipalSignInLogs` to find the IP address where the client app authenticated.
+3. Check `MicrosoftGraphActivityLogs` to find other activities with the same IP address and summarize the activities.
+######################
+######################
+                                 
+
+Notes:
+- For example 1, we can give the AppID of Microsoft Graph API because it should be a known information. But we won't give the mailbox owner's UPN because it is the answer to the question.
+- For example 2, we cannot give the IP address because it is a key intermdiate information that need to be found to continue the investigation. We also cannot give the `ClientAppId` or the `ObjectId` because they are also key information.
+- For example 3, we cannot give the `ClientAppId` or the `ObjectId` because they are key information. 
+""")
 
 class QAGenerator:
     def __init__(self, graphml_file, question_file, config_list):
         self.graph = nx.read_graphml(graphml_file)
+        mapping = {str(node): int(node) for node in self.graph.nodes()}
+        self.graph = nx.relabel_nodes(self.graph, mapping)
+
         self.config_list = config_list
         self.question_file = question_file
         self.generated_pairs = set()
@@ -143,17 +278,21 @@ class QAGenerator:
 
         return path, combinations
 
-    def _node_to_string(self, node_id):
+    def _node_to_string(self, node_id, with_query=False):
         node_data = self.graph.nodes[node_id]
         node_type = node_data.get('type', '')
         node_description = node_data.get('description', '')
         table_name = node_data.get('table_name', '')
         additional_info = node_data.get('additional_info', '')
+        kql_query = node_data.get('kql_query', '')
 
         parts = [f"#ID: {node_id}", f"#Type: {node_type}", f"#Description: {node_description}"]
 
         if node_type == 'Investigation' and table_name:
             parts.append(f"#Table: {table_name}")
+        
+        if node_type == 'Investigation' and kql_query:
+            parts.append(f"#KQLQuery: {kql_query}")
 
         if additional_info:
             parts.append(f"#AdditionalInfo: {additional_info}")
@@ -164,6 +303,52 @@ class QAGenerator:
         # A leaf node in an undirected graph will have a degree of 1
         return [node for node in self.graph.nodes if self.graph.degree(node) == 1 and self.graph.nodes[node].get('type') == 'IoC']
 
+    def retrieve_questions(self, start_node=None, end_node=None):
+        # filter the questions based on the start and end node
+        filtered_questions = []
+        if start_node:
+            filtered_questions = [question for question in self.questions_list if question.get('start_node') == start_node]
+        if end_node:
+            filtered_questions = [question for question in filtered_questions if question.get('end_node') == end_node]
+        
+        return filtered_questions
+
+    def retrieve_node_as_dict(self, node_id):
+        # Retrieve the node data as a dictionary
+        return self.graph.nodes[node_id]
+
+
+    def generate_hints(self):
+        from copy import deepcopy
+        tmp_questions = deepcopy(self.questions_list)
+        for i, q in enumerate(tmp_questions):
+            path, _ = self._get_all_combinations(int(q['start_node']), int( q['end_node']))
+
+            node_strings = [self._node_to_string(node, with_query=True) for node in path]
+            nodes_str = "\n\n".join(node_strings)
+
+            qstr = q['context'] + " " + q['question']
+            final_str = (
+                f"Question:\n{qstr}\n\n"
+                f"Investigation Path:\n{nodes_str}"
+                f"\n\nYour Response:\n"
+            )
+            # print(final_str)
+            # print("*"*30)
+            
+            response = LLM_call(
+                instruction=HINT_PROMPT,
+                task=final_str,
+                config_list=self.config_list,
+                stop=['######################']
+            )
+            print(response)
+            print("------"*30)
+            tmp_questions[i]['hint'] = response.strip()
+        
+        return tmp_questions
+
+        
 
     def _generate_questions_for_one_path(self, start_node, end_node):
         path, all_combinations = self._get_all_combinations(start_node, end_node)
@@ -185,7 +370,6 @@ class QAGenerator:
             f"Path: {'->'.join(map(str, path))}\n"
             f"Nodes:\n{nodes_str}"
         )
-        # print(final_str)
 
         response = LLM_call(
             instruction=QAGEN_PROMPT,

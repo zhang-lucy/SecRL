@@ -38,12 +38,16 @@ class ThuGEnv(gym.Env):
             noise_level: int = 0,
             save_file: Union[str, bool] = True,
             max_steps: int = 15,
+            max_entry_return: int = 15,
             container_name: str = "mysql-container",
             dataset_name: str = "env_monitor_db",
             port: str = "3306",
+            add_hint: bool = False
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
+        self.max_entry_return = max_entry_return
+        self.add_hint = add_hint
 
         if save_file is False:
             print("Warning: No save file provided. Logging will not be saved.")
@@ -172,8 +176,17 @@ class ThuGEnv(gym.Env):
             try: 
                 self.cursor.execute(action)
                 observation = self.cursor.fetchall()
+
+                limit_entry = False
+                retrieved_len = len(observation)
+                if len(str(observation)) > 100000:
+                    if len(observation) > self.max_entry_return:
+                        observation = observation[:self.max_entry_return]
+                        limit_entry = True
                 if stringify:
                     observation = str(observation)
+                    if limit_entry:
+                        observation = f"Retrieved {retrieved_len} entries. Displaying first {self.max_entry_return} entries.\n{observation}"
             except Exception as e:
                 observation = f"{e.__class__.__name__}: {e.__context__}"
                 query_success = False
@@ -216,7 +229,7 @@ class ThuGEnv(gym.Env):
                 - observation (str): The initial observation is the question text.
                 - info (Dict): The info dictionary with fields "attack" and "noise_level".
         """
-        if self.curr_question:
+        if len(self.curr_trajectory) != 0:
             self.all_logs.append(self.get_logging())
             if save_log:
                 self.save_logging()
@@ -237,7 +250,7 @@ class ThuGEnv(gym.Env):
             "qid": idx
         }
     
-        return get_full_question(observation), info
+        return get_full_question(observation, self.add_hint), info
     
     def render(self):
         """Render the environment.

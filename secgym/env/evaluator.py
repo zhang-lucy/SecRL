@@ -45,8 +45,12 @@ class Evaluator:
 
     def __init__(self,
                  config_list,
+                 cache_seed: int = 41,
                  ) -> None:
-        self.client = OpenAIWrapper(config_list=config_list)
+        self.client = OpenAIWrapper(
+            config_list=config_list,
+            cache_seed=cache_seed
+            )
         self.use_llm = True
 
     def checking(self, 
@@ -77,21 +81,24 @@ class Evaluator:
 
             discount_factor = 0.4
             # reverse the response
-            score = 1
+            current_score = 1
+            total_score = 0
 
             step_eval = list(response.values())
             step_eval.reverse()
             for b in step_eval:
                 if b == "True":
-                    return score
-                score *= discount_factor
+                    total_score += current_score
+                if total_score == 1:
+                    return 1
+                current_score *= discount_factor
 
             # 1 2 3 4
             # False  False False True -> 1
             # False False True  False -> 0.3
             # True True True False -> 0.3     # 0.3 + 0.09 + 0.027 = 0.417
             # all false
-            return 0
+            return total_score
 
     
     def check_single_response(self, question: dict, submitted_answer: str):

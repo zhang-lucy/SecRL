@@ -102,20 +102,21 @@ class SOCGraph:
         
         # Set up the figure size
         plt.figure(figsize=figsize)
+
+        default_pos = nx.circular_layout(self.G)
         
         # Draw the graph
-        nx.draw(self.G, pos, with_labels=True, labels=labels, node_size=node_sizes, node_color=node_colors, font_size=10)
+        nx.draw(self.G,pos=pos, with_labels=True, labels=labels, node_size=node_sizes, node_color=node_colors, font_size=10)
 
         # Save the plot if required
         if save_figure and file_path is not None:
-            plt.savefig(file_path)
+            plt.savefig(file_path, dpi=600)
         
         # Show the plot if required
         if show_plot:
             plt.show()
         else:
             plt.close()
-
 
     def hierarchy_pos(self, root):
         def _hierarchy_pos(G, root, width=1., vert_gap=0.2, vert_loc=0, xcenter=0.5, pos=None, parent=None):

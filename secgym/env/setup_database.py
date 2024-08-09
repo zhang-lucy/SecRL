@@ -6,7 +6,7 @@ import json
 import docker
 from docker.errors import ContainerError, ImageNotFound, APIError, NotFound
 import pandas as pd
-from secbench.env.utils import find_most_similar
+# from secgym.utils import find_most_similar
 import argparse
 
 
@@ -144,9 +144,17 @@ def create_sql_file_from_csv_folder(csv_folder, sql_file_path, database_name):
         if not file_name.endswith(".csv"):
             continue
         table_name = file_name.replace(".csv", "")
+        
+        # check meta file exists
 
-        with open(os.path.join(csv_folder, f"{table_name}.meta"), 'r') as meta_file:
-            type_map = json.load(meta_file)
+        if os.path.exists(os.path.join(csv_folder, f"{table_name}.meta")):
+            with open(os.path.join(csv_folder, f"{table_name}.meta"), 'r') as meta_file:
+                type_map = json.load(meta_file)
+        else:
+            print(f"Meta file not found for {table_name}. Inferring types from the CSV file...")
+            df = pd.read_csv(os.path.join(csv_folder, f"{table_name}.csv"), sep="¤", encoding='utf-8-sig', on_bad_lines='skip', engine='python')
+            type_map = {str(col): "string" for col in df.columns}
+            print(type_map)
 
         json_columns = [col for col, dtype in type_map.items() if dtype == "dynamic"]
 
