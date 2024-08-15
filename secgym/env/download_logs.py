@@ -98,8 +98,8 @@ LIST_TABLES = [
 
 if __name__ == "__main__":
 
-    file_path = os.path.join(os.path.dirname(__file__), "data/addcomp_jul25")
-    start_time = datetime(2024, 7, 25, 15, 0, 0, 0, tzinfo=timezone.utc)
+    file_path = os.path.join(os.path.dirname(__file__), "data/apski")
+    start_time = datetime(2024, 7, 22, 1, 0, 0, 0, tzinfo=timezone.utc)
 
     # for 3 hours
     duration = timedelta(hours=3)

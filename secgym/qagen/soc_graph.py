@@ -77,7 +77,8 @@ class SOCGraph:
                           max_line_length=20, 
                           show_plot=True, 
                           save_figure=False, 
-                          file_path=None
+                          file_path=None,
+                          layout='tree'
                           ):
         # Define node sizes and colors based on type
         node_sizes = []
@@ -98,12 +99,14 @@ class SOCGraph:
                 node_colors.append('#FFB6C1')  # Light pink color for type IoC
 
         # Define the custom tree layout
-        pos = self.hierarchy_pos(root)
-        
+        if layout == 'tree':
+            pos = self.hierarchy_pos(root)
+        elif layout == 'circular':
+            pos = nx.circular_layout(self.G)
+        else:
+            raise ValueError("Invalid layout. Choose 'tree' or 'circular'.")
         # Set up the figure size
         plt.figure(figsize=figsize)
-
-        default_pos = nx.circular_layout(self.G)
         
         # Draw the graph
         nx.draw(self.G,pos=pos, with_labels=True, labels=labels, node_size=node_sizes, node_color=node_colors, font_size=10)

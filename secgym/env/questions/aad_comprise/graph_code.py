@@ -18,7 +18,7 @@ ioc1_2 = socgraph.add_ioc("MailboxOwnerUPN: mmelendez@DefenderATEVET17.onmicroso
 
 # Investigation 2
 investigation2 = socgraph.add_investigation(
-    "Check table `SecurityExposureManagement` to find more information about the client app with that ID.",
+    "Check table `AppRegistrationList` to find more information about the client app with that ID.",
     table_name="SecurityExposureManagement",
     from_ioc_id=ioc1_1
 )
@@ -83,7 +83,7 @@ base_node_size=15000,
 max_line_length=30, 
 show_plot=False,
 save_figure=True,
-file_path="graph_plot.png"
+file_path="graph_7nodes.svg"
 )
-socgraph.save_to_graphml("graph.graphml")
+# socgraph.save_to_graphml("graph.graphml")
 

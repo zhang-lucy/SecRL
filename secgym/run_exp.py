@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Union
 
 from secgym.env.ThuGEnv import ThuGEnv
-from secgym.myconfig import config_list_4o
+from secgym.myconfig import config_list_4o, config_list_4_turbo, config_list_35
 
 def run_experiment(
         agent,
@@ -18,21 +18,39 @@ def run_experiment(
     accum_reward = 0
     accum_success = 0
     accum_logs = []
-    
+    tested_num = 0
+
+    # open a json:
+    # with open("results/agent_log_hint_4.json", "r") as f:
+    #     trial_1 = json.load(f)
+
     for i in range(thug_env.num_questions):
         observation, _ = thug_env.reset(i) # first observation is question dict
         agent.reset()
 
+        # if trial_1[i]['reward'] == 1:
+        #     print(f"Skipping question {i+1} as it has been solved")
+        #     continue
+        # tmp = (thug_env.curr_question['start_node'], thug_env.curr_question['end_node'])
+        # if tmp not in [(12, 6), (6, 12), (8, 14), (14, 8), (14, 10), (14, 4), (4, 10), (4, 3)]:
+        #     continue
         # temp hack
         if "SecurityExposureManagement" in thug_env.curr_question['tables']:
             print(f"Skipping question {i+1}")
             continue
+
+        tested_num += 1 
         
         # run one episode
         for s in range(thug_env.max_steps):
             print(f"Observation: {observation}")
             print("*"*50)
-            action, submit = agent.act(observation)
+            try:
+                action, submit = agent.act(observation)
+            except Exception as e:
+                print(f"Error: {e}")
+                reward = 0
+                break
             observation, reward, _, _ = thug_env.step(action=action, submit=submit)
 
             if submit:
@@ -43,7 +61,7 @@ def run_experiment(
 
         result_dict ={
                 "reward": reward,
-                "success": reward == 1,
+                "nodes": f"{thug_env.curr_question['start_node']}-{thug_env.curr_question['end_node']}",
                 "question_dict": thug_env.curr_question,
             }
         result_dict.update(agent.get_logging())
@@ -51,34 +69,73 @@ def run_experiment(
 
         with open(save_agent_file, "w") as f:
             json.dump(accum_logs, f, indent=4)
-        print(f"Question {i+1} | Reward: {reward} || Accumlated Success: {accum_success}/{i+1}={accum_success/(i+1):.3f} | Avg Reward so far: {accum_reward/(i+1):.3f}")  
+        print(f"Question {i+1} | Reward: {reward} || Accumlated Success: {accum_success}/{tested_num}={accum_success/(tested_num):.3f} | Avg Reward so far: {accum_reward/(tested_num):.3f}")  
         print("*"*50, "\n", "*"*50)
 
-        if i == num_test:
+        if num_test >0 and i == num_test:
             print(f"Tested {num_test} questions. Stopping...")
             break
-
+    
+    return accum_success, tested_num, accum_reward
 
 if __name__ == "__main__":
     curr_time = datetime.now().strftime("%Y%m%d-%H%M%S")
     # save_agent_file = f"results/agent_log_{curr_time}.json"
-    save_agent_file = f"results/agent_log.json"
+    # cache_seed = 44
+    # agent_config_list = config_list_4o
+
+    cache_seed = 46
+    temperature = 0
+    add_hint = False
+    model = "gpt-4turbo"
+    submit_summary = False
+
+    model_config_map = {
+        "gpt-3.5": config_list_35,
+        "gpt-4o": config_list_4o,
+        "gpt-4turbo": config_list_4_turbo,
+    }
+    agent_config_list = model_config_map[model]
+
+    post_fix = f"_{model}_{cache_seed}"
+    if add_hint:
+        post_fix += "_hint"
+    if submit_summary:
+        post_fix += "_sum"
+
+    # post_fix = "gpt35"
+    # cache_seed = 45
+
+    # with hint
+    # 4, 44 -> 45/56
+    # 5, 45 -> 9/11
+
+    save_agent_file = f"results/agent_log{post_fix}.json"
+    save_env_file = f"results/env_log{post_fix}.json"
 
     agent = BaselineAgent(
-        config_list=config_list_4o,
-        cache_seed=42
+        config_list=agent_config_list,
+        cache_seed=cache_seed, # 42
+        submit_summary=submit_summary,
+        temperature=temperature,
     )
 
     thug_env = ThuGEnv(
         attack="AAD_Comprise", 
         config_list=config_list_4o, 
         noise_level=0,
-        save_file="results/aad_comprise.json"
+        save_file=save_env_file,
+        add_hint=add_hint,
+        max_steps=15
     ) 
-    run_experiment(
+    avg_success, tested_num, avg_reward = run_experiment(
         agent=agent,
         thug_env=thug_env,
         save_agent_file=save_agent_file,
-        num_test=5
+        num_test=-1 # all questions
     )
+
+    with open('results.txt', 'a') as f:
+        f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}\n")
+        f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")
     

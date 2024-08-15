@@ -15,16 +15,39 @@ Thought can reason about the current situation, and Action can be two types:
 (2) submit[<your answer>], which indicates that the previous observation is the answer
 """
 
+BASE_SUMMARY_PROMPT = """You are a security analyst. 
+You need to answer a given security question by querying the database.
+The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
+Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
 
+Your repsone should always be a thought-action pair:
+Thought: <your reasoning>
+Action: <your SQL query>
+
+Thought can reason about the current situation, and Action can be two types: 
+(1) execute[<your query>], which executes the SQL query: 
+(2) submit[<your answer>], which indicates that the previous observation is the answer
+
+When submitting an answer, please also summarize key information you found to get to the answer.
+For example, an IP address or an ID that you used.
+"""
 
 class BaselineAgent:
     def __init__(self,
                  config_list,
                  cache_seed=41,
+                 max_steps=15,
+                 submit_summary=False,
+                 temperature=0
                  ):
         self.config_list = config_list
-        self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
-        self.messages = [{"role": "system", "content": BASE_PROMPT}]
+        self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed, temperature=temperature)
+        sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
+        self.messages = [{"role": "system", "content": sys_prompt}]
+
+        self.max_steps = max_steps
+        self.submit_summary = submit_summary
+        self.step_count = 0
 
     def _call_llm(self, messages):
         response = self.client.create(
@@ -36,6 +59,10 @@ class BaselineAgent:
         self._add_message(observation, role="user")
         response = self._call_llm(messages=self.messages)
         print(response)
+
+        if self.step_count >= self.max_steps-1 and self.submit_summary:
+            summary_prompt = "You have reached maximum number of steps. Please summarize your findings of key information, and sumbit them."
+            self._add_message(summary_prompt, role="system")
 
         try:
             thought, action = response.strip().split(f"\nAction:")
@@ -51,6 +78,9 @@ class BaselineAgent:
             self._add_message(f"{thought}\nAction:{action}", role="assistant")
         
         print("*"*50)
+
+        self.step_count += 1
+        # parse the action
         parsed_action, is_code, submit = sql_parser(action)
         
         # submit = True if "submit" in thought.lower() else False
@@ -66,7 +96,9 @@ class BaselineAgent:
         self.messages.append(msging(msg, role))
 
     def reset(self):
-        self.messages = [{"role": "system", "content": BASE_PROMPT}]
+        self.step_count = 0
+        sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
+        self.messages = [{"role": "system", "content": sys_prompt}]
         self.client.clear_usage_summary()
 
 

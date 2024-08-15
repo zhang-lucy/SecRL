@@ -24,6 +24,30 @@ config_list_35 = [
 ]
 
 config_list_4o = [
+  {
+      "model": "gpt-4o",
+      "base_url": "https://dataoai3.openai.azure.com/",
+      "api_type": "azure",
+      "api_version":  "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider,
+      "price": [0.005, 0.015]
+  },
+  {
+      "model": "gpt-4o",
+      "base_url": "https://dataoai2.openai.azure.com/",
+      "api_type": "azure",
+      "api_version":  "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider,
+      "price": [0.005, 0.015]
+  },
+  {
+
+        "model": "gpt-4o-2024-05-13",
+        "base_url": "https://aif-complex-tasks-west-us-3.openai.azure.com/",
+        "api_type": "azure",
+        "api_version":  "2024-05-01-preview",
+        "azure_ad_token_provider": token_provider,
+  },
     {
       "model": "gpt-4o",
       "base_url": "https://yadaoai.openai.azure.com/",
@@ -32,7 +56,14 @@ config_list_4o = [
       "azure_ad_token_provider": token_provider,
       "price": [0.005, 0.015]
   },
-
+      {
+      "model": "gpt-4o_2",
+      "base_url": "https://yadaoai.openai.azure.com/",
+      "api_type": "azure",
+      "api_version":  "2024-05-01-preview",
+      "azure_ad_token_provider": token_provider,
+      "price": [0.005, 0.015]
+  },
   {
       "model": "gpt-4o",
       "base_url": "https://yroai.openai.azure.com/",

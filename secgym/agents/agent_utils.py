@@ -7,11 +7,13 @@ def msging(msg: str, role: str="user"):
 
 
 
-def sql_parser(action: str):
+def sql_parser(action: str, code_block=False):
     if "submit[" in action:
         pattern = r'submit\[(.*)\]'
         submit = True
     else:
+        if code_block:
+            pattern = r'```sql(.*?)```'
         pattern = r'execute\[(.*)\]'
         submit = False
 

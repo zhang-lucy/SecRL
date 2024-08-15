@@ -11,7 +11,9 @@ import autogen
 def msging(msg, role="user"): 
     return {"role": role, "content": msg}
 
-def get_full_question(question_dict):
+def get_full_question(question_dict, add_hint=False):
+    if add_hint:
+        return f"{question_dict.get('context', '')} {question_dict['question']} \n Here is the hint to this questions: {question_dict['hint']}".strip()
     return f"{question_dict.get('context', '')} {question_dict['question']}".strip()
 
 

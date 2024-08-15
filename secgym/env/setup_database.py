@@ -88,8 +88,8 @@ def create_container(
             )
             print(f"Started container {container_name} with ID: {container.id} on port {port}")
             container.reload()
-            print(f"Waiting 60 seconds for the container to start...")
-            time.sleep(60)  # Wait for the container to start
+            print(f"Waiting 30 seconds for the container to start...")
+            time.sleep(30)  # Wait for the container to start
             return container, port
         except (ContainerError, ImageNotFound) as e:
             print(f"Error: {e}")
@@ -216,7 +216,7 @@ IGNORE 1 ROWS;
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup a MySQL database from CSV files')
     parser.add_argument('--port', type=str, default="3306", help='Port number for the MySQL container')
-    parser.add_argument('--csv_folder', type=str, default=to_abs_path("data/logs_jun3_30"), help='Folder containing the CSV files')
+    parser.add_argument('--csv_folder', type=str, default=to_abs_path("data/aadcomp_jul25"), help='Folder containing the CSV files')
     parser.add_argument('--sql_file', type=str, default=to_abs_path("data/secbench.sql"), help='Output SQL file')
     parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
     parser.add_argument('--container_name', type=str, default="mysql-container", help='Name of the MySQL container')
