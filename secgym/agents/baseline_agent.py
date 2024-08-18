@@ -28,8 +28,7 @@ Thought can reason about the current situation, and Action can be two types:
 (1) execute[<your query>], which executes the SQL query: 
 (2) submit[<your answer>], which indicates that the previous observation is the answer
 
-When submitting an answer, please also summarize key information you found to get to the answer.
-For example, an IP address or an ID that you used.
+When submitting an answer, please summarize key information from intermediate steps that lead to your answer.
 """
 
 class BaselineAgent:
