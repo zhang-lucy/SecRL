@@ -87,8 +87,8 @@ if __name__ == "__main__":
     cache_seed = 46
     temperature = 0
     add_hint = False
-    model = "gpt-4turbo"
-    submit_summary = False
+    model = "gpt-4o"
+    submit_summary = True
 
     model_config_map = {
         "gpt-3.5": config_list_35,
