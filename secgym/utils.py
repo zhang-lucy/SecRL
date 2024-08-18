@@ -31,6 +31,244 @@ def LLM_call(instruction: str, task: str, config_list: list, **args) -> str:
     )
     return response.choices[0].message.content
 
+def process_entity_identifiers(entities_json_string):
+    try:
+        entity_dict_list = json.loads(entities_json_string)
+    except:
+        return []
+
+    def is_local_ipv4(ip_address):
+        try:
+            if ip_address == "0.0.0.0" or ip_address == "127.0.0.1" or ip_address[:7] == "192.168" or ip_address[:3] == "10.":
+                return True
+            elif (ip_address[0:4] == "172."):
+                ip_address_fields = ip_address.split(".")
+                if len(ip_address_fields) >= 2:
+                    ip_range = int(ip_address_fields[1])
+                    if ip_range >= 16 and ip_range <= 32:
+                        return True
+            
+            return False
+        except:
+            return False
+
+    def get_identifier_value(entity_dict, identifier_field):
+        return str(entity_dict[identifier_field]).lower() if identifier_field in entity_dict else ""
+    
+    entity_field_delimiter = "__"
+    def union_fields(identifier_list):
+        str_identifier_list = [str(identifier).lower() for identifier in identifier_list]
+        return entity_field_delimiter.join(str_identifier_list)
+
+    final_entities_list = []
+
+    for entity_dict in entity_dict_list:
+        if "Type" in entity_dict:
+            type_value = entity_dict["Type"].lower()
+            node_attributes = {"node_type": type_value}
+            
+
+            if type_value == "account":
+
+                identifier_field = "AadUserId"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+                if "Name" in entity_dict and entity_dict["Name"] not in ["root", "system", "guest", "admin", "administrator", "user"]:
+                    node_attributes['identifier_fields'] = "Name"
+                    final_entities_list.append([type_value, "Name", entity_dict["Name"], json.dumps(node_attributes.copy())])
+
+                if "Name" in entity_dict and entity_dict["Name"] not in ["root", "system", "guest", "admin", "administrator", "user"] and "UPNSuffix" in entity_dict:
+                    node_attributes['identifier_fields'] = "Email"
+                    final_entities_list.append([type_value, "Email", entity_dict["Name"] + "@"  + entity_dict['UPNSuffix'], json.dumps(node_attributes.copy())])
+                
+                if "Sid" in entity_dict:
+                    if entity_dict["Sid"] in ['S-1-5-18']: continue
+                    node_attributes['identifier_fields'] = "Sid"
+                    final_entities_list.append([type_value, "Sid", entity_dict["Sid"], json.dumps(node_attributes.copy())])
+                
+                node_attributes['identifier_fields'] = "AadUserId"
+
+            elif type_value == "cloud-application":
+
+                identifier_field = "AppId"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+                if "Name" in entity_dict and "InstanceName" in entity_dict:
+                    node_attributes['identifier_fields'] = "Name__InstanceName"
+                    final_entities_list.append([type_value, "Name__InstanceName", union_fields([entity_dict["Name"], entity_dict['InstanceName']]), json.dumps(node_attributes.copy())])
+                
+                node_attributes['identifier_fields'] = "AppId"
+
+            elif type_value == "file":
+
+                identifier_field = "Name"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+                # if "Name" in entity_dict and "Directory" in entity_dict:
+                #     final_entities_list.append([type_value, "Directory__Name", entity_dict['Directory'] + entity_field_delimiter + entity_dict["Name"], json.dumps(node_attributes.copy())])
+                node_attributes['identifier_fields'] = "Name"
+
+            elif type_value == "filehash":
+
+                if "Algorithm" in entity_dict and "Value" in entity_dict:
+                    node_attributes['identifier_fields'] = "Algorithm__Value"
+                    final_entities_list.append([type_value, "Algorithm__Value", union_fields([entity_dict["Algorithm"], entity_dict["Value"]]), json.dumps(node_attributes.copy())])
+                
+                continue
+
+            elif type_value == "host":
+
+                identifier_field = "AadDeviceId"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+                if "AzureID" in entity_dict:
+                    node_attributes['identifier_fields'] = "AzureID"
+                    final_entities_list.append([type_value, "AzureID", entity_dict["AzureID"], json.dumps(node_attributes.copy())])
+
+                if "HostName" in entity_dict:
+                    node_attributes['identifier_fields'] = "HostName"
+                    final_entities_list.append([type_value, "HostName", entity_dict["HostName"], json.dumps(node_attributes.copy())])
+
+                if "OMSAgentID" in entity_dict:
+                    node_attributes['identifier_fields'] = "OMSAgentID"
+                    final_entities_list.append([type_value, "OMSAgentID", entity_dict["OMSAgentID"], json.dumps(node_attributes.copy())])
+
+                node_attributes['identifier_fields'] = "AadDeviceId"
+
+            elif type_value == "iotdevice":
+
+                identifier_field = "DeviceId"
+                node_attributes['identifier_fields'] = "DeviceId"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+            elif type_value == "ip":
+
+                identifier_field = "Address"
+                node_attributes['identifier_fields'] = "Address"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+                if identifier_value in ('0.0.0.0', '127.0.0.1', '8.8.8.8'): continue
+                node_attributes['IsLocalIPv4'] = str(is_local_ipv4(identifier_value))
+                #if is_local_ipv4(identifier_value): continue
+            
+            elif type_value == "mailbox" or type_value == "mailboxconfiguration":
+
+                identifier_field = "MailboxPrimaryAddress"
+                node_attributes['identifier_fields'] = "MailboxPrimaryAddress"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+            elif type_value == "mailcluster":
+
+                if "Source" in entity_dict and "Query" in entity_dict:
+                    node_attributes['identifier_fields'] = "Source__Query"
+                    final_entities_list.append([type_value, "Source__Query", union_fields([entity_dict["Source"], entity_dict["Query"]]), json.dumps(node_attributes.copy())])
+                
+                continue
+            
+            elif type_value == "mailmessage":
+
+                identifier_field = "Sender"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+                if "Subject" in entity_dict: node_attributes['subject'] = entity_dict['Subject']
+
+                if "Recipient" in entity_dict:
+                    node_attributes['identifier_fields'] = "Recipient"
+                    final_entities_list.append([type_value, "Recipient", entity_dict["Recipient"], json.dumps(node_attributes.copy())])
+
+                if "SenderIP" in entity_dict and entity_dict["SenderIP"] not in ('0.0.0.0', '127.0.0.1', '8.8.8.8'):
+                    node_attributes['identifier_fields'] = "SenderIP"
+                    ip_address = entity_dict["SenderIP"]
+                    copy_node_attributes = node_attributes.copy()
+                    copy_node_attributes['IsLocalIPv4'] = str(is_local_ipv4(ip_address))
+                    final_entities_list.append([type_value, "SenderIP", ip_address, json.dumps(copy_node_attributes)])
+                
+                node_attributes['identifier_fields'] = "Sender"
+
+            elif type_value == "oauth-application":
+
+                identifier_field = "OAuthObjectId"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+                if "OAuthAppId" in entity_dict:
+                    node_attributes['identifier_fields'] = "OAuthAppId"
+                    final_entities_list.append([type_value, "OAuthAppId", entity_dict["OAuthAppId"], json.dumps(node_attributes.copy())])
+                
+                node_attributes['identifier_fields'] = "OAuthObjectId"
+            
+            elif type_value == "process":
+
+                if "ProcessId" in entity_dict and "CreatedTimeUtc" in entity_dict and "CommandLine" in entity_dict:
+                    node_attributes['identifier_fields'] = "ProcessId__CreatedTimeUtc__CommandLine"
+                    final_entities_list.append([type_value, "ProcessId__CreatedTimeUtc__CommandLine", union_fields([entity_dict["ProcessId"], entity_dict["CreatedTimeUtc"], entity_dict["CommandLine"]]), json.dumps(node_attributes.copy())])
+
+                if "CommandLine" in entity_dict:
+                    node_attributes['identifier_fields'] = "ExtractedFileName"
+                    command_line = str(get_identifier_value(entity_dict, "CommandLine")).lower()
+                    extracted_files = re.findall(r'([^\\\/\s"\']*\.(?:exe|pdf|dll|xlsx|docx|zip|png|txt|ps1|html|png|tmp))', command_line)
+                    for extracted_file in extracted_files:
+                        final_entities_list.append([type_value, "ExtractedFileName", extracted_file, json.dumps(node_attributes.copy())])
+
+                continue
+            
+            elif type_value == "security-group":
+
+                identifier_field = "ObjectGuid"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+
+                if "SID" in entity_dict:
+                    node_attributes['identifier_fields'] = "SID"
+                    final_entities_list.append([type_value, "SID", entity_dict["SID"], json.dumps(node_attributes.copy())])
+                
+                node_attributes['identifier_fields'] = "ObjectGuid"
+
+            elif type_value == "service-principal":
+
+                identifier_field = "ServicePrincipalObjectId"
+                node_attributes['identifier_fields'] = "ServicePrincipalObjectId"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+            
+            elif type_value == "url":
+
+                identifier_field = "Url"
+                node_attributes['identifier_fields'] = "Url"
+                identifier_value = get_identifier_value(entity_dict, identifier_field)
+            #     # TODO: add method to check if url is absolute or not
+                #node_attributes['IsAbsoluteUrl'] = str(is_absolute_url(identifier_value))
+            
+            # both cloud resource types extract the subscription id from the resource url
+            # elif type_value == "gcp-resource":
+
+            #     identifier_field = "RelatedAzureResourceIds"
+            #     resource_url = str(get_identifier_value(entity_dict, identifier_field)).lower()
+            #     match = re.search(r'(?<=subscriptions/)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', resource_url)
+            #     identifier_value = match.group() if match else ""
+            
+            elif type_value == "azure-resource":
+
+                identifier_field = "ResourceId"
+                resource_url = str(get_identifier_value(entity_dict, identifier_field)).lower()
+                identifier_value = resource_url
+
+                subscription_match = re.search(r'(?<=subscriptions/)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', resource_url)                
+                if subscription_match:
+                    node_attributes['identifier_fields'] = "SubscriptionId"
+                    final_entities_list.append([type_value, "SubscriptionId", subscription_match.group(), json.dumps(node_attributes.copy())])
+
+                resource_group_list = re.findall(r'resourcegroups/([^/]*)/', resource_url)
+                if len(resource_group_list):
+                    node_attributes['identifier_fields'] = "ResourceGroup"
+                    final_entities_list.append([type_value, "ResourceGroup", resource_group_list[0], json.dumps(node_attributes.copy())])
+
+                node_attributes['identifier_fields'] = "ResourceId"
+
+            else:
+                continue
+            
+            if identifier_value != "":
+                final_entities_list.append([type_value, identifier_field, identifier_value, json.dumps(node_attributes)])
+    
+    return final_entities_list
+
 
 def scrap_table_schema(table_name, yaml_filename, save_yaml=True):
     yaml_filename = f"data/schema/{table_name}.yaml"
