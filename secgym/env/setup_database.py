@@ -139,33 +139,50 @@ def create_sql_file_from_csv_folder(csv_folder, sql_file_path, database_name):
         f"CREATE DATABASE IF NOT EXISTS {database_name};",
         f"USE {database_name};"
     ]
+    for file_name in os.listdir(csv_folder):    
+        if file_name.endswith(".csv"):
+            table_name = file_name.replace(".csv", "")
+            # check meta file exists
+            if os.path.exists(os.path.join(csv_folder, f"{table_name}_metadata.json")):
+                with open(os.path.join(csv_folder, f"{table_name}_metadata.json"), 'r') as meta_file:
+                    type_map = json.load(meta_file)
+            else:
+                print(f"Meta file not found for {table_name}. Inferring types from the CSV file...")
+                df = pd.read_csv(os.path.join(csv_folder, f"{table_name}.csv"), sep="¤", encoding='utf-8-sig', on_bad_lines='skip', engine='python')
+                type_map = {str(col): "string" for col in df.columns}
+                # print(type_map)
 
-    for file_name in os.listdir(csv_folder):
-        if not file_name.endswith(".csv"):
-            continue
-        table_name = file_name.replace(".csv", "")
-        
-        # check meta file exists
+            json_columns = [col for col, dtype in type_map.items() if dtype == "dynamic"]
 
-        if os.path.exists(os.path.join(csv_folder, f"{table_name}.meta")):
-            with open(os.path.join(csv_folder, f"{table_name}.meta"), 'r') as meta_file:
+            # Generate CREATE TABLE statement
+            create_table_sql = generate_create_table_sql(table_name, type_map)
+            sql_statements.append(create_table_sql)
+
+            # Generate LOAD DATA INFILE statement
+            load_data_sql = generate_load_data_sql(file_name, table_name, type_map.keys(), json_columns)
+            sql_statements.append(load_data_sql)
+        elif os.path.isdir(os.path.join(csv_folder, file_name)):
+            # a folder of CSV files. file_name is the table name: SecurityAlert
+            # In the folder, there are SecurityAlert_i.csv starting from 1 and a SecurityAlert.meta file
+            # add the corresponding SQL statements: creating one table and loading all the data
+
+            table_name = file_name
+            with open(os.path.join(csv_folder, f"{file_name}/{file_name}_0_metadata.json"), 'r') as meta_file:
                 type_map = json.load(meta_file)
-        else:
-            print(f"Meta file not found for {table_name}. Inferring types from the CSV file...")
-            df = pd.read_csv(os.path.join(csv_folder, f"{table_name}.csv"), sep="¤", encoding='utf-8-sig', on_bad_lines='skip', engine='python')
-            type_map = {str(col): "string" for col in df.columns}
-            print(type_map)
+            json_columns = [col for col, dtype in type_map.items() if dtype == "dynamic"]
 
-        json_columns = [col for col, dtype in type_map.items() if dtype == "dynamic"]
+            # get all the csv files
+            csv_files = [f"{file_name}/{f}" for f in os.listdir(os.path.join(csv_folder, file_name)) if f.endswith(".csv")]
+            
+            # Generate CREATE TABLE statement
+            create_table_sql = generate_create_table_sql(table_name, type_map)
+            sql_statements.append(create_table_sql)
 
-        # Generate CREATE TABLE statement
-        create_table_sql = generate_create_table_sql(table_name, type_map)
-        sql_statements.append(create_table_sql)
-
-        # Generate LOAD DATA INFILE statement
-        load_data_sql = generate_load_data_sql(table_name, type_map.keys(), json_columns)
-        sql_statements.append(load_data_sql)
-
+            # Generate LOAD DATA INFILE statement
+            for i, csv_file in enumerate(csv_files):
+                load_data_sql = generate_load_data_sql(csv_file, table_name, type_map.keys(), json_columns)
+                sql_statements.append(load_data_sql)
+           
     # Write all SQL statements to the output file
     with open(sql_file_path, 'w', encoding='utf-8') as sql_file:
         sql_file.write("\n\n".join(sql_statements))
@@ -190,10 +207,10 @@ def generate_create_table_sql(table_name, type_map):
         sql = sql.replace("Usage", "`Usage`")
     return sql
 
-def generate_load_data_sql(table_name, columns, json_columns):
+def generate_load_data_sql(file_name, table_name, columns, json_columns):
     """Generate LOAD DATA INFILE SQL statement."""
     load_data_sql = f"""
-LOAD DATA INFILE '/var/lib/mysql-files/{table_name}.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/{file_name}'
 INTO TABLE {table_name}
 FIELDS TERMINATED BY '¤'
 ENCLOSED BY '"'
@@ -216,15 +233,15 @@ IGNORE 1 ROWS;
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup a MySQL database from CSV files')
     parser.add_argument('--port', type=str, default="3306", help='Port number for the MySQL container')
-    parser.add_argument('--csv_folder', type=str, default=to_abs_path("data/aadcomp_jul25"), help='Folder containing the CSV files')
+    parser.add_argument('--csv', type=str, help='Folder containing the CSV files')
     parser.add_argument('--sql_file', type=str, default=to_abs_path("data/secbench.sql"), help='Output SQL file')
-    parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
     parser.add_argument('--container_name', type=str, default="mysql-container", help='Name of the MySQL container')
+    parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
     parser.add_argument('--respawn', action='store_true', help='Delete and recreate the container')
     args = parser.parse_args()
     # make sure the data is downloaded and stored in the 'large_data' folder
 
-    csv_folder = to_abs_path(args.csv_folder)
+    csv_folder = to_abs_path(args.csv)
     sql_file_path = to_abs_path(args.sql_file)
 
     # 1. create a .sql file from the CSV  filesin the 'large_data' folder
@@ -245,7 +262,6 @@ if __name__ == "__main__":
         port=args.port,
         respawn=args.respawn
     )
-
 
     # # 3. test connection to the MySQL container
     connection = mysql.connector.connect(

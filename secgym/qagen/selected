@@ -1,0 +1,180 @@
+    {
+        "context": "A connection from IP address 10.60.0.16 associated with hostname `vnevado-win11h.vnevado.alpineskihouse.co` to IP address 20.96.16.175 was seen on the proxy. The destination URL `login.micro.demo.antoinetest.ovh` is flagged as malicious. Please investigate what happened on the computer.",
+        "question": "What is the URL that was detected in the proxy logs as malicious?",
+        "len": 3,
+
+        "answer": "login.micro.demo.antoinetest.ovh",
+        "start_alert": 33,
+        "end_alert": 33,
+        "start_entities": [
+            35,
+            36
+        ],
+        "end_entity": [
+            34
+        ],
+        "shortest_alert_path": [
+            33
+        ]
+    },
+    {
+        "context": "A connection from IP `10.60.0.16` belonging to the host `vnevado-win11h.vnevado.alpineskihouse.co` was detected in proxy logs accessing the URL `login.micro.demo.antoinetest.ovh`. This might indicate a potential security incident, and it is recommended to investigate the computer involved.",
+        "question": "What is the IP address associated with the Suspicious Azure Resource Management activities by a risky user?",
+        "answer": "185.220.101.1",
+        "len": 7,
+        "start_alert": 33,
+        "end_alert": 32,
+        "start_entities": [
+            35,
+            34
+        ],
+        "end_entity": [
+            13
+        ],
+        "shortest_alert_path": [
+            33,
+            25,
+            24,
+            14,
+            32
+        ]
+    },
+
+    {
+        "context": "A file `powershell.exe` was launched on 2024-08-01 at 12:37:29.6522416 UTC with a process ID of 2556, from a host running `ntdsutil.exe`. Ntdsutil is used to manage Active Directory services and may be used by attackers to gather information for persistence or lateral movement within an organization.",
+        "question": "In the context of the suspicious activity involving `powershell.exe` and `ntdsutil.exe`, which Azure subscription ID was involved in the resource management operation detected by Microsoft Defender?",
+        "answer": "99005f96-e572-4035-b476-836fd9d83d64",
+        "start_alert": 0,
+        "end_alert": 7,
+        "start_entities": [
+            1,
+            4
+        ],
+        "end_entity": [
+            8
+        ],
+        "shortest_alert_path": [
+            0,
+            5,
+            7
+        ]
+    },
+    {
+        "context": "Suspicious Azure Resource Management (ARM) activities were performed by a user account that signed in to a risky session. The alert was based on a Microsoft Defender for Cloud alert related to ARM and Microsoft Entra ID Protection risk scores. The IP address involved in this activity is `185.220.101.1`.",
+        "question": "Can you provide the AadDeviceId of the host where a malicious URL was clicked following the suspicious ARM activities?",
+        "answer": "76707c40-3343-490e-9205-88fdb51aefe0",
+        "start_alert": 32,
+        "end_alert": 24,
+        "start_entities": [
+            13
+        ],
+        "end_entity": [
+            26
+        ],
+        "shortest_alert_path": [
+            32,
+            14,
+            24
+        ]
+    },
+
+    {
+        "context": "A user named Megan Bower clicked on a malicious URL `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/` in an email that was later quarantined by zero-hour auto purge (ZAP). This alert was triggered based on a Microsoft Defender for Office 365 alert.",
+        "question": "What is the AadUserId of the user Megan Bower who accessed the quarantined link?",
+        "answer": "6c16dea3-5326-461e-a48e-38b527df3a70",
+        "start_alert": 31,
+        "end_alert": 31,
+        "start_entities": [
+            23,
+            14
+        ],
+        "end_entity": [
+            17
+        ],
+        "shortest_alert_path": [
+            31
+        ]
+    }
+    // {
+    //     "context": "A user named Megan Bower clicked on a link `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/` in an email that was later quarantined by zero-hour auto purge (ZAP). This alert was triggered based on a Microsoft Defender for Office 365.",
+    //     "question": "What is the email address of the user who clicked on the malicious URL?",
+    //     "answer": "meganb@vnevado.alpineskihouse.co",
+    //     "start_alert": 31,
+    //     "end_alert": 30,
+    //     "start_entities": [
+    //         23,
+    //         14
+    //     ],
+    //     "end_entity": [
+    //         20
+    //     ],
+    //     "shortest_alert_path": [
+    //         31,
+    //         14,
+    //         30
+    //     ]
+    // }, # one investigation
+
+    // {
+    //     "context": "A potentially malicious URL click was detected involving a user named Megan Bower. The primary address of Megan Bower's mailbox is `meganb@vnevado.alpineskihouse.co`.",
+    //     "question": "Can you provide the recipient email address associated with the potentially malicious URL click?",
+    //     "answer": "meganb@vnevado.alpineskihouse.co",
+    //     "start_alert": 30,
+    //     "end_alert": 30,
+    //     "start_entities": [
+    //         14,
+    //         19
+    //     ],
+    //     "end_entity": [
+    //         20
+    //     ],
+    //     "shortest_alert_path": [
+    //         30
+    //     ]
+    // },
+    // {
+    //     "context": "A resource management operation was detected from a suspicious proxy IP address using Azure Resource Manager. The resources involved are identified as `/subscriptions/99005f96-e572-4035-b476-836fd9d83d64/resourcegroups/ctfcat/providers/microsoft.devtestlab/schedules/shutdown-computevm-vnevado-dc` and `/subscriptions/99005f96-e572-4035-b476-836fd9d83d64/resourcegroups/ctfcat/providers/microsoft.network/networkinterfaces/vnevado-dc-nic`. This behavior can be legitimate but is often seen in malicious activities when threat actors try to hide their source IP.",
+    //     "question": "Related to this alert, there is also a detection of a potentially malicious URL click. Can you provide the URL that was detected as malicious?",
+    //     "answer": "https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/",
+    //     "len": 5,
+    //     "start_alert": 7,
+    //     "end_alert": 30,
+    //     "start_entities": [
+    //         12,
+    //         11
+    //     ],
+    //     "end_entity": [
+    //         23
+    //     ],
+    //     "shortest_alert_path": [
+    //         7,
+    //         14,
+    //         30
+    //     ]
+    // },
+
+
+
+    // {
+    //     "context": "On 8/14/2024 at 10:34 PM, commands were executed using `ntdsutil.exe` and `powershell.exe` on a network or organization that might indicate an attacker collecting Active Directory information. The specific commands were `ntdsutil.exe ac i ntds ifm create full c:\\temp q q` with Process ID 6748 and `powershell.exe -encodedcommand ...` with Process ID 2556.",
+    //     "question": "Regarding the recent Malicious URL detected in the proxy logs, which IP address was associated with this alert?",
+    //     "answer": "10.60.0.16",
+    //     "start_alert": 0,
+    //     "end_alert": 33,
+    //     "start_entities": [
+    //         3,
+    //         1
+    //     ],
+    //     "end_entity": [
+    //         35
+    //     ],
+    //     "shortest_alert_path": [
+    //         0,
+    //         5,
+    //         7,
+    //         14,
+    //         24,
+    //         25,
+    //         33
+    //     ]
+    // },

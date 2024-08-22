@@ -2,37 +2,78 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
 from secgym.utils import process_entity_identifiers
+from typing import List, Union
+import json
+import random
 
 class AlertGraph:
-    def __init__(self, alerts: pd.DataFrame) -> None:
+    def __init__(self) -> None:
         """
         Initialize the AlertGraph with a DataFrame of alerts.
         
         :param alerts: DataFrame containing alert entries.
         """
-        self.alerts = alerts
         self.graph = nx.Graph()
         self.next_node_id = 0
         self.entity_node_map = {}  # To map (identifier_field, value) to node_id
-        self._build_graph()
+        self.alert_node_ids = set()
+        self.incident = None
+        self.alerts = []
 
-    def _build_graph(self) -> None:
+
+    def build_graph_from_incident_alert(self, incident: pd.Series, alerts: Union[list[pd.Series], pd.DataFrame]) -> None:
         """Builds the graph from the DataFrame of alerts and their entities."""
-        for idx, alert in self.alerts.iterrows():
+
+        self.alerts = alerts
+        if isinstance(alerts, pd.DataFrame):
+            self.alerts = alerts.iterrows()
+        self.incident = incident
+
+        # time stamp to string
+        self.incident['TimeGenerated [UTC]'] = str(self.incident['TimeGenerated [UTC]'])
+        self.graph.graph['incident'] = json.dumps(self.incident.to_dict())
+
+        for idx, alert in enumerate(self.alerts):
             alert_node_id = self.next_node_id
             self.next_node_id += 1
+            self.alert_node_ids.add(alert_node_id)
 
+            alert['TimeGenerated [UTC]'] = str(alert['TimeGenerated [UTC]'])
             # Add alert node
             self.graph.add_node(
                 alert_node_id,
                 type="alert",
                 name=alert["AlertName"],
-                description=alert["Description"]
+                description=alert["Description"],
+                entry=json.dumps(alert.to_dict())
             )
 
             # Process and add entities
             entities = process_entity_identifiers(alert["Entities"])
             self._add_entities_to_graph(entities, alert_node_id)
+
+    def load_graph_from_graphml(self, filepath: str) -> None:
+
+        self.graph = nx.read_graphml(filepath, node_type=int)
+        self.next_node_id = max(self.graph.nodes) + 1
+
+        # Rebuild the entity_node_map
+        # incident and alert entries back to pandas
+        incident = json.loads(self.graph.graph['incident'])
+        self.incident = pd.Series(incident)
+
+        self.entity_node_map = {}
+        for node, data in self.graph.nodes(data=True):
+            if data.get('type') == 'entity':
+                identifier_field = data.get('identifier_fields', '')
+                value = data.get('value', '')
+                self.entity_node_map[(identifier_field, value)] = node
+            
+            elif data.get('type') == 'alert':
+                self.alert_node_ids.add(node)
+                # alert entry back to pandas
+                self.alerts.append(pd.Series(json.loads(data['entry'])))
+        
 
     def _add_entities_to_graph(self, entities: list, alert_node_id: int) -> None:
         """Adds entities to the graph and connects them to the corresponding alert."""
@@ -73,14 +114,14 @@ class AlertGraph:
         print(f"Graph saved to {filepath}")
 
     def plot_custom_graph(self, 
-                        root, 
-                        figsize=(10, 10), 
-                        base_node_size=5000, 
-                        max_line_length=20, 
+                        root=0, 
+                        figsize=(30, 20),
+                        base_node_size=15000, 
+                        max_line_length=80, 
                         show_plot=True, 
                         save_figure=False, 
                         file_path=None,
-                        layout='circular'
+                        layout='spring'
                         ):
         # Define node sizes and colors based on type
         node_sizes = []
@@ -97,15 +138,15 @@ class AlertGraph:
                 # wrapped_description = "\n".join(textwrap.wrap(full_description, max_line_length))
                 # label = f"ID: {node}\n{data.get('name', '')}\n{wrapped_description}"
                 
-                labels[node] = label
+                labels[node] = label[:max_line_length+7]
                 node_sizes.append(base_node_size)  # Size for type alert
                 node_colors.append('#ADD8E6')  # Light blue color for type alert
             elif data.get('type') == 'entity':
                 # Concatenate identifier_field and value for entities
                 identifier_field = data.get('identifier_fields', '')
                 value = data.get('value', '')
-                label = f"{identifier_field}: {value}"
-                labels[node] = label
+                label = f"ID: {node}\n{identifier_field}: {value}"
+                labels[node] = label[:max_line_length+7]
                 node_sizes.append(base_node_size // 3)  # Smaller size for type entity
                 node_colors.append('#FFB6C1')  # Light pink color for type entity
 
@@ -114,6 +155,16 @@ class AlertGraph:
             pos = self.hierarchy_pos(root)
         elif layout == 'circular':
             pos = nx.circular_layout(self.graph)
+        elif layout == 'spring':
+            pos = nx.spring_layout(self.graph)
+        elif layout == 'fruchterman_reingold':
+            pos = nx.fruchterman_reingold_layout(self.graph)
+        elif layout == 'spectral':
+            pos = nx.spectral_layout(self.graph)
+        elif layout == 'shell':
+            pos = nx.shell_layout(self.graph)
+        elif layout == 'random':
+            pos = nx.random_layout(self.graph)
         elif not isinstance(layout, str):
             pos = layout
         else:
@@ -134,9 +185,136 @@ class AlertGraph:
             plt.show()
         else:
             plt.close()
+    
+    def get_e2e_paths(self):
+        """
+        Get all paths from one entity to another entity.
 
+        1. start node is an entity node
+        2. end node is an entity node
+        3. path includes alert and entity nodes
+        
+        - undirect: reverse the whole path is another path
+        - should not include entity node to self
+        - should be the shortest path, only get one path from each start node to end node
+        """
+        e2e_paths = []
+        # iterate all entity nodes
+        for entity_node in self.entity_node_map.values():
+            # get all paths from entity node to entity node
+            for entity_node2 in self.entity_node_map.values():
+                if entity_node == entity_node2:
+                    continue
+                paths = nx.all_shortest_paths(self.graph, source=entity_node, target=entity_node2)
+                # get the first path
+                e2e_paths.append(next(paths))
+        
+        print(f"Total end-to-end paths: {len(e2e_paths)}")
+        # print number base on len of the list
+        length_count = {}
+        for path in e2e_paths:
+            length = len(path)
+            if length not in length_count:
+                length_count[length] = 1
+            else:
+                length_count[length] += 1
+        
+        for length, count in length_count.items():
+            print(f"Length {length}: {count}")
+         
+        return e2e_paths
 
-    # Example usage:
-    # graph = AlertGraph(alerts=alert_entries)
-    # graph.save_to_graphml("alert_graph.graphml")
-    # graph.plot_graph()
+    def get_graph_patterns(self):
+        """
+        For each alert node, print 
+        1. num of entities it connected
+        2. num of leaf entities it connected
+        """
+        print("Graph patterns:")
+
+        for alert_node in self.alert_node_ids:
+            entities = [node for node in self.graph.neighbors(alert_node) if self.graph.nodes[node]['type'] == 'entity']
+            leaf_entities = [node for node in entities if self.graph.degree(node) == 1]
+            print(f"Alert node {alert_node}: {len(entities)} entities, {len(leaf_entities)} leaf entities")
+    
+
+    def get_complet_alert_paths(self, alert_paths_dict) -> list:
+        return [alert_paths_dict['start_entities']] + alert_paths_dict['shortest_alert_path'] + alert_paths_dict['end_entity']
+
+    def get_alert_paths(self, k=2, verbose=True):
+        """
+        Question from any two alerts:
+		- Pick any two alert (can be same)
+		- Select k entities from on alert that is farthest from another entity (if same alert, the entity should not be the same)
+
+        Args:
+        - k: number of entities to be selected from the farthest entities
+        - verbose: print out the alert pairs and selected entities
+
+        Return:
+        - list of alert paths, each path is a dict with keys: start_alert, end_alert, start_entities, end_entity, shortest_alert_path
+        """
+        def get_farthest_entities(start_alert, end_alert):
+            start_entities = [node for node in self.graph.neighbors(start_alert) if self.graph.nodes[node]['type'] == 'entity']
+            # print(f"Start entities: {start_entities}")
+            dist_map = {}
+            for entity in start_entities:
+                tmp_dist = nx.shortest_path_length(self.graph, source=entity, target=end_alert)
+                if tmp_dist not in dist_map:
+                    dist_map[tmp_dist] = [entity]
+                else:
+                    dist_map[tmp_dist].append(entity)
+            
+            # print(f"Dist map: {dist_map}")
+            max_dist = max(dist_map.keys())
+            return dist_map[max_dist]
+    
+        # construct alert pairs
+        alert_nodes = list(self.alert_node_ids)
+        alert_pairs = [(alert1, alert2) for alert1 in alert_nodes for alert2 in alert_nodes]
+
+        alert_paths = []
+        for alert1, alert2 in alert_pairs:
+            # get entities connected to alert1 that is farthest from alert2 node
+            # print(f"Alert pair: {alert1} -> {alert2}")
+
+            farthest_start_entities = get_farthest_entities(alert1, alert2)
+            if alert1 != alert2: # if start and end alert is different
+                if k > len(farthest_start_entities):
+                    selected_from_a1 = farthest_start_entities
+                    print(f"Construct path from alert {alert1} to alert {alert2}, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available.")
+                else:
+                    selected_from_a1 = random.sample(farthest_start_entities, k)
+
+                # get entities connected to alert2 that is farthest from alert1 node
+                farthest_end_entities = get_farthest_entities(alert2, alert1)
+                selected_from_a2 = random.sample(farthest_end_entities, 1)
+            else: # start and end alert is the same
+                if k >= len(farthest_start_entities):
+                    print(f"Construct path using the same alert, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available in alert id {alert1}.")
+                    print(f'Use {len(farthest_start_entities) - 1} entities instead.')
+                selected_from_a1 = random.sample(farthest_start_entities, min(k, len(farthest_start_entities)-1))
+                
+                # sample 1 from the rest of farthest_start_entities, start and end entity should not be the same
+                remaining_entities = [entity for entity in farthest_start_entities if entity not in selected_from_a1]
+                selected_from_a2 = remaining_entities
+            
+            shortest_alert_path = nx.shortest_path(self.graph, source=alert1, target=alert2) # path between alert1 and alert2
+            alert_paths.append(
+                {
+                    "start_alert": alert1,
+                    "end_alert": alert2,
+                    "start_entities": selected_from_a1,
+                    "end_entities": selected_from_a2,
+                    "shortest_alert_path": shortest_alert_path
+                }
+            )
+            if verbose:
+                print(f"Alert pair: {alert1} -> {alert2}, start entities: {selected_from_a1}, end entity: {selected_from_a2}, shortest alert path: {shortest_alert_path}")
+                print(f"-"*100)
+
+        print(f"Total alert paths: {len(alert_paths)}. Expected: alert_num ^ 2 = {len(alert_nodes) ** 2}")
+        return alert_paths
+
+    def get_node(self, node_id):
+        return self.graph.nodes(data=True)[node_id]

@@ -20,7 +20,6 @@ def get_full_question(question_dict, add_hint=False):
 def LLM_call(instruction: str, task: str, config_list: list, **args) -> str:
     client = autogen.OpenAIWrapper(
         config_list=config_list,
-        cache_seed=41,
         **args
     )
     response = client.create(
