@@ -56,12 +56,13 @@ class Evaluator:
     def checking(self, 
                  question: dict, 
                  submitted_answer: str, 
+                 eval_step: bool = False
                  ) -> float:
             
             is_correct = self.check_single_response(question, submitted_answer)
             if is_correct == 1:
                 return 1
-            if "solution" not in question:
+            if "solution" not in question or not eval_step:
                 return 0
             
             # check process if solution is provided

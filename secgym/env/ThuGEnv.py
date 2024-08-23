@@ -15,6 +15,7 @@ from secgym.env.evaluator import Evaluator
 ATTACKS = {
     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
     "AAD_Comprise": "aad_comprise/aad_comprise_qa.json",
+    "Incident_322": "newqa.json",
 }
 
 def start_container(container_name):
@@ -42,12 +43,14 @@ class ThuGEnv(gym.Env):
             container_name: str = "mysql-container",
             dataset_name: str = "env_monitor_db",
             port: str = "3306",
-            add_hint: bool = False
+            add_hint: bool = False,
+            eval_step: bool = False
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
         self.max_entry_return = max_entry_return
         self.add_hint = add_hint
+        self.eval_step = eval_step
 
         if save_file is False:
             print("Warning: No save file provided. Logging will not be saved.")
@@ -279,7 +282,7 @@ class ThuGEnv(gym.Env):
     def _eval(self, answer: str) -> float:
         """Evaluate the answer and return the score.
         """
-        return self.evaluator.checking(self.curr_question, answer)
+        return self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
 
 
 if __name__ == "__main__":

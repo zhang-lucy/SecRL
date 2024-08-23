@@ -2,7 +2,7 @@ from agents.baseline_agent import BaselineAgent
 import json
 from datetime import datetime
 from typing import Union
-
+import os
 from secgym.env.ThuGEnv import ThuGEnv
 from secgym.myconfig import config_list_4o, config_list_4_turbo, config_list_35
 
@@ -35,9 +35,9 @@ def run_experiment(
         # if tmp not in [(12, 6), (6, 12), (8, 14), (14, 8), (14, 10), (14, 4), (4, 10), (4, 3)]:
         #     continue
         # temp hack
-        if "SecurityExposureManagement" in thug_env.curr_question['tables']:
-            print(f"Skipping question {i+1}")
-            continue
+        # if "SecurityExposureManagement" in thug_env.curr_question['tables']:
+        #     print(f"Skipping question {i+1}")
+        #     continue
 
         tested_num += 1 
         
@@ -61,7 +61,7 @@ def run_experiment(
 
         result_dict ={
                 "reward": reward,
-                "nodes": f"{thug_env.curr_question['start_node']}-{thug_env.curr_question['end_node']}",
+                "nodes": f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}",
                 "question_dict": thug_env.curr_question,
             }
         result_dict.update(agent.get_logging())
@@ -88,7 +88,8 @@ if __name__ == "__main__":
     temperature = 0
     add_hint = False
     model = "gpt-4o"
-    submit_summary = True
+    submit_summary = False
+    max_steps = 15
 
     model_config_map = {
         "gpt-3.5": config_list_35,
@@ -103,30 +104,25 @@ if __name__ == "__main__":
     if submit_summary:
         post_fix += "_sum"
 
-    # post_fix = "gpt35"
-    # cache_seed = 45
-
-    # with hint
-    # 4, 44 -> 45/56
-    # 5, 45 -> 9/11
-
+    os.makedirs("results", exist_ok=True)
     save_agent_file = f"results/agent_log{post_fix}.json"
     save_env_file = f"results/env_log{post_fix}.json"
 
     agent = BaselineAgent(
         config_list=agent_config_list,
-        cache_seed=cache_seed, # 42
+        cache_seed=cache_seed, 
         submit_summary=submit_summary,
         temperature=temperature,
     )
 
     thug_env = ThuGEnv(
-        attack="AAD_Comprise", 
+        attack="Incident_322", 
         config_list=config_list_4o, 
         noise_level=0,
         save_file=save_env_file,
         add_hint=add_hint,
-        max_steps=15
+        max_steps=max_steps,
+        eval_step=False,
     ) 
     avg_success, tested_num, avg_reward = run_experiment(
         agent=agent,

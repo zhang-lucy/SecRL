@@ -170,8 +170,13 @@ def query_and_save_data(
                 error = response.partial_error
                 print(f"Getting error, retry chunk {chunk_id}", error)
                 # update max size allowed and row per query
-                max_size_allowed -= 2000000
-                row_per_query = min(row_per_query, max_size_allowed // (total_size/total_count))
+                if "'sort' operator" in str(error): 
+                    time_chunk = int(time_chunk * 0.8)
+                    print("Sort operator error, reducing time chunk:", time_chunk)
+
+                else:
+                    max_size_allowed -= 2000000
+                    row_per_query = min(row_per_query, max_size_allowed // (total_size/total_count))
             else:
                 # set new start time to be the last time from the response
                 earliest, latest = save_table(os.path.join(updated_file_path, f"{table_name}_{chunk_id}.csv"), response, need_metadata=chunk_id == 0)
@@ -190,6 +195,7 @@ def query_and_save_data(
             print(f"Table {table_name} is empty. Skipping.")
         else:
             print(f"Table {table_name} is saved.")
+    print("-"*100)
 
 LIST_TABLES = [
     "AADManagedIdentitySignInLogs",
@@ -213,7 +219,7 @@ LIST_TABLES = [
     "AZFWNetworkRuleAggregation",
     "AZFWThreatIntel",
     "AzureActivity",
-    # "AzureDiagnostics",
+    "AzureDiagnostics",
     "AzureMetrics",
     "ContainerRegistryRepositoryEvents",
     "Heartbeat",
@@ -282,39 +288,72 @@ def print_file_size(
 # FirstActivityTime [UTC]                            8/1/2024, 12:26:22.000 PM
 # LastActivityTime [UTC]                             8/1/2024, 12:37:30.277 PM
 # extract 3 hours containing the attack
+# attacks = {
+#     322: {
+#         "start_time": datetime(2024, 8, 1, 11, 0, 0, 0, tzinfo=timezone.utc),
+#         "end_time": datetime(2024, 8, 1, 14, 0, 0, 0, tzinfo=timezone.utc),
+#     },
+# }
+
 attacks = {
-    322: {
-        "start_time": datetime(2024, 8, 1, 11, 0, 0, 0, tzinfo=timezone.utc),
-        "end_time": datetime(2024, 8, 1, 14, 0, 0, 0, tzinfo=timezone.utc),
-    }
-}
+    5: {'start_time': datetime(2024, 6, 20, 8, 51, 7, 52079, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 6, 20, 9, 38, 4, 116591, tzinfo=timezone.utc)},
+    38: {'start_time': datetime(2024, 6, 26, 15, 49, 16, 784267, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 6, 26, 16, 13, 56, 115283, tzinfo=timezone.utc)},
+    34: {'start_time': datetime(2024, 6, 26, 11, 57, 25, 302556, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 6, 26, 13, 17, 18, 874531, tzinfo=timezone.utc)},
+    39: {'start_time': datetime(2024, 6, 27, 14, 25, 58, 353842, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 6, 27, 22, 21, 6, 820675, tzinfo=timezone.utc)},
+    55: {'start_time': datetime(2024, 7, 1, 15, 1, 28, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 7, 7, 0, 1, 1, 21452, tzinfo=timezone.utc)},
+    122: {'start_time': datetime(2024, 7, 13, 9, 17, 30, 965401, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 7, 13, 9, 17, 48, 673545, tzinfo=timezone.utc)},
+    134: {'start_time': datetime(2024, 7, 17, 10, 49, 35, 108080, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 7, 17, 11, 6, 54, tzinfo=timezone.utc)},
+    166: {'start_time': datetime(2024, 7, 22, 8, 18, 18, 418000, tzinfo=timezone.utc),
+    'end_time': datetime(2024, 7, 22, 9, 46, 21, tzinfo=timezone.utc)}
+  }
 
-if __name__ == "__main__":
-    ATEVET_17 = "0fbd2874-9307-4572-b499-f8fa3cc75daf"
-    Alpine = "e34d562e-ef12-4c4e-9bc0-7c6ae357c015"
+def get_new_times(start_time, end_time):
+    # state new start time to be the exact hour of the original start time - 1, clear up minutes and seconds
+    start_time = start_time.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
+    end_time = end_time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+    return start_time, end_time
 
-    # parameters
-    # start_time = datetime(2024, 6, 18, 0, 0, 0, 0, tzinfo=timezone.utc)
-    # end_time = datetime(2024, 8, 2, 0, 0, 0, 0, tzinfo=timezone.utc)
-    # file_path = os.path.join(os.path.dirname(__file__), "data/alpineSkiHouse")
 
-    start_time = attacks[322]["start_time"]
-    end_time = attacks[322]["end_time"]
-    # name: date+incident number
-    file_path = os.path.join(os.path.dirname(__file__), "data/aug1_322")
-    workspace_id = Alpine
-
-    # print_file_size(Alpine)
-
+def download_logs(workspace_id, table_names, start_time, end_time, file_path):
     os.makedirs(file_path, exist_ok=True)
-    for table in LIST_TABLES:
+    for table in table_names:
+        # if table already exists, skip
         if os.path.exists(os.path.join(file_path, f"{table}.csv")) or os.path.exists(os.path.join(file_path, table)):
-            print(f"Table {table} is already saved.")
+            print(f"Table {table} already exists. Skipping.")
             continue
+        # if table != "AzureDiagnostics":
+        #     continue
         try :
             query_and_save_data(workspace_id, table, (start_time, end_time), file_path, verbose=True)
         except HttpResponseError as e:
             print(f"Table {table} is failed to save.")
             print(e)
             continue
+
+if __name__ == "__main__":
+    # ATEVET_17 = "0fbd2874-9307-4572-b499-f8fa3cc75daf"
+    Alpine = "e34d562e-ef12-4c4e-9bc0-7c6ae357c015"
+
+    # name: date+incident number
+    # print_file_size(Alpine)
+
+    start_time = datetime(2024, 6, 20, 0, 0, 0, tzinfo=timezone.utc)
+    end_time = datetime(2024, 7, 23, 0, 0, 0, tzinfo=timezone.utc)
+    download_logs(Alpine, LIST_TABLES, start_time, end_time, f"final_data/alphineskihouse")
     
+
+    # root_path = os.path.join(os.path.dirname(__file__), "final_data")
+
+    # for a in attacks:
+    #     file_path = os.path.join(root_path, f"incident_{a}")
+    #     start_time, end_time = get_new_times(attacks[a]["start_time"], attacks[a]["end_time"])
+    #     # print time interval
+    #     print(f"Incident {a}: {start_time} - {end_time}")
+    #     download_logs(Alpine, LIST_TABLES, start_time, end_time, file_path)

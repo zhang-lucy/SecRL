@@ -88,8 +88,26 @@ def create_container(
             )
             print(f"Started container {container_name} with ID: {container.id} on port {port}")
             container.reload()
-            print(f"Waiting 30 seconds for the container to start...")
-            time.sleep(30)  # Wait for the container to start
+            # print(f"Waiting 40 seconds for the container to start...")
+            # time.sleep(40)  # Wait for the container to start
+
+            # iterate and check if the container is running or exited
+
+            time_limit = 600
+            time_step = 2
+            while time_limit > 0:
+                if container.status == "running":
+                    print(f"Container {container_name} is running.")
+                    break
+                elif container.status == "exited":
+                    print(f"Container {container_name} has exited due to an error.")
+                    break
+                time.sleep(time_step)
+                time_limit -= time_step
+            
+            if time_limit == 0:
+                raise Exception(f"Container {container_name} did not start within the time limit.")
+
             return container, port
         except (ContainerError, ImageNotFound) as e:
             print(f"Error: {e}")
@@ -130,8 +148,20 @@ def process_csv(csv_folder):
 
             break
 
-def create_sql_file_from_csv_folder(csv_folder, sql_file_path, database_name):
-    """Create a single .sql file from a folder of CSV and .meta files."""
+def create_sql_file_from_csv_folder(
+        csv_folder, 
+        sql_file_path, 
+        database_name,
+        skip_tables=["SecurityAlert", "SecurityIncident"]
+        ):
+    """Create a single .sql file from a folder of CSV and .meta files.
+
+    Args:
+        csv_folder (str): Path to the folder containing the CSV and .meta files.
+        sql_file_path (str): Path to the output SQL file.
+        database_name (str): Name of the database to create.
+        skip_tables (list): List of table names to skip.
+    """
     sql_statements = [
         "CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';",
         "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%';",
@@ -139,7 +169,11 @@ def create_sql_file_from_csv_folder(csv_folder, sql_file_path, database_name):
         f"CREATE DATABASE IF NOT EXISTS {database_name};",
         f"USE {database_name};"
     ]
-    for file_name in os.listdir(csv_folder):    
+    for file_name in os.listdir(csv_folder):
+
+        if file_name.replace(".csv", "").strip() in skip_tables: 
+            print(f"Skipping table {file_name}")
+            continue
         if file_name.endswith(".csv"):
             table_name = file_name.replace(".csv", "")
             # check meta file exists

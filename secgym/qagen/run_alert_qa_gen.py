@@ -24,6 +24,13 @@ Entities from this alert:
     return f"Start Alert:\n{start_alert_str}\nEnd Alert:\n{end_alert_str}"
 
 # print(qagen_prompt_format(alert_graph, all_paths[0]))
+def get_solution_path(alert_graph, path_dict):
+    solution = []
+    for n in path_dict["shortest_alert_path"]:
+        node = alert_graph.get_node(n)
+        if node["node_type"] == "entity":
+            solution.append(f"Entity field: {node['identifier_fields']}, Value: `{node['value']}`\n")
+            
 
 QAGEN_PROMPT = """Your goal is to ask a security question from the given data from a security analyst's perspective.
 You are given the start alert and end alert, and corresponding entities. The two alerts are connected by a alert-entity path. The start and end alert might be the same.
