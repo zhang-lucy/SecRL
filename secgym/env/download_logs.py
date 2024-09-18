@@ -109,7 +109,7 @@ def save_table(file_path_name, response, need_metadata=False):
         df[column] = df[column].apply(lambda x: "{}" if x == "" else x)
         df[column] = df[column].apply(lambda x: "{}" if pd.isnull(x) else x)
     
-    df.to_csv(file_path_name, index=False, sep="¤", encoding='utf-8')
+    df.to_csv(file_path_name, index=False, sep="❖", encoding='utf-8')
     return df["TimeGenerated"].min(), df["TimeGenerated"].max()
 
 def query_and_save_data(
@@ -338,22 +338,19 @@ def download_logs(workspace_id, table_names, start_time, end_time, file_path):
             continue
 
 if __name__ == "__main__":
-    # ATEVET_17 = "0fbd2874-9307-4572-b499-f8fa3cc75daf"
+    # Set workspace id
     Alpine = "e34d562e-ef12-4c4e-9bc0-7c6ae357c015"
 
-    # name: date+incident number
-    # print_file_size(Alpine)
-
-    start_time = datetime(2024, 6, 20, 0, 0, 0, tzinfo=timezone.utc)
-    end_time = datetime(2024, 7, 23, 0, 0, 0, tzinfo=timezone.utc)
-    download_logs(Alpine, LIST_TABLES, start_time, end_time, f"final_data/alphineskihouse")
+    # download alphine ski house, total days: 33
+    # start_time = datetime(2024, 6, 20, 0, 0, 0, tzinfo=timezone.utc)
+    # end_time = datetime(2024, 7, 23, 0, 0, 0, tzinfo=timezone.utc)
+    # download_logs(Alpine, LIST_TABLES, start_time, end_time, f"data/alphineskihouse")
     
-
-    # root_path = os.path.join(os.path.dirname(__file__), "final_data")
-
-    # for a in attacks:
-    #     file_path = os.path.join(root_path, f"incident_{a}")
-    #     start_time, end_time = get_new_times(attacks[a]["start_time"], attacks[a]["end_time"])
-    #     # print time interval
-    #     print(f"Incident {a}: {start_time} - {end_time}")
-    #     download_logs(Alpine, LIST_TABLES, start_time, end_time, file_path)
+    # # download logs for each incident
+    root_path = os.path.join(os.path.dirname(__file__), "data")
+    for a in attacks:
+        file_path = os.path.join(root_path, f"incident_{a}")
+        start_time, end_time = get_new_times(attacks[a]["start_time"], attacks[a]["end_time"])
+        # print time interval
+        print(f"Incident {a}: {start_time} - {end_time}")
+        download_logs(Alpine, LIST_TABLES, start_time, end_time, file_path)

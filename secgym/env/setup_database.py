@@ -9,6 +9,7 @@ import pandas as pd
 # from secgym.utils import find_most_similar
 import argparse
 
+from secgym.env.process_logs import SEPARATOR, QUOTECHAR
 
 def to_abs_path(path):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), path)
@@ -27,7 +28,6 @@ def create_container_per_attack(attack):
             port=str(3306 + i),
             respawn=True
         )
-
 
 def create_container(
     csv_folder,
@@ -69,6 +69,7 @@ def create_container(
                 environment={
                     "MYSQL_ROOT_PASSWORD": "admin",
                     "MYSQL_DATABASE": database_name,
+                    "MYSQL_ROOT_HOST": "%"
                 },
                 ports={
                     "3306/tcp": port
@@ -88,71 +89,40 @@ def create_container(
             )
             print(f"Started container {container_name} with ID: {container.id} on port {port}")
             container.reload()
-            # print(f"Waiting 40 seconds for the container to start...")
-            # time.sleep(40)  # Wait for the container to start
 
-            # iterate and check if the container is running or exited
+            # check log to see "ready for connections"
+            print("Waiting for the container to start...")
 
-            time_limit = 600
+            time_limit = 300
             time_step = 2
             while time_limit > 0:
-                if container.status == "running":
-                    print(f"Container {container_name} is running.")
-                    break
-                elif container.status == "exited":
+                container.reload()
+                if container.status == "exited":
                     print(f"Container {container_name} has exited due to an error.")
                     break
+                logs = container.logs().decode('utf-8')
+                if "MySQL init process done. Ready for start up" in logs:
+                    print(f"Container {container_name} is ready.")
+                    break
+
                 time.sleep(time_step)
                 time_limit -= time_step
             
-            if time_limit == 0:
-                raise Exception(f"Container {container_name} did not start within the time limit.")
+            time.sleep(4)  # Wait for the container to be ready
+            # if time_limit == 0:
+            #     raise Exception(f"Container {container_name} did not start within the time limit.")
 
             return container, port
         except (ContainerError, ImageNotFound) as e:
             print(f"Error: {e}")
             raise
 
-
-
-def process_csv(csv_folder):
-    """Create a single .sql file from a folder of CSV and .meta files."""
-    for file_name in os.listdir(csv_folder):
-        print(file_name)
-        if file_name.endswith(".meta"):
-            meta_file_path = os.path.join(csv_folder, file_name)
-            table_name = file_name.replace(".meta", "")
-
-            # Read the .meta file
-            with open(meta_file_path, 'r') as meta_file:
-                meta_data = json.load(meta_file)
-                columns = meta_data['columns']
-                dtypes = meta_data['dtypes']
-            json_columns = [col for col, dtype in zip(columns, dtypes) if dtype == "dynamic"]
-
-            # process with pandas
-            # for column that is dynamic, check if empty and convert to {}, and save to the origninal file
-            csv_file_path = os.path.join(csv_folder, f"{table_name}.csv")
-            with open(csv_file_path, 'r') as csv_file:
-                df = pd.read_csv(csv_file, sep="¤", encoding='utf-8', on_bad_lines='skip', engine='python')
-                for column in df.columns:
-
-                    if column in json_columns:
-                        print("Processing column:", column)
-                        # convert empty string or None to {}
-                        df[column] = df[column].apply(lambda x: "{}" if x == "" else x)
-                        df[column] = df[column].apply(lambda x: "{}" if pd.isnull(x) else x)
-                        print(df[column].head())
-                # df.to_csv(csv_file_path, index=False)
-                df.to_csv(csv_file_path, index=False, sep="¤", quotechar='"', encoding='utf-8')
-
-            break
-
 def create_sql_file_from_csv_folder(
         csv_folder, 
         sql_file_path, 
         database_name,
-        skip_tables=["SecurityAlert", "SecurityIncident"]
+        skip_tables=["SecurityAlert", "SecurityIncident"],
+        verbose=False
         ):
     """Create a single .sql file from a folder of CSV and .meta files.
 
@@ -172,17 +142,18 @@ def create_sql_file_from_csv_folder(
     for file_name in os.listdir(csv_folder):
 
         if file_name.replace(".csv", "").strip() in skip_tables: 
-            print(f"Skipping table {file_name}")
+            if verbose:
+                print(f"Skipping table {file_name}")
             continue
         if file_name.endswith(".csv"):
             table_name = file_name.replace(".csv", "")
             # check meta file exists
-            if os.path.exists(os.path.join(csv_folder, f"{table_name}_metadata.json")):
-                with open(os.path.join(csv_folder, f"{table_name}_metadata.json"), 'r') as meta_file:
+            if os.path.exists(os.path.join(csv_folder, f"{table_name}.meta")):
+                with open(os.path.join(csv_folder, f"{table_name}.meta"), 'r') as meta_file:
                     type_map = json.load(meta_file)
             else:
                 print(f"Meta file not found for {table_name}. Inferring types from the CSV file...")
-                df = pd.read_csv(os.path.join(csv_folder, f"{table_name}.csv"), sep="¤", encoding='utf-8-sig', on_bad_lines='skip', engine='python')
+                df = pd.read_csv(os.path.join(csv_folder, f"{table_name}.csv"), sep=SEPARATOR, encoding='utf-8-sig', on_bad_lines='skip', engine='python')
                 type_map = {str(col): "string" for col in df.columns}
                 # print(type_map)
 
@@ -201,13 +172,13 @@ def create_sql_file_from_csv_folder(
             # add the corresponding SQL statements: creating one table and loading all the data
 
             table_name = file_name
-            with open(os.path.join(csv_folder, f"{file_name}/{file_name}_0_metadata.json"), 'r') as meta_file:
+            with open(os.path.join(csv_folder, f"{file_name}/{file_name}_0.meta"), 'r') as meta_file:
                 type_map = json.load(meta_file)
             json_columns = [col for col, dtype in type_map.items() if dtype == "dynamic"]
 
             # get all the csv files
             csv_files = [f"{file_name}/{f}" for f in os.listdir(os.path.join(csv_folder, file_name)) if f.endswith(".csv")]
-            
+
             # Generate CREATE TABLE statement
             create_table_sql = generate_create_table_sql(table_name, type_map)
             sql_statements.append(create_table_sql)
@@ -243,11 +214,13 @@ def generate_create_table_sql(table_name, type_map):
 
 def generate_load_data_sql(file_name, table_name, columns, json_columns):
     """Generate LOAD DATA INFILE SQL statement."""
+    separator = SEPARATOR
+    quotechar = QUOTECHAR
     load_data_sql = f"""
 LOAD DATA INFILE '/var/lib/mysql-files/{file_name}'
 INTO TABLE {table_name}
-FIELDS TERMINATED BY '¤'
-ENCLOSED BY '"'
+FIELDS TERMINATED BY '{separator}'
+ENCLOSED BY '{quotechar}'
 LINES TERMINATED BY '\\n'
 IGNORE 1 ROWS;
 """
@@ -264,25 +237,100 @@ IGNORE 1 ROWS;
     # load_data_sql += f"""SET {tmp_set};"""
     return load_data_sql
 
+def debug_tables(args):
+    # remove one table from the list, compile and see if it works
+    log_list = [
+        "AADNonInteractiveUserSignInLogs",
+        "AADServicePrincipalSignInLogs",
+        "AuditLogs",
+        "AZFWDnsQuery",
+        "AzureDiagnostics",
+        "AzureMetrics",
+        "CloudAppEvents",
+        "DeviceEvents",
+        "DeviceFileEvents",
+        "DeviceImageLoadEvents",
+        "DeviceNetworkEvents",
+        "DeviceProcessEvents",
+        "DeviceRegistryEvents",
+        "IdentityLogonEvents",
+        "LAQueryLogs",
+        "MicrosoftGraphActivityLogs",
+        "SecurityAlert",
+        "SigninLogs",
+        "ThreatIntelligenceIndicator"
+    ]
+    skip_tables=["SecurityAlert", "SecurityIncident", "AzureDiagnostics", "LAQueryLogs"]
+    error_list = []
+
+    for i in range(len(log_list)):
+        print(len(log_list))
+        # make copy of the log_list
+        log_list_copy = log_list.copy()
+        # remove the ith element a
+        removed_table = log_list_copy.pop(i)
+        if removed_table in skip_tables:
+            print(f"Skipping table {removed_table}")
+            continue
+
+        create_sql_file_from_csv_folder(
+            csv_folder=csv_folder,
+            sql_file_path=sql_file_path,
+            database_name=args.database_name,
+            skip_tables=log_list_copy
+        )
+        
+        print(f"Processing table {removed_table}", end="...")
+
+        # 2. start a MySQL docker container
+        # print("> 2 Starting a MySQL container...")
+        container, port = create_container(
+            csv_folder=csv_folder,
+            sql_file_path=sql_file_path,
+            database_name=args.database_name,
+            container_name=args.container_name,
+            port=args.port,
+            respawn=args.respawn
+        )
+
+        if container.status == "exited":
+            error_list.append(removed_table)
+            print(f"Error with {removed_table}")
+        else:
+            print(f"Success with {removed_table}")
+        
+        os.system("docker volume prune -f")
+    print("Errors:", error_list)
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup a MySQL database from CSV files')
-    parser.add_argument('--port', type=str, default="3306", help='Port number for the MySQL container')
     parser.add_argument('--csv', type=str, help='Folder containing the CSV files')
+    parser.add_argument('--port', type=str, default="3306", help='Port number for the MySQL container')
     parser.add_argument('--sql_file', type=str, default=to_abs_path("data/secbench.sql"), help='Output SQL file')
     parser.add_argument('--container_name', type=str, default="mysql-container", help='Name of the MySQL container')
     parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
     parser.add_argument('--respawn', action='store_true', help='Delete and recreate the container')
+    parser.add_argument('--debug', action='store_true', help='Debug mode')
     args = parser.parse_args()
     # make sure the data is downloaded and stored in the 'large_data' folder
 
     csv_folder = to_abs_path(args.csv)
     sql_file_path = to_abs_path(args.sql_file)
+    
+    if args.debug:
+        args.respawn = True
+        debug_tables(args)
+        exit(0)
 
     # 1. create a .sql file from the CSV  filesin the 'large_data' folder
+    skip_tables = ["SecurityAlert", "SecurityIncident", "AzureDiagnostics", "LAQueryLogs"]
+    # skip_tables += ["DeviceFileEvents"]
     create_sql_file_from_csv_folder(
         csv_folder=csv_folder,
         sql_file_path=sql_file_path,
-        database_name=args.database_name
+        database_name=args.database_name,
+        skip_tables=skip_tables,
+        verbose=True
     )
     print(f"> 1. SQL file created: {sql_file_path}")
 
@@ -297,7 +345,10 @@ if __name__ == "__main__":
         respawn=args.respawn
     )
 
-    # # 3. test connection to the MySQL container
+    if container.status == "exited":
+        print(f"Error: Container {args.container_name} has exited due to an error.")
+        exit(1)
+    # 3. test connection to the MySQL container
     connection = mysql.connector.connect(
         host='localhost',
         port=port,
@@ -305,7 +356,6 @@ if __name__ == "__main__":
         password='admin'
     )
     print("> 3. Successfully connected to the database")
-    time.sleep(1)  
 
     print("> 4. Testing connection to the MySQL container...")
     if connection.is_connected():

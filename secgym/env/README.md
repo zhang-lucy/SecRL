@@ -1,38 +1,38 @@
-# Data processing
+# Enviroment Setup
 
-- Need to decide: what tables are needed, confirm they are plugged in.
+## Data Download
 
-## Logging
-**1. Download logs**
+### Download from Hugging Face directly
 
+
+### Original Handling Process
+1. Register an account at Alphine Ski House.
+2. Login in to the azure account.
 ```bash
-python download_logs.py
+az login
 ```
-- Logs from a single attack from a certain time range.
-- Benign user logs from a longer time range.
-
-**2. Data synthesis**
-
-- Latest: Remove this part
-Synthesize data using LLMs
+3. Uncomment the code in `download_data.py` to download the Alphine Ski House data or for 8 different incidents.
+The `alphineskihouse` folder contains logs from Jun 20, 2024 to Jul 23, 2024. While each incident folder contains logs for that specific incident from the start of incident to the end of the incident.
 ```bash
-python synthesize_logs.py
+python download_data.py
+```
+4. Run process_data.py to process the data. This will change the some file's entry from double quotes to single quotes.
+```bash
+python process_data.py
 ```
 
-**3. Data preprocessing**
 
-    - TODO: need to reset the time
-    - TODO: the logs may contain other attacks, we may need to filter them out.
+## Environment Setup
 
-Three level of logs:
-
-- Easy: logs from the attack + data from one day of benign user logs.
-- Medium: logs from the attack + logs from a week of benign user logs. # start from jun 27 to jul 3
-- Hard: logs from the attack + logs from a month of benign user logs.
-
-
-**4. Connect to database**
+We are using MYSQL docker container for the database. Please first install docker and docker-compose and then pull the mysql image:
 
 ```bash
-python setup_dtabase.py --csv_folder <path_to_csv_folder>
+docker pull mysql:9.0
+```
+
+Then run the following command to start the mysql container:
+
+
+```bash
+python setup_database.py --csv_folder <path_to_csv_folder>
 ```
