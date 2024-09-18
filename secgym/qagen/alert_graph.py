@@ -30,7 +30,7 @@ class AlertGraph:
         self.incident = incident
 
         # time stamp to string
-        self.incident['TimeGenerated [UTC]'] = str(self.incident['TimeGenerated [UTC]'])
+        self.incident['TimeGenerated'] = str(self.incident['TimeGenerated'])
         self.graph.graph['incident'] = json.dumps(self.incident.to_dict())
 
         for idx, alert in enumerate(self.alerts):
@@ -38,7 +38,7 @@ class AlertGraph:
             self.next_node_id += 1
             self.alert_node_ids.add(alert_node_id)
 
-            alert['TimeGenerated [UTC]'] = str(alert['TimeGenerated [UTC]'])
+            alert['TimeGenerated'] = str(alert['TimeGenerated'])
             # Add alert node
             self.graph.add_node(
                 alert_node_id,
@@ -51,6 +51,14 @@ class AlertGraph:
             # Process and add entities
             entities = process_entity_identifiers(alert["Entities"])
             self._add_entities_to_graph(entities, alert_node_id)
+
+        # check number of distinct subgraphs
+        if nx.number_connected_components(self.graph) > 1:
+            print(f"Number of distinct subgraphs: {nx.number_connected_components(self.graph)}")
+            print("> Prune the graph to keep only the largest connected component.")
+            # get the largest connected component
+            largest_cc = max(nx.connected_components(self.graph), key=len)
+            self.graph = self.graph.subgraph(largest_cc).copy()
 
     def load_graph_from_graphml(self, filepath: str) -> None:
 
@@ -115,7 +123,7 @@ class AlertGraph:
 
     def plot_custom_graph(self, 
                         root=0, 
-                        figsize=(30, 20),
+                        figsize=(22, 16),
                         base_node_size=15000, 
                         max_line_length=80, 
                         show_plot=True, 

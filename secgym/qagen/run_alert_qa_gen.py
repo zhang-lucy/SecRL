@@ -1,7 +1,6 @@
 from secgym.utils import LLM_call
 import json
 import pandas as pd
-from secgym.qagen.alert_paser import processs_incidents
 from secgym.qagen.alert_graph import AlertGraph
 
 

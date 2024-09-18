@@ -16,9 +16,9 @@ The `alphineskihouse` folder contains logs from Jun 20, 2024 to Jul 23, 2024. Wh
 ```bash
 python download_data.py
 ```
-4. Run process_data.py to process the data. This will change the some file's entry from double quotes to single quotes.
+4. Run process_logs.py to process the data. This will change the some file's entry from double quotes to single quotes.
 ```bash
-python process_data.py
+python process_logs.py
 ```
 
 
