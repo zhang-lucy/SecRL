@@ -40,6 +40,7 @@ class ThuGEnv(gym.Env):
             save_file: Union[str, bool] = True,
             max_steps: int = 15,
             max_entry_return: int = 15,
+            max_str_len: int = 100000,
             container_name: str = "mysql-container",
             dataset_name: str = "env_monitor_db",
             port: str = "3306",
@@ -49,6 +50,7 @@ class ThuGEnv(gym.Env):
         self.noise_level = noise_level
         self.max_steps = max_steps
         self.max_entry_return = max_entry_return
+        self.max_str_len = max_str_len
         self.add_hint = add_hint
         self.eval_step = eval_step
 
@@ -161,6 +163,7 @@ class ThuGEnv(gym.Env):
         Args:
             action (str): The action to take. It should be a SQL query or a string that is the final answer.
             submit (bool, optional): Whether to submit the action. Defaults to False. If set, the final answer should be passed as the action.
+            stringify (bool, optional): Whether to stringify the result. Defaults to True.
         
         Returns:
             Tuple[np.ndarray, float, bool, Dict]: The observation, reward, done, and info.
@@ -182,7 +185,7 @@ class ThuGEnv(gym.Env):
 
                 limit_entry = False
                 retrieved_len = len(observation)
-                if len(str(observation)) > 100000:
+                if len(str(observation)) > self.max_str_len:
                     if len(observation) > self.max_entry_return:
                         observation = observation[:self.max_entry_return]
                         limit_entry = True

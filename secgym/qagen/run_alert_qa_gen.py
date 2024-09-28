@@ -2,34 +2,7 @@ from secgym.utils import LLM_call
 import json
 import pandas as pd
 from secgym.qagen.alert_graph import AlertGraph
-
-
-def qagen_prompt_format(alert_graph, path_dict):
-    def format_alert_str(alert_node: int, entities:list):
-        alert = json.loads(alert_graph.get_node(alert_node)['entry'])
-        entity_str = ""
-        for n in entities:
-            entity = alert_graph.get_node(n)
-            entity_str += f"Type: {entity['node_type']}, Field: {entity['identifier_fields']}, Value: `{entity['value']}`\n"
-        return f"""Time: {alert['TimeGenerated [UTC]']}
-Name: {alert['AlertName']}
-Description: {alert['Description']}
-Entities from this alert:
-{entity_str.strip()}
-"""
-    start_alert_str = format_alert_str(path_dict['start_alert'], path_dict['start_entities'])
-    end_alert_str = format_alert_str(path_dict['end_alert'], path_dict['end_entities'])
-
-    return f"Start Alert:\n{start_alert_str}\nEnd Alert:\n{end_alert_str}"
-
-# print(qagen_prompt_format(alert_graph, all_paths[0]))
-def get_solution_path(alert_graph, path_dict):
-    solution = []
-    for n in path_dict["shortest_alert_path"]:
-        node = alert_graph.get_node(n)
-        if node["node_type"] == "entity":
-            solution.append(f"Entity field: {node['identifier_fields']}, Value: `{node['value']}`\n")
-            
+import argparse
 
 QAGEN_PROMPT = """Your goal is to ask a security question from the given data from a security analyst's perspective.
 You are given the start alert and end alert, and corresponding entities. The two alerts are connected by a alert-entity path. The start and end alert might be the same.
@@ -73,7 +46,7 @@ Time: 8/14/2024, 10:34:41.429 PM
 Name: Suspicious credential dump from NTDS.dit
 Description: Attackers dump NTDS.dit in order to obtain user's credentials which are stored in the domain controller.
 Entities from this alert:
-Type: process, Field: ProcessId__CreatedTimeUtc__CommandLine, Value: `6748__2024-08-01t12:37:30.2769191z__"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q`
+Type: process, Field: ProcessId__CreatedTimeUtc__CommandLine, Value: `6748__2024-08-01t12:37:30.2769191z__"ntdsutil.exe" "ac i ntds" ifm "create full c:\\temp" q q`
 Type: process, Field: ExtractedFileName, Value: `ntdsutil.exe`
 
 End Alert:
@@ -122,78 +95,154 @@ The two alerts are connected by a alert-entity path. The start and end alert mig
 Your response should be in JSON format containing 3 fields: "context", "question", and "answer".
 """
 
+class QAGen:
+    def __init__(self,
+                 qa_path: str,
+                 graph_path: str,
+                 config_list: list,
+                 cache_seed: int,
+                 trial: int = 5
+                ) -> None:
+        self.qa_path = qa_path
+        self.cache_seed = cache_seed
+        self.graph_path = graph_path
+        self.config_list = config_list
 
-def validate_qa_dict(generated_qa: dict):
-    required_fields = ["context", "question", "answer"]
+        self.alert_graph = AlertGraph()
+        self.alert_graph.load_graph_from_graphml(self.graph_path)
+        print("Alert graph loaded.")
+        self.all_paths = self.alert_graph.get_alert_paths()
+        
+        self.all_questions = []
+        self.trial = trial  
+        self.accum_cost = 0
 
-    # check every required field is present & no other fields are present
-    return len(generated_qa) == len(required_fields) and all([field in generated_qa for field in required_fields]) 
+
+    def qagen_prompt_format(self, path_dict):
+        def format_alert_str(alert_node: int, entities:list):
+            alert = json.loads(self.alert_graph.get_node(alert_node)['entry'])
+            entity_str = ""
+            for n in entities:
+                entity = self.alert_graph.get_node(n)
+                entity_str += f"Type: {entity['node_type']}, Field: {entity['identifier_fields']}, Value: `{entity['value']}`\n"
+            return f"""Time: {alert['TimeGenerated']}
+    Name: {alert['AlertName']}
+    Description: {alert['Description']}
+    Entities from this alert:
+    {entity_str.strip()}
+    """
+        start_alert_str = format_alert_str(path_dict['start_alert'], path_dict['start_entities'])
+        end_alert_str = format_alert_str(path_dict['end_alert'], path_dict['end_entities'])
+
+        return f"Start Alert:\n{start_alert_str}\nEnd Alert:\n{end_alert_str}"
+
+    def get_solution_path(self, path_dict):
+        solution = []
+        for n in path_dict["shortest_alert_path"]:
+            node = self.alert_graph.get_node(n)
+            if node["node_type"] == "entity":
+                solution.append(f"Entity field: {node['identifier_fields']}, Value: `{node['value']}`\n")
+
+    @staticmethod
+    def validate_qa_dict(generated_qa: dict):
+        required_fields = ["context", "question", "answer"]
+        # check every required field is present & no other fields are present
+        return len(generated_qa) == len(required_fields) and all([field in generated_qa for field in required_fields]) 
 
 
-# with open(qa_path, "r") as f:
-#     all_questions = json.load(f)
-# for question in all_questions:
-#     final_str = qagen_prompt_format(alert_graph, question)
-#     if question['answer'] in question['question'] or question['answer'] in question['context']:
-#         print(f"Original prompt: {final_str}")
-#         print(f"context: {question['context']}")
-#         print(f"Original question: {question['question']}")
-#         print(f"Original answer: {question['answer']}")
-#         print("-"*50)
+    def generate_qa(self):
+        for i, path_dict in enumerate(self.all_paths):
+            print(f"Generating {i+1} th question.")
 
-from secgym.myconfig import config_list_4o
-# ---------
+            # Construct the prompt
+            final_str = self.qagen_prompt_format(path_dict)
+            final_str += "\n##############\nYour response:\n"
 
-# params 
-qa_path = "newqa.json"
-cache_seed = 41
+            print("-" * 10, "Input Prompt", "-" * 10)
+            print(final_str)
 
-alert_graph = AlertGraph()
-alert_graph.load_graph_from_graphml("sample_incident.graphml")
-print("Alert graph loaded.")
-all_paths = alert_graph.get_alert_paths()
 
-all_questions = []
-for i, path_dict in enumerate(all_paths):
-    print(f"Generating {i+1} th question.")
-    final_str = qagen_prompt_format(alert_graph, path_dict)
-    final_str += "\n##############\nYour response:\n"
-    print(final_str)
-    for i in range(5):
-        response = LLM_call(
-            instruction=QAGEN_PROMPT,
-            task=final_str,
-            config_list=config_list_4o,
-            response_format={"type": "json_object"},
-            cache_seed=cache_seed+i
-        )
-
-        response_data = json.loads(response)
-        if validate_qa_dict(response_data):
-            print(response)
-            break
-        else:
-            print("Invalid response\n", response)
+            print("-" * 10, "Response from LLM", "-" * 10)
             response_data = {}
-    print("-"*100)
-    print("-"*100)
+            # Generate QA, try 5 times
+            for i in range(self.trial):
+                response, cost = LLM_call(
+                    instruction=QAGEN_PROMPT,
+                    task=final_str,
+                    config_list=self.config_list,
+                    response_format={"type": "json_object"},
+                    cache_seed=self.cache_seed+i,
+                    return_cost=True
+                )
+                self.accum_cost += cost
 
-    if response_data['answer'] in response_data['question'] or response_data['answer'] in response_data['context']:
-        response = LLM_call(
-            instruction=REWRITE_PROMPT,
-            task=final_str + "\nQuestion: \n" + json.dumps(response_data),
-            config_list=config_list_4o,
-            response_format={"type": "json_object"},
-            cache_seed=cache_seed
-        )
-        response_data = json.loads(response)
-        if not validate_qa_dict(response_data):
-            print("Invalid response from rewrite. continue.\n", response)
-            response_data = {}    
+                print(response)
+                try:
+                    response_data = json.loads(response)
+                except json.JSONDecodeError:
+                    print("JSON Decoding Error:\n", response)
+                    continue
+                
+                if not self.validate_qa_dict(response_data):
+                    print("Invalid fields in generated question\n", response)
+                    continue
     
-    response_data.update(path_dict)
-    all_questions.append(response_data)
-    with open(qa_path, "w") as f:
-        json.dump(all_questions, f, indent=4)
+                # We need to make sure the answer is not leaked in the context or question
+                # If the answer is in the context or question, we need to rewrite the context, question, and answer
+                if response_data['answer'] in response_data['question'] or response_data['answer'] in response_data['context']:
+                    response, cost = LLM_call(
+                        instruction=REWRITE_PROMPT,
+                        task=final_str + "\nQuestion: \n" + json.dumps(response_data),
+                        config_list=self.config_list,
+                        response_format={"type": "json_object"},
+                        cache_seed=self.cache_seed
+                    )
+                    self.accum_cost += cost
+                    print("-" * 10, "Rewrite QA", "-" * 10)
+                    print(response)
+                    try:
+                        response_data = json.loads(response)
+                    except json.JSONDecodeError:
+                        print("JSON Decoding Error from rewrite:\n", response)
+                        continue  
+
+                if not self.validate_qa_dict(response_data):
+                    print("Invalid fields from rewrite. continue.\n", response)
+                    continue
+
+                if not (response_data['answer'] in response_data['question'] or response_data['answer'] in response_data['context']):
+                    # double check the answer is not leaked
+                    break
+  
+            print("-"*100)
+            print("-"*100)
+
+            # append the path used to generate the QA
+            response_data.update(path_dict)
+
+            # Save the QA
+            self.all_questions.append(response_data)
+            with open(self.qa_path, "w") as f:
+                json.dump(self.all_questions, f, indent=4)
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run Alert QA Generation")
+    parser.add_argument("--qa_path", "-q", type=str, default="newqa.json", help="Path to save the generated QA")
+    parser.add_argument("--graph_path", "-g", type=str, default="sample_incident.graphml", help="Path to the alert graph")
+    parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
+    args = parser.parse_args()
+
+    from secgym.myconfig import config_list_4o
+
+    qagenena = QAGen(
+        qa_path=args.qa_path,
+        graph_path=args.graph_path,
+        config_list=config_list_4o,
+        cache_seed=args.cache_seed
+    )
+
+    qagenena.generate_qa()
 
 

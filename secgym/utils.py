@@ -17,7 +17,7 @@ def get_full_question(question_dict, add_hint=False):
     return f"{question_dict.get('context', '')} {question_dict['question']}".strip()
 
 
-def LLM_call(instruction: str, task: str, config_list: list, **args) -> str:
+def LLM_call(instruction: str, task: str, config_list: list, return_cost:bool = False, **args) -> str:
     client = autogen.OpenAIWrapper(
         config_list=config_list,
         **args
@@ -28,6 +28,8 @@ def LLM_call(instruction: str, task: str, config_list: list, **args) -> str:
             {'role': 'user', 'content': task}
         ]
     )
+    if return_cost:
+        return response.choices[0].message.content, response.cost
     return response.choices[0].message.content
 
 def process_entity_identifiers(entities_json_string):
