@@ -247,7 +247,7 @@ class AlertGraph:
     
 
     def get_complet_alert_paths(self, alert_paths_dict) -> list:
-        return [alert_paths_dict['start_entities']] + alert_paths_dict['shortest_alert_path'] + alert_paths_dict['end_entity']
+        return [alert_paths_dict['start_entities']] + alert_paths_dict['shortest_alert_path'] + [alert_paths_dict['end_entities']]
 
     def get_alert_paths(self, k=2, verbose=True):
         """
@@ -290,7 +290,7 @@ class AlertGraph:
             if alert1 != alert2: # if start and end alert is different
                 if k > len(farthest_start_entities):
                     selected_from_a1 = farthest_start_entities
-                    print(f"Construct path from alert {alert1} to alert {alert2}, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available.")
+                    print(f"Warning: Construct path from alert {alert1} to alert {alert2}, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available.")
                 else:
                     selected_from_a1 = random.sample(farthest_start_entities, k)
 
@@ -298,14 +298,17 @@ class AlertGraph:
                 farthest_end_entities = get_farthest_entities(alert2, alert1)
                 selected_from_a2 = random.sample(farthest_end_entities, 1)
             else: # start and end alert is the same
+                if len(farthest_start_entities) - 1 <= 0:
+                    print(f"Alert {alert1} has only one entity connected, skip.")
+                    continue
                 if k >= len(farthest_start_entities):
-                    print(f"Construct path using the same alert, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available in alert id {alert1}.")
-                    print(f'Use {len(farthest_start_entities) - 1} entities instead.')
+                    print(f"Warning: Construct path using the same alert, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available in alert id {alert1}.")
+                    print(f'Warning: Use {len(farthest_start_entities) - 1} entities instead.')
                 selected_from_a1 = random.sample(farthest_start_entities, min(k, len(farthest_start_entities)-1))
                 
                 # sample 1 from the rest of farthest_start_entities, start and end entity should not be the same
                 remaining_entities = [entity for entity in farthest_start_entities if entity not in selected_from_a1]
-                selected_from_a2 = remaining_entities
+                selected_from_a2 = random.sample(remaining_entities, 1)
             
             shortest_alert_path = nx.shortest_path(self.graph, source=alert1, target=alert2) # path between alert1 and alert2
             alert_paths.append(
