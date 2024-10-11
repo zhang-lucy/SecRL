@@ -12,10 +12,58 @@ from secgym.utils import get_full_question
 from secgym.env.evaluator import Evaluator
 
 
+# ATTACKS = {
+#     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
+#     "AAD_Comprise": "aad_comprise/aad_comprise_qa.json",
+#     "Incident_322": "newqa.json",
+# }
+
 ATTACKS = {
-    "Blitz_Ransomware" : "bliz_ransomware_qa.json",
-    "AAD_Comprise": "aad_comprise/aad_comprise_qa.json",
-    "Incident_322": "newqa.json",
+    "incident_5": {
+        "questions": "incident_5_qa.json",
+        "port": "3306",
+        "container_name": "incident_5"
+    },
+    "incident_38": {
+        "questions": "incident_38_qa.json",
+        "port": "3307",
+        "container_name": "incident_38"
+    },
+    "incident_34": {
+        "questions": "incident_34_qa.json",
+        "port": "3308",
+        "container_name": "incident_34"
+    },
+    "incident_39": {
+        "questions": "incident_39_qa.json",
+        "port": "3309",
+        "container_name": "incident_39"
+    },
+    "incident_55": {
+        "questions": "incident_55_qa.json",
+        "port": "3310",
+        "container_name": "incident_55"
+    },
+    "incident_134": {
+        "questions": "incident_134_qa.json",
+        "port": "3311",
+        "container_name": "incident_134"
+    },
+    "incident_166": {
+        "questions": "incident_166_qa.json",
+        "port": "3312",
+        "container_name": "incident_166"
+    },
+    "incident_322": {
+        "questions": "incident_322_qa.json",
+        "port": "3313",
+        "container_name": "incident_322"
+    },
+}
+
+AlphineSkiHouse = {
+    "port": "3314",
+    "container_name": "alphineskihouse"
 }
 
 def start_container(container_name):
@@ -42,7 +90,7 @@ class ThuGEnv(gym.Env):
             max_entry_return: int = 15,
             max_str_len: int = 100000,
             container_name: str = "mysql-container",
-            dataset_name: str = "env_monitor_db",
+            database_name: str = "env_monitor_db", # sql database name
             port: str = "3306",
             add_hint: bool = False,
             eval_step: bool = False
@@ -77,7 +125,7 @@ class ThuGEnv(gym.Env):
         )
         if self.connection.is_connected():
             self.cursor = self.connection.cursor()
-            self.cursor.execute(f"USE {dataset_name};")
+            self.cursor.execute(f"USE {database_name};")
         else:
             raise ValueError("Could not connect to the database.")
 

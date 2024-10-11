@@ -306,8 +306,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup a MySQL database from CSV files')
     parser.add_argument('--csv', type=str, help='Folder containing the CSV files')
     parser.add_argument('--port', type=str, default="3306", help='Port number for the MySQL container')
-    parser.add_argument('--sql_file', type=str, default=to_abs_path("data/secbench.sql"), help='Output SQL file')
-    parser.add_argument('--container_name', type=str, default="mysql-container", help='Name of the MySQL container')
+    parser.add_argument('--sql_file', type=str, help='Output SQL file')
+    parser.add_argument('--container_name', type=str, help='Name of the MySQL container')
     parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
     parser.add_argument('--respawn', action='store_true', help='Delete and recreate the container')
     parser.add_argument('--debug', action='store_true', help='Debug mode')
@@ -316,6 +316,8 @@ if __name__ == "__main__":
 
     csv_folder = to_abs_path(args.csv)
     sql_file_path = to_abs_path(args.sql_file)
+    os.makedirs(os.path.dirname(sql_file_path), exist_ok=True)
+    print(os.path.dirname(sql_file_path))
     
     if args.debug:
         args.respawn = True
@@ -366,6 +368,6 @@ if __name__ == "__main__":
         cursor.execute("SHOW TABLES;")
         tables = cursor.fetchall()
         print("Tables in the database:", tables)
-
     
-
+    print("> 5. Stopping the MySQL container...")
+    container.stop()

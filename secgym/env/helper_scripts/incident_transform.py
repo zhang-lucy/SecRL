@@ -1,5 +1,5 @@
 
-from secgym.qagen.soc_graph import SOCGraph
+from secgym.qagen.soc_qa_gen.soc_graph import SOCGraph
 socgraph = SOCGraph()
 
 ioc0 = socgraph.add_ioc("There is an unusual addtion of credentials to an Oauth application registration.")

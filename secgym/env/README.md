@@ -14,7 +14,7 @@ az login
 3. Uncomment the code in `download_data.py` to download the Alphine Ski House data or for 8 different incidents.
 The `alphineskihouse` folder contains logs from Jun 20, 2024 to Jul 23, 2024. While each incident folder contains logs for that specific incident from the start of incident to the end of the incident.
 ```bash
-python download_data.py
+python download_logs.py
 ```
 4. Run process_logs.py to process the data. This will change the some file's entry from double quotes to single quotes.
 ```bash
@@ -36,3 +36,12 @@ Then run the following command to start the mysql container:
 ```bash
 python setup_database.py --csv_folder <path_to_csv_folder>
 ```
+
+
+## Data Anonymization
+
+1. Identify PII related columns and fields: `pii_col_identify.py`
+
+2. With that, we run `pii_mapper.py` to map the PII fields to a anonymized value.
+
+3. Finally, we run `pii_replace.py` to replace the PII fields with the anonymized value.
