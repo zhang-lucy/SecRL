@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from typing import Union
 import os
-from secgym.env.ThuGEnv import ThuGEnv
+from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
 from secgym.myconfig import config_list_4o, config_list_4_turbo, config_list_35
 
 def run_experiment(
@@ -25,6 +25,9 @@ def run_experiment(
     #     trial_1 = json.load(f)
 
     for i in range(thug_env.num_questions):
+        if i == num_test:
+            print(f"Tested {num_test} questions. Stopping...")
+            break
         observation, _ = thug_env.reset(i) # first observation is question dict
         agent.reset()
 
@@ -71,10 +74,6 @@ def run_experiment(
             json.dump(accum_logs, f, indent=4)
         print(f"Question {i+1} | Reward: {reward} || Accumlated Success: {accum_success}/{tested_num}={accum_success/(tested_num):.3f} | Avg Reward so far: {accum_reward/(tested_num):.3f}")  
         print("*"*50, "\n", "*"*50)
-
-        if num_test >0 and i == num_test:
-            print(f"Tested {num_test} questions. Stopping...")
-            break
     
     return accum_success, tested_num, accum_reward
 
@@ -105,8 +104,6 @@ if __name__ == "__main__":
         post_fix += "_sum"
 
     os.makedirs("results", exist_ok=True)
-    save_agent_file = f"results/agent_log{post_fix}.json"
-    save_env_file = f"results/env_log{post_fix}.json"
 
     agent = BaselineAgent(
         config_list=agent_config_list,
@@ -115,23 +112,28 @@ if __name__ == "__main__":
         temperature=temperature,
     )
 
-    thug_env = ThuGEnv(
-        attack="Incident_322", 
-        config_list=config_list_4o, 
-        noise_level=0,
-        save_file=save_env_file,
-        add_hint=add_hint,
-        max_steps=max_steps,
-        eval_step=False,
-    ) 
-    avg_success, tested_num, avg_reward = run_experiment(
-        agent=agent,
-        thug_env=thug_env,
-        save_agent_file=save_agent_file,
-        num_test=-1 # all questions
-    )
+    for attack in ATTACKS:
+        print(f"Running attack: {attack}")
+        save_agent_file = f"results/{attack}_agent_log{post_fix}.json"
+        save_env_file = f"results/{attack}_env_log{post_fix}.json"
 
-    with open('results.txt', 'a') as f:
-        f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}\n")
-        f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")
-    
+        thug_env = ThuGEnv(
+            attack=attack,
+            config_list=config_list_4o, 
+            noise_level=0,
+            save_file=save_env_file,
+            add_hint=add_hint,
+            max_steps=max_steps,
+            eval_step=True,
+        ) 
+        avg_success, tested_num, avg_reward = run_experiment(
+            agent=agent,
+            thug_env=thug_env,
+            save_agent_file=save_agent_file,
+            num_test=-1 # set to -1 to run all questions
+        )
+        agent.reset()
+
+        with open('results.txt', 'a') as f:
+            f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}\n")
+            f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")

@@ -1,8 +1,8 @@
 # python setup_database.py \
-#     --csv data_anonymized/alphineskihouse \
+#     --csv data_anonymized/alpineskihouse \
 #     --port 3314 \
-#     --sql_file sql_files/alphineskihouse.sql \
-#     --container_name alphineskihouse \
+#     --sql_file sql_files/alpineskihouse.sql \
+#     --container_name alpineskihouse \
 #     --respawn
 
 python setup_database.py \
