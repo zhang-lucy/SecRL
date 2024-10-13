@@ -30,4 +30,14 @@ To set docker for the full environment, please uncomment the first command in `s
 3. LLM setup
 We are using [AutoGen](https://autogen-ai.github.io/autogen/) for API calling. Setup your API key in the `secgym/myconfig.py` file. You can follow the instructions [here](https://autogen-ai.github.io/autogen/docs/notebooks/autogen_uniformed_api_calling#config-list-setup).
 
-4. Run Baseline
+4. Install the requirements
+Setup the environment using conda or venv and install the requirements:
+```bash
+pip install -r requirements.txt
+```
+
+5. Run Baseline
+```bash
+cd secgym
+python run_exp.py
+```
