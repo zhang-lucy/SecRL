@@ -8,6 +8,7 @@ from collections import defaultdict
 import os
 import re
 import json
+from tenacity import retry, wait_fixed
 
 import pandas as pd
 from openai import AzureOpenAI
@@ -134,7 +135,7 @@ The idea is to give the agent some context from one part of the report, and the 
                 )
             return dict_output
 
-
+    @retry(wait=wait_fixed(60))
     def generate_questions(
             self,
             save=False,

@@ -2,13 +2,13 @@ from secgym.myconfig import config_list_4o
 from secgym.qagen.qa_gen import QAGen
 import os
 graph_files = [
-    'incident_34.graphml',
-    'incident_166.graphml',
+    # 'incident_34.graphml',
+    # 'incident_166.graphml',
     'incident_55.graphml',
-    'incident_5.graphml',
-    'incident_38.graphml',
-    'incident_134.graphml',
-    'incident_39.graphml',
+    # 'incident_5.graphml',
+    # 'incident_38.graphml',
+    # 'incident_134.graphml',
+    # 'incident_39.graphml',
     'incident_322.graphml'
  ]
 

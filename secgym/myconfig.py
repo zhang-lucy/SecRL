@@ -23,83 +23,213 @@ config_list_35 = [
   }
 ]
 
+config_list_4o_mini = [
+  {
+    "model": "gpt-4o-mini",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-2",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-3",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-4",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+    {
+    "model": "gpt-4o-mini-5",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-6",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-7",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-8",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+    {
+    "model": "gpt-4o-mini-9",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-10",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-11",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-12",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  }
+]
+
+
 config_list_4o = [
   {
-      "model": "gpt-4o",
-      "base_url": "https://dataoai3.openai.azure.com/",
-      "api_type": "azure",
-      "api_version":  "2024-05-01-preview",
-      "azure_ad_token_provider": token_provider,
-      "price": [0.005, 0.015]
+    "model": "gpt-4o",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
   },
   {
-      "model": "gpt-4o",
-      "base_url": "https://dataoai2.openai.azure.com/",
-      "api_type": "azure",
-      "api_version":  "2024-05-01-preview",
-      "azure_ad_token_provider": token_provider,
-      "price": [0.005, 0.015]
+    "model": "gpt-4o-2",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
   },
   {
-
-        "model": "gpt-4o-2024-05-13",
-        "base_url": "https://aif-complex-tasks-west-us-3.openai.azure.com/",
-        "api_type": "azure",
-        "api_version":  "2024-05-01-preview",
-        "azure_ad_token_provider": token_provider,
-  },
-    {
-      "model": "gpt-4o",
-      "base_url": "https://yadaoai.openai.azure.com/",
-      "api_type": "azure",
-      "api_version":  "2024-05-01-preview",
-      "azure_ad_token_provider": token_provider,
-      "price": [0.005, 0.015]
-  },
-      {
-      "model": "gpt-4o_2",
-      "base_url": "https://yadaoai.openai.azure.com/",
-      "api_type": "azure",
-      "api_version":  "2024-05-01-preview",
-      "azure_ad_token_provider": token_provider,
-      "price": [0.005, 0.015]
+    "model": "gpt-4o-3",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
   },
   {
-      "model": "gpt-4o",
-      "base_url": "https://yroai.openai.azure.com/",
-      "api_type": "azure",
-      "api_version":  "2024-05-01-preview",
-      "azure_ad_token_provider": token_provider,
-      "price": [0.005, 0.015]
-  },
-  {
-      "model": "gpt-4o-2024-05-13",
-      "base_url": "https://yroai5.openai.azure.com/",
-      "api_type": "azure",
-      "api_version":  "2024-05-01-preview",
-      "azure_ad_token_provider": token_provider,
-    "price": [0.005, 0.015]
-  },
-    {
-      "model": "gpt-4o",
-      "base_url": "https://yroai2.openai.azure.com/",
-      "api_type": "azure",
-      "api_version":  "2024-05-01-preview",
-      "azure_ad_token_provider": token_provider,
-      "price": [0.005, 0.015]
-  },
+    "model": "gpt-4o-2",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  }
 ]
+
+# config_list_4o = [
+#   {
+#       "model": "gpt-4o",
+#       "base_url": "https://dataoai3.openai.azure.com/",
+#       "api_type": "azure",
+#       "api_version":  "2024-05-01-preview",
+#       "azure_ad_token_provider": token_provider,
+#       "price": [0.005, 0.015]
+#   },
+#   {
+#       "model": "gpt-4o",
+#       "base_url": "https://dataoai2.openai.azure.com/",
+#       "api_type": "azure",
+#       "api_version":  "2024-05-01-preview",
+#       "azure_ad_token_provider": token_provider,
+#       "price": [0.005, 0.015]
+#   },
+#   {
+
+#         "model": "gpt-4o-2024-05-13",
+#         "base_url": "https://aif-complex-tasks-west-us-3.openai.azure.com/",
+#         "api_type": "azure",
+#         "api_version":  "2024-05-01-preview",
+#         "azure_ad_token_provider": token_provider,
+#   },
+#     {
+#       "model": "gpt-4o",
+#       "base_url": "https://yadaoai.openai.azure.com/",
+#       "api_type": "azure",
+#       "api_version":  "2024-05-01-preview",
+#       "azure_ad_token_provider": token_provider,
+#       "price": [0.005, 0.015]
+#   },
+#       {
+#       "model": "gpt-4o_2",
+#       "base_url": "https://yadaoai.openai.azure.com/",
+#       "api_type": "azure",
+#       "api_version":  "2024-05-01-preview",
+#       "azure_ad_token_provider": token_provider,
+#       "price": [0.005, 0.015]
+#   },
+#   {
+#       "model": "gpt-4o",
+#       "base_url": "https://yroai.openai.azure.com/",
+#       "api_type": "azure",
+#       "api_version":  "2024-05-01-preview",
+#       "azure_ad_token_provider": token_provider,
+#       "price": [0.005, 0.015]
+#   },
+#   {
+#       "model": "gpt-4o-2024-05-13",
+#       "base_url": "https://yroai5.openai.azure.com/",
+#       "api_type": "azure",
+#       "api_version":  "2024-05-01-preview",
+#       "azure_ad_token_provider": token_provider,
+#     "price": [0.005, 0.015]
+#   },
+#     {
+#       "model": "gpt-4o",
+#       "base_url": "https://yroai2.openai.azure.com/",
+#       "api_type": "azure",
+#       "api_version":  "2024-05-01-preview",
+#       "azure_ad_token_provider": token_provider,
+#       "price": [0.005, 0.015]
+#   },
+# ]
+
 
 config_list_4_0125 = [
     {
-        "model": "gpt-4-0125-preview",
-        "base_url": "https://yroai.openai.azure.com/",
+        "model": "gpt-4-1106-preview",
+        "base_url": "https://medeina-openai-dev-011.openai.azure.com/",
         "api_type": "azure",
-        "api_version":  "2024-05-01-preview",
-        "azure_ad_token_provider": token_provider,
-        "price": [0.01, 0.03]
+        "api_version":  "2023-09-15-preview",
+        "azure_ad_token_provider": token_provider
     }
 ]
+
+# config_list_4_0125 = [
+#     {
+#         "model": "gpt-4-0125-preview",
+#         "base_url": "https://yroai.openai.azure.com/",
+#         "api_type": "azure",
+#         "api_version":  "2024-05-01-preview",
+#         "azure_ad_token_provider": token_provider,
+#         "price": [0.01, 0.03]
+#     }
+# ]
 
 config_list_4_turbo = [
     {
@@ -130,17 +260,20 @@ config_list_4_combin = [
 ]
 
 if __name__ == "__main__":
-    
+
   from autogen import OpenAIWrapper
 
-  client = OpenAIWrapper(config_list=config_list_35, cache_seed=None)
-  print("Test gpt 35", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+#   client = OpenAIWrapper(config_list=config_list_35, cache_seed=None)
+#   print("Test gpt 35", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
   client = OpenAIWrapper(config_list=config_list_4o, cache_seed=None)
   print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
-  client = OpenAIWrapper(config_list=config_list_4_0125, cache_seed=None)
-  print("Test gpt4 0125", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+  client = OpenAIWrapper(config_list=config_list_4o_mini, cache_seed=None)
+  print("Test gpt 4o-mini", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
-  client = OpenAIWrapper(config_list=config_list_4_turbo, cache_seed=None)
-  print("Test gpt4 turbo", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+  # client = OpenAIWrapper(config_list=config_list_4_0125, cache_seed=None)
+  # print("Test gpt4 0125", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+
+#   client = OpenAIWrapper(config_list=config_list_4_turbo, cache_seed=None)
+#   print("Test gpt4 turbo", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)

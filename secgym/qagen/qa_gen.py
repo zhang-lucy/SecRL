@@ -4,6 +4,7 @@ import pandas as pd
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
 
+#TODO: tweak prompt
 QAGEN_PROMPT = """Your goal is to ask a security question from the given data from a security analyst's perspective.
 You are given the start alert and end alert, and corresponding entities. The two alerts are connected by a alert-entity path. The start and end alert might be the same.
 You will use the start alert as the context, and ask a question about the entities in the end alert.
@@ -194,20 +195,38 @@ class QAGen:
     def format_alert_str(self, alert_node: int, entities:list):
             alert = json.loads(self.alert_graph.get_node(alert_node)['entry'])
             entity_str = ""
+            #TODO:changing to read all entities instead of provided ones
             for n in entities:
                 entity = self.alert_graph.get_node(n)
-                entity_str += f"Type: {entity['node_type']}, Field: {entity['identifier_fields']}, Value: `{entity['value']}`\n"
+                entity_str += f"Type: {entity['node_type']}, Field: {entity['identifier_fields']}, Value: `{entity['value']}, Full Entity Entry: {json.dumps(entity)}`\n"
             return f"""Time: {alert['TimeGenerated']}
-Name: {alert['AlertName']}
-Description: {alert['Description']}
-Entities from this alert:
-{entity_str.strip()}
-"""
+                    Name: {alert['AlertName']}
+                    Description: {alert['Description']}
+                    Full Alert Entry: {alert}
+                    Entities from this alert that are part of the alert-entity path used to generate the question:
+                    {entity_str.strip()}
+                    """
+                    #TODO: Add relevent fields from the alert
+                    #TODO: How entities are connected to the alert, edge information
+                    #Full Alert Entry: {alert}
 
     def qagen_prompt_format(self, path_dict):
-        start_alert_str = self.format_alert_str(path_dict['start_alert'], path_dict['start_entities'])
-        end_alert_str =  self.format_alert_str(path_dict['end_alert'], path_dict['end_entities'])
-        return f"Start Alert:\n{start_alert_str}\nEnd Alert:\n{end_alert_str}"
+        # start_alert_str = self.format_alert_str(path_dict['start_alert'], path_dict['start_entities'])
+        # end_alert_str =  self.format_alert_str(path_dict['end_alert'], path_dict['end_entities'])
+        # return f"Start Alert:\n{start_alert_str}\nEnd Alert:\n{end_alert_str}"
+        compelte_solution_path = path_dict['shortest_alert_path'] + path_dict['end_entities']
+        assert len(compelte_solution_path) % 2 == 0
+        for i in range(0, len(compelte_solution_path), 2):
+            if i == 0:
+                entity_str = "Start Alert:\n"
+            elif i+2 < len(compelte_solution_path):
+                entity_str += "\n, Next Alert:\n"
+            else:
+                entity_str += "\nEnd Alert:\n"
+
+            entity_str += self.format_alert_str(compelte_solution_path[i], [compelte_solution_path[i+1]])
+
+        return entity_str
 
     def solution_prompt_format(self, path_dict):
         compelte_solution_path = path_dict['shortest_alert_path'] + path_dict['end_entities']

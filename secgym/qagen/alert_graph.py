@@ -110,7 +110,10 @@ class AlertGraph:
                 entity_node_id = self.entity_node_map[entity_key]
 
             # Connect the alert to the entity
+            #TODO: Add edge attributes for extra_info, use gpt to generate the relationship
             self.graph.add_edge(alert_node_id, entity_node_id)
+
+            
 
     def save_to_graphml(self, filepath: str) -> None:
         """
@@ -274,6 +277,7 @@ class AlertGraph:
                     dist_map[tmp_dist].append(entity)
             
             # print(f"Dist map: {dist_map}")
+            #TODO: Customized the selection of entities from furthest to different lengths
             max_dist = max(dist_map.keys())
             return dist_map[max_dist]
     

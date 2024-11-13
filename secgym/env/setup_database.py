@@ -141,15 +141,20 @@ def create_sql_file_from_csv_folder(
     ]
     for file_name in os.listdir(csv_folder):
 
+        #skipping apple metadata stuff
+        if file_name.startswith("._"):
+            continue    
+            
         if file_name.replace(".csv", "").strip() in skip_tables: 
             if verbose:
                 print(f"Skipping table {file_name}")
             continue
         if file_name.endswith(".csv"):
             table_name = file_name.replace(".csv", "")
+            
             # check meta file exists
             if os.path.exists(os.path.join(csv_folder, f"{table_name}.meta")):
-                with open(os.path.join(csv_folder, f"{table_name}.meta"), 'r') as meta_file:
+                with open(os.path.join(csv_folder, f"{table_name}.meta"),  'r') as meta_file:
                     type_map = json.load(meta_file)
             else:
                 print(f"Meta file not found for {table_name}. Inferring types from the CSV file...")
@@ -325,7 +330,7 @@ if __name__ == "__main__":
         exit(0)
 
     # 1. create a .sql file from the CSV  filesin the 'large_data' folder
-    skip_tables = ["SecurityAlert", "SecurityIncident", "AzureDiagnostics", "LAQueryLogs"]
+    skip_tables = ["SecurityAlert", "SecurityIncident", "AzureDiagnostics", "LAQueryLogs", "AlertEvidence", "AlertInfo"] #TODO: add alertinfo and alertevidence
     # skip_tables += ["DeviceFileEvents"]
     create_sql_file_from_csv_folder(
         csv_folder=csv_folder,

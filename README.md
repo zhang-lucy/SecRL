@@ -8,7 +8,13 @@ We present the first benchmark to test LLM-based agents on threat hunting in the
 1. Data download
 Please pull data from hugging face and put in the `env/data_anonymized` folder.
 
-2. We are using MYSQL docker container for the database. Please first install docker and docker-compose and then pull the mysql image:
+2. Install the requirements
+Setup the environment using conda or venv and install the requirements:
+```bash
+pip install -r requirements.txt
+```
+
+3. We are using MYSQL docker container for the database. Please first install docker and docker-compose and then pull the mysql image:
 
 ```bash
 docker pull mysql:9.0
@@ -27,14 +33,10 @@ Check out volumes with `docker system df -v`.
 To set docker for the full environment, please uncomment the first command in `setup_docker.sh`. Note that this will take up 33GB of disk space.
 
 
-3. LLM setup
+4. LLM setup
 We are using [AutoGen](https://autogen-ai.github.io/autogen/) for API calling. Setup your API key in the `secgym/myconfig.py` file. You can follow the instructions [here](https://autogen-ai.github.io/autogen/docs/notebooks/autogen_uniformed_api_calling#config-list-setup).
 
-4. Install the requirements
-Setup the environment using conda or venv and install the requirements:
-```bash
-pip install -r requirements.txt
-```
+
 
 5. Run Baseline
 ```bash

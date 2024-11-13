@@ -4,7 +4,8 @@ from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
-from secgym.myconfig import config_list_4o, config_list_4_turbo, config_list_35
+from secgym.myconfig import config_list_4o 
+#config_list_4_turbo, config_list_35
 
 def run_experiment(
         agent,
@@ -91,9 +92,9 @@ if __name__ == "__main__":
     max_steps = 15
 
     model_config_map = {
-        "gpt-3.5": config_list_35,
+        #"gpt-3.5": config_list_35,
         "gpt-4o": config_list_4o,
-        "gpt-4turbo": config_list_4_turbo,
+        #"gpt-4turbo": config_list_4_turbo,
     }
     agent_config_list = model_config_map[model]
 

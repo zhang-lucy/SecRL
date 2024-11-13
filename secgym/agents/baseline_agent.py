@@ -1,5 +1,6 @@
 from autogen import OpenAIWrapper
 from .agent_utils import sql_parser, msging
+from tenacity import retry, wait_fixed
 
 BASE_PROMPT = """You are a security analyst. 
 You need to answer a given security question by querying the database.
