@@ -362,13 +362,15 @@ if __name__ == "__main__":
     # download alphine ski house, total days: 33
     start_time = datetime(2024, 6, 20, 0, 0, 0, tzinfo=timezone.utc)
     end_time = datetime(2024, 8, 3, 0, 0, 0, tzinfo=timezone.utc)
-    download_logs(Alpine, LIST_TABLES, start_time, end_time, f"data/alphineskihouse")
+    print(start_time-end_time)
+    # download_logs(Alpine, LIST_TABLES, start_time, end_time, f"data/alphineskihouse")
     
     # # download logs for each incident
-    # root_path = os.path.join(os.path.dirname(__file__), "data")
-    # for a in attacks:
-    #     file_path = os.path.join(root_path, f"incident_{a}")
-    #     start_time, end_time = get_new_times(attacks[a]["start_time"], attacks[a]["end_time"])
-    #     # print time interval
-    #     print(f"Incident {a}: {start_time} - {end_time}")
-    #     download_logs(Alpine, LIST_TABLES, start_time, end_time, file_path)
+    root_path = os.path.join(os.path.dirname(__file__), "data")
+    for a in attacks:
+        file_path = os.path.join(root_path, f"incident_{a}")
+        start_time, end_time = get_new_times(attacks[a]["start_time"], attacks[a]["end_time"])
+        print(f"Incident {a}: {start_time} - {end_time}, {end_time-start_time}")
+        # # print time interval
+        # print(f"Incident {a}: {start_time} - {end_time}")
+        # download_logs(Alpine, LIST_TABLES, start_time, end_time, file_path)
