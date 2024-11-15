@@ -252,7 +252,7 @@ class AlertGraph:
     def get_complet_alert_paths(self, alert_paths_dict) -> list:
         return [alert_paths_dict['start_entities']] + alert_paths_dict['shortest_alert_path'] + [alert_paths_dict['end_entities']]
 
-    def get_alert_paths(self, k=2, verbose=True):
+    def get_alert_paths(self, k=10, verbose=True):
         """
         Question from any two alerts:
 		- Pick any two alert (can be same)
@@ -294,27 +294,52 @@ class AlertGraph:
             if alert1 != alert2: # if start and end alert is different
                 if k > len(farthest_start_entities):
                     selected_from_a1 = farthest_start_entities
-                    print(f"Warning: Construct path from alert {alert1} to alert {alert2}, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available.")
+                    # print(f"Warning: Construct path from alert {alert1} to alert {alert2}, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available.")
                 else:
                     selected_from_a1 = random.sample(farthest_start_entities, k)
 
                 # get entities connected to alert2 that is farthest from alert1 node
                 farthest_end_entities = get_farthest_entities(alert2, alert1)
-                selected_from_a2 = random.sample(farthest_end_entities, 1)
+
+                # filter out node_type  -> host and process  and try select first, if none don't filter
+                filtered_end_entities = [entity for entity in farthest_end_entities if self.graph.nodes[entity]['node_type'] not in ['host', 'process']]
+                if len(filtered_end_entities) > 0:
+                    selected_from_a2 = random.sample(filtered_end_entities, 1)
+                else:
+                    print(f"Warning: No entity with node_type host or process connected to alert {alert2}, select from all entities.")
+                    selected_from_a2 = random.sample(farthest_end_entities, 1)
             else: # start and end alert is the same
                 if len(farthest_start_entities) - 1 <= 0:
                     print(f"Alert {alert1} has only one entity connected, skip.")
                     continue
-                if k >= len(farthest_start_entities):
-                    print(f"Warning: Construct path using the same alert, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available in alert id {alert1}.")
-                    print(f'Warning: Use {len(farthest_start_entities) - 1} entities instead.')
+                # if k >= len(farthest_start_entities):
+                #     print(f"Warning: Construct path using the same alert, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available in alert id {alert1}.")
+                #     print(f'Warning: Use {len(farthest_start_entities) - 1} entities instead.')
                 selected_from_a1 = random.sample(farthest_start_entities, min(k, len(farthest_start_entities)-1))
                 
                 # sample 1 from the rest of farthest_start_entities, start and end entity should not be the same
                 remaining_entities = [entity for entity in farthest_start_entities if entity not in selected_from_a1]
                 selected_from_a2 = random.sample(remaining_entities, 1)
             
-            shortest_alert_path = nx.shortest_path(self.graph, source=alert1, target=alert2) # path between alert1 and alert2
+            # get all shortest path between alert1 and alert2  and random select one
+            shortest_alert_paths = list(nx.all_shortest_paths(self.graph, source=alert1, target=alert2))
+            shortest_alert_path = random.choice(shortest_alert_paths)
+
+            # if selected_from_a2 in selected_from_a1, remove it
+            for entity in selected_from_a1:
+                val_a1 = self.graph.nodes[entity]['value']
+                val_a2 = self.graph.nodes[selected_from_a2[0]]['value']
+                if val_a1 in val_a2 or val_a2 in val_a1:
+                    print(f"Warning: Remove the same entity from start and end entities.")
+                    selected_from_a1.remove(entity)
+                    break
+            if len(selected_from_a1) == 0:
+                print(f"Warning: No entity selected from alert {alert1}, skip.")
+                continue
+            # if selected_from_a2[0]['value'] in selected_from_a1:
+            #     selected_from_a1.remove(selected_from_a2[0])
+            #     print(f"Warning: Remove the same entity from start and end entities.")
+
             alert_paths.append(
                 {
                     "start_alert": alert1,

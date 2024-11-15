@@ -12,11 +12,18 @@ graph_files = [
     'incident_322.graphml'
  ]
 
+include_entry = False
+if include_entry:
+    file_suffix = "qa_entry.json"
+else:
+    file_suffix = "qa.json"
+
 for file in graph_files:
     qagenena = QAGen(
-        qa_path=f"../env/questions/{file.split('.')[0]}_qa.json",
+        qa_path=f"../env/questions/{file.split('.')[0]}_{file_suffix}.json",
         graph_path=os.path.join("graph_files", file),
         config_list=config_list_4o,
-        cache_seed=41
+        cache_seed=41,
+        include_entry=False,
     )
     qagenena.generate_qa()
