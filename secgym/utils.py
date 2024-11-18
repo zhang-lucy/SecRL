@@ -8,6 +8,8 @@ import os
 import Levenshtein
 import autogen
 
+from openai import APITimeoutError
+
 def msging(msg, role="user"): 
     return {"role": role, "content": msg}
 
@@ -17,23 +19,21 @@ def get_full_question(question_dict, add_hint=False):
     return f"{question_dict.get('context', '')} {question_dict['question']}".strip()
 
 
-def LLM_call(instruction: str, task: str, config_list: list, return_cost:bool = False, retry = 10,  **args) -> str:
+def LLM_call(instruction: str, task: str, config_list: list, return_cost:bool = False, retry = 10, is_o1=False, **args) -> str:
     client = autogen.OpenAIWrapper(
         config_list=config_list,
         **args
     )
     for r in range(retry):
         try:
-            response = client.create(
-                messages = [
-                    {'role': 'system', 'content': instruction},
-                    {'role': 'user', 'content': task}
-                ]
-            )
-        except Exception as e:
+            messages = [{'role': 'system', 'content': instruction}, {'role': 'user', 'content': task}]
+            if is_o1:
+                messages[0]['role'] = 'user'
+            response = client.create(messages=messages)
+        except APITimeoutError as e:
             continue
-        else:
-            break
+        break
+    print(response)
     if return_cost:
         return response.choices[0].message.content, response.cost
     return response.choices[0].message.content
