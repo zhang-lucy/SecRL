@@ -165,7 +165,88 @@ Your response:
 }
 """
 
-QAGEN_PROMPT_FULL_PATH = """Your goal is to ask a security question from the given data from a security analyst's perspective.
+QAGEN_PROMPT_NO_ENTRY = """Your goal is to ask a security question from the given data from a security analyst's perspective.
+You are given an alert-entity graph. The graph starts and ends in entity nodes. Intermediate alert and entities are also given. 
+
+How to use the information provided:
+1. The question should be about the end entity (it should be the answer to the question). So NEVER include the end entity in the context or question.
+2. Always include start entities (if not all) in the context/question. Use the alert information to connect the context and question.
+3. A connecting entity is an entity that is presented in last alert and the next alert. The specific value of the connecting entities will be replace with placeholder `???`. You can reference to them if needed.
+4. At repetitive entities: If the entity is also an end entity, you MUST NOT include it in the context/question. If the entity is a start entity, you can include it in the context/question.
+
+Note:
+- If there is one alert, that means the start and end alerts are the same.
+
+The JSON must have the following fields:
+- "context": the context from the start alert. you should combine the alert and the (start) entities given in a consistent sentence. You can simplify the context a bit if it is too long. Make sure the answer is not leaked in the context. If the start alert or the related entities contains the answer, you should remove it from the context.
+    - Try to connect the context and the question in a natural way using the intermediate alerts.
+- "question": the question about the end alert. The question should be carefully crafted so that:
+    1. The question should be natural and relevant to the context, and it should be clear and have a deterministic answer.
+    2. But it should not leak the answer. If the start and end alert are the same, you should be more careful since the given entities may have overlapping information.
+    3. The question should be specific of the answer you are looking for, and the answer should match the question.
+- "answer": the answer to the question. You may be given one or more entities from the end alert, select the most meaningful entity and make sure it is not leaked in the context or question.
+
+Examples:
+##############
+Start Entity:
+Type: process, Field: ExtractedFileName, Value: `powershell.exe`
+Type: host, Field: HostName, Value: `vnevado-dc`
+
+Start Alert:
+Time: 2024-08-01 12:54:34.046089+00:00
+Name: Ntdsutil collecting Active Directory information
+Description: Attackers might be using Ntdsutil to gather information for persistence or to move laterally in a network or organization. Ntdsutil is a command line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). It was launched to maintain the database of AD DS.
+
+End Entity:
+Type: process, Field: ProcessId__CreatedTimeUtc__CommandLine, Value: `2556__2024-08-01t12:37:29.6522416z__"powershell.exe" -encodedcommand iabuahqazabz...`
+##############
+Your response:
+{
+    "context": "A file `powershell.exe` was launched on host `vnevado-dc`, which might be an indicator of an attacker using Ntdsutil to gather information for persistence or to move laterally in a network or organization. Note: Ntdsutil is a command line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). It was launched to maintain the database of AD DS.",
+    "question": "When was the last time the file `powershell.exe` was launched on host `vnevado-dc`, and what was the process ID?",
+    "answer": "Time: 2024-08-01t12:37:29.6522416, Process Id: 2556"
+}
+##############
+##############
+Start Entity:
+Type: url, Field: Url, Value: `login.micro.demo.antoinetest.ovh`
+Type: ip, Field: Address, Value: `231.60.52.209`
+Type: ip, Field: Address, Value: `228.3.31.94`
+
+Start Alert:
+Time: 2024-08-01 12:47:22.846409+00:00
+Name: Malicious Url detected in Proxy logs
+Description: Connection from 231.60.52.209 - vnevado-win11h.vnevado.alpineskihouse.co to login.micro.demo.antoinetest.ovh has been seen on the proxy, please check on the computer what happened
+
+Connected Entities:
+Type: host, Field: HostName, Value: `???`
+
+Next Alert:
+Time: 2024-08-01 13:49:58.880422+00:00
+Name: Malicious URL was clicked on that device
+Description: Malicious URL was clicked on that device
+
+Connected Entities:
+Type: account, Field: Name, Value: `???`
+
+End Alert:
+Time: 2024-08-01 13:09:13.222398+00:00
+Name: Azure Resource Manager operation from suspicious proxy IP address
+Description: Microsoft Defender for Resource Manager detected a resource management operation from an IP address that is associated with proxy services, such as TOR. While this behavior can be legitimate, it's often seen in malicious activities, when threat actors try to hide their source IP.
+
+End Entity:
+Type: ip, Field: Address, Value: `253.1.244.215`
+##############
+Your response:
+{
+    "context": "Connection from 231.60.52.209 - vnevado-win11h.vnevado.alpineskihouse.co to login.micro.demo.antoinetest.ovh has been seen on the proxy. A malicious URL was clicked on some host by an account."
+    "question: "From the same account, the defender detected a resource management operation from an IP address that is associated with proxy services, such as TOR. Can you get the IP address of the proxy?",
+    "answer": "253.1.244.215"
+}
+"""
+
+
+QAGEN_PROMPT_WITH_ENTRY = """Your goal is to ask a security question from the given data from a security analyst's perspective.
 You are given an alert-entity graph. The graph starts and ends in entity nodes. Intermediate alert and entities are also given. 
 
 How to use the information provided:
