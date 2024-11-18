@@ -136,10 +136,23 @@ config_list_4o_mini = [
 
 
 config_list_4o = [
-
   {
     "model": "gpt-4o-0513-spot",
     "base_url": "https://devpythiaaoaiauseast.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-0513-spot",
+    "base_url": "https://devpythiaaoaiswedencentral.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4-0125-spot",
+    "base_url": "https://devpythiaaoaicanadacentral.openai.azure.com",
     "api_type": "azure",
     "api_version": "2024-08-01-preview",
     "azure_ad_token_provider": token_provider
