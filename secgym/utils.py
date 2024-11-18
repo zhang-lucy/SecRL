@@ -17,17 +17,23 @@ def get_full_question(question_dict, add_hint=False):
     return f"{question_dict.get('context', '')} {question_dict['question']}".strip()
 
 
-def LLM_call(instruction: str, task: str, config_list: list, return_cost:bool = False, **args) -> str:
+def LLM_call(instruction: str, task: str, config_list: list, return_cost:bool = False, retry = 10,  **args) -> str:
     client = autogen.OpenAIWrapper(
         config_list=config_list,
         **args
     )
-    response = client.create(
-        messages = [
-            {'role': 'system', 'content': instruction},
-            {'role': 'user', 'content': task}
-        ]
-    )
+    for r in range(retry):
+        try:
+            response = client.create(
+                messages = [
+                    {'role': 'system', 'content': instruction},
+                    {'role': 'user', 'content': task}
+                ]
+            )
+        except Exception as e:
+            continue
+        else:
+            break
     if return_cost:
         return response.choices[0].message.content, response.cost
     return response.choices[0].message.content

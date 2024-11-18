@@ -4,7 +4,7 @@ import pandas as pd
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
 from secgym.utils import process_entity_identifiers
-from secgym.qagen.qa_gen_prompts import QAGEN_PROMPT_FULL_PATH, REWRITE_PROMPT, SOLUTIN_GEN_PROMPT
+from secgym.qagen.qa_gen_prompts import REWRITE_PROMPT, SOLUTIN_GEN_PROMPT, QAGEN_PROMPT_NO_ENTRY, QAGEN_PROMPT_WITH_ENTRY
 
 class QAGen:
     def __init__(self,
@@ -44,13 +44,17 @@ Name: {alert['AlertName']}
 Description: {alert['Description']}
 """
     
-    def get_entity_str(self, entities):
+    def get_entity_str(self, entities, omit_value=False):
         if isinstance(entities, int):
             entities = [entities]
         entity_str = ""
         for n in entities:
-            entity = self.alert_graph.get_node(n)
-            entity_str += f"Type: {entity['node_type']}, Field: {entity['identifier_fields']}, Value: `{entity['value']}`\n"
+            entity = self.alert_graph.get_node(n) 
+            entity_str += f"Type: {entity['node_type']}, Field: {entity['identifier_fields']}, Value: "
+            if not omit_value:
+                entity_str += f"`{entity['value']}`\n"
+            else:
+                entity_str += f"`???`\n"
         return entity_str
 
     def get_all_entity_from_alert(self, alert_node):
@@ -84,7 +88,10 @@ Description: {alert['Description']}
             if i+2 >= len(compelte_solution_path):
                 prompt += "End Entity:\n" + self.get_entity_str(path_dict['end_entities'])
             else:
-                prompt += "Connected Entities:\n" + self.get_entity_str(compelte_solution_path[i+1])
+                if include_entry:
+                    prompt += "Connected Entities:\n" + self.get_entity_str(compelte_solution_path[i+1])
+                else:
+                    prompt += "Connected Entities:\n" + self.get_entity_str(compelte_solution_path[i+1], omit_value=True)
         return prompt
     
 
@@ -147,16 +154,22 @@ Description: {alert['Description']}
             print("-" * 10, "Input Prompt", "-" * 10)
             print(final_str)
 
-
             print("-" * 10, "Response from LLM", "-" * 10)
             # print(self.solution_prompt_format(path_dict))
-            # exit()
+            if i > 3:
+                exit()
+            else:
+                continue
             # continue
             response_data = {}
             # Generate QA, try 5 times
             for j in range(self.trial):
+                if self.include_entry:
+                    prompt = QAGEN_PROMPT_WITH_ENTRY
+                else:
+                    prompt = QAGEN_PROMPT_NO_ENTRY
                 response, cost = LLM_call(
-                    instruction=QAGEN_PROMPT_FULL_PATH,
+                    instruction=prompt,
                     task=final_str,
                     config_list=self.config_list,
                     response_format={"type": "json_object"},
@@ -205,16 +218,24 @@ Description: {alert['Description']}
                     break
                     
             # generate the solution path
-            response, cost = LLM_call(
-                instruction=SOLUTIN_GEN_PROMPT,
-                task=self.solution_prompt_format(path_dict),
-                config_list=self.config_list,
-                response_format={"type": "json_object"},
-                cache_seed=self.cache_seed,
-                return_cost=True
-            )
-            self.accum_cost += cost
-            response_data.update(json.loads(response))
+            for j in range(self.trial):
+                response, cost = LLM_call(
+                    instruction=SOLUTIN_GEN_PROMPT,
+                    task=self.solution_prompt_format(path_dict),
+                    config_list=self.config_list,
+                    response_format={"type": "json_object"},
+                    cache_seed=self.cache_seed+j,
+                    return_cost=True
+                )
+                self.accum_cost += cost
+                try:
+                    solution_path = json.loads(response)
+                    response_data.update(solution_path)
+                except json.JSONDecodeError:
+                    print("JSON Decoding Error from solution generation:\n", response)
+                    continue
+                break
+                
             print("-" * 10, "Solution Path", "-" * 10)
             print(response)
             print("-"*100)
