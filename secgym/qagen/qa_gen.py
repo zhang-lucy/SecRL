@@ -5,6 +5,7 @@ from secgym.qagen.alert_graph import AlertGraph
 import argparse
 from secgym.utils import process_entity_identifiers
 from secgym.qagen.qa_gen_prompts import REWRITE_PROMPT, SOLUTIN_GEN_PROMPT, QAGEN_PROMPT_NO_ENTRY, QAGEN_PROMPT_WITH_ENTRY
+import autogen
 
 class QAGen:
     def __init__(self,
@@ -13,13 +14,25 @@ class QAGen:
                  config_list: list,
                  cache_seed: int,
                  trial: int = 5,
-                 include_entry: bool = False
+                 include_entry: bool = False,
+                 qa_gen_model = "gpt-4o",
+                 solution_gen_model = "gpt-4o",
                 ) -> None:
         self.qa_path = qa_path
         self.cache_seed = cache_seed
         self.graph_path = graph_path
         self.config_list = config_list
         self.include_entry = include_entry
+
+        self.qa_gen_model = qa_gen_model
+        self.qa_gen_config_list = autogen.filter_config(config_list, filter_dict={'tags': [qa_gen_model]})
+        if len(self.qa_gen_config_list) == 0:
+            raise ValueError(f"QA generation model {qa_gen_model} not found in the config list, please put 'tags': ['{qa_gen_model}'] in the config list to inicate this model")
+
+        self.solution_gen_model = solution_gen_model
+        self.solution_gen_config_list = autogen.filter_config(config_list, {'tags': [solution_gen_model]})
+        if len(self.solution_gen_config_list) == 0:
+            raise ValueError(f"Solution generation model {solution_gen_model} not found in the config list, please put 'tags': ['{solution_gen_model}'] in the config list to inicate this model")
 
         self.alert_graph = AlertGraph()
         self.alert_graph.load_graph_from_graphml(self.graph_path)
@@ -156,10 +169,10 @@ Description: {alert['Description']}
 
             print("-" * 10, "Response from LLM", "-" * 10)
             # print(self.solution_prompt_format(path_dict))
-            if i > 3:
-                exit()
-            else:
-                continue
+            # if i > 3:
+            #     exit()
+            # else:
+            #     continue
             # continue
             response_data = {}
             # Generate QA, try 5 times
@@ -168,23 +181,32 @@ Description: {alert['Description']}
                     prompt = QAGEN_PROMPT_WITH_ENTRY
                 else:
                     prompt = QAGEN_PROMPT_NO_ENTRY
+                is_o1 = True if "o1" in self.qa_gen_model else False
+
+                if is_o1:
+                    response_format = None
+                else:
+                    response_format={"type": "json_object"},
+                
                 response, cost = LLM_call(
                     instruction=prompt,
                     task=final_str,
-                    config_list=self.config_list,
-                    response_format={"type": "json_object"},
+                    config_list=self.qa_gen_config_list,
+                    response_format=response_format,
                     cache_seed=self.cache_seed+j,
+                    is_o1=is_o1,
                     return_cost=True
                 )
                 self.accum_cost += cost
-
-                print(response)
+                if "```json" in response:
+                    # extract ```json``` part
+                    response = response.split("```json")[1].split("```")[0].strip()
                 try:
                     response_data = json.loads(response)
                 except json.JSONDecodeError:
                     print("JSON Decoding Error:\n", response)
                     continue
-                
+
                 if not self.validate_qa_dict(response_data):
                     print("Invalid fields in generated question\n", response)
                     continue
@@ -195,7 +217,7 @@ Description: {alert['Description']}
                     response, cost = LLM_call(
                         instruction=REWRITE_PROMPT,
                         task=final_str + "\nQuestion: \n" + json.dumps(response_data),
-                        config_list=self.config_list,
+                        config_list=self.qa_gen_config_list,
                         response_format={"type": "json_object"},
                         cache_seed=self.cache_seed,
                         return_cost=True
@@ -222,7 +244,7 @@ Description: {alert['Description']}
                 response, cost = LLM_call(
                     instruction=SOLUTIN_GEN_PROMPT,
                     task=self.solution_prompt_format(path_dict),
-                    config_list=self.config_list,
+                    config_list=self.solution_gen_config_list,
                     response_format={"type": "json_object"},
                     cache_seed=self.cache_seed+j,
                     return_cost=True
@@ -252,20 +274,30 @@ Description: {alert['Description']}
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run Alert QA Generation")
-    parser.add_argument("--qa_path", "-q", type=str, default="newqa.json", help="Path to save the generated QA")
-    parser.add_argument("--graph_path", "-g", type=str, default="sample_incident.graphml", help="Path to the alert graph")
-    parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
-    args = parser.parse_args()
+    print("Please use run_qa.py to generate QA")
+    # parser = argparse.ArgumentParser(description="Run Alert QA Generation")
+    # parser.add_argument("--qa_path", "-q", type=str, default="newqa.json", help="Path to save the generated QA")
+    # parser.add_argument("--graph_path", "-g", type=str, default="sample_incident.graphml", help="Path to the alert graph")
+    # parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
+    # parser.add_argument("--include_entry", action="store_true", help="Include full alert entry in the question prompt")
+    # parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for QA generation")
+    # parser.add_argument("--solution_model", "-s", type=str, default=None, help="Model to use for solution generation")
+    # args = parser.parse_args()
 
-    from secgym.myconfig import config_list_4o
+    # from secgym.myconfig import config_list_4o
 
-    qagenena = QAGen(
-        qa_path=args.qa_path,
-        graph_path=args.graph_path,
-        config_list=config_list_4o,
-        cache_seed=args.cache_seed,
-        include_entry=True
-    )
+    # if args.solution_model is None:
+    #     print(f"Warning: Solution model not provided, using the same model as QA generation: {args.model}")
+    #     args.solution_model = args.model
 
-    qagenena.generate_qa()
+    # qagenena = QAGen(
+    #     qa_path=args.qa_path,
+    #     graph_path=args.graph_path,
+    #     config_list=None, # set your config list here
+    #     qa_gen_model=args.model,
+    #     solution_gen_model=args.solution_model,
+    #     cache_seed=args.cache_seed,
+    #     include_entry=args.include_entry,
+    # )
+
+    # qagenena.generate_qa()
