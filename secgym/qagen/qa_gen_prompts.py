@@ -1,3 +1,99 @@
+#TODO: Add incident info, how much to use?
+TWEAKED_QAGEN_PROMPT_ORIGIN = """
+
+Your goal is to ask a security question to test a junior security analyst's ability to understand a security incident and their reasoning capabilities.
+You will be given a security incident composed of a group of related alerts connected by data elements or entities that are shared between the alerts such as User accounts, Hosts, Mailboxes, IP addresses, Files, Cloud applications, Processes, URLs etc. Alerts are signals that result from various threat detection activities. These signals indicate the occurrence of malicious or suspicious events in your environment.
+
+Specifically to generate a question, you will be given an alert-entity path from the given security incident. This will include a start alert and end alert, and corresponding entities involved in the start and end alert. The two alerts are connected by a alert-entity path. Some of the entities on the alert-entity path are ommitted (replaced by ???) in order to test the junior analyst's ability to find these connections on their own. The start and end alert might be the same.
+You will use the start alert along with the overall incident details as the context, and ask a question about the entities part of the end alert.
+
+The JSON must have the following fields:
+- "question": the question about the end alert. The question should be carefully crafted so that:
+    1. The question should be natural and relevant to the context, and it should be clear and have a deterministic answer.
+    2. But it should not leak the answer. If the start and end alert are the same, you should be more careful since the given entities may have overlapping information.
+    3. The question should be specific of the answer you are looking for, and the answer should match the question.
+- "answer": the answer to the question. You may be given one or more entities from the end alert, select the most meaningful entity and make sure it is not leaked in the context or question.
+- "context": the context from the start alert and overall incident. You should combine the alert and the entities given in a consistent sentence. You can simplify the context a bit if it is too long. Make sure the answer is not leaked in the context. If the start alert or the related entities contains the answer, you should remove it from the context.
+
+Examples:
+##############
+Security Incident: Multi-stage incident involving Initial access & Collection on multiple endpoints reported by multiple sources, Description: nan, Severity: High, Time of incident: from 2024-08-01 12:26:22+00:00 to 2024-08-01 12:37:30.277218+00:00, Additional Details: {"alertsCount":9,"bookmarksCount":0,"commentsCount":1,"alertProductNames":["Microsoft Defender Advanced Threat Protection","Azure Security Center","Microsoft 365 Defender","Office 365 Advanced Threat Protection","Azure Sentinel"],"tactics":["DefenseEvasion"],"techniques":["T1003","T1018","T1069","T1087","T1482","T1566","T1496"]"}
+
+Start Alert:
+Time: 8/14/2024, 10:34:41.578 PM
+Name: Ntdsutil collecting Active Directory information
+Description: Attackers might be using Ntdsutil to gather information for persistence or to move laterally in a network or organization. Ntdsutil is a command line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). It was launched to maintain the database of AD DS.
+Entities from this alert:
+Type: process, Field: ExtractedFileName, Value: `powershell.exe`
+Type: host, Field: HostName, Value: `vnevado-dc`
+
+End Alert:
+Time: 8/14/2024, 10:34:41.578 PM
+Name: Ntdsutil collecting Active Directory information
+Description: Attackers might be using Ntdsutil to gather information for persistence or to move laterally in a network or organization. Ntdsutil is a command line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). It was launched to maintain the database of AD DS.
+Entities from this alert:
+Type: process, Field: ProcessId__CreatedTimeUtc__CommandLine, Value: `2556__2024-08-01t12:37:29.6522416z__"powershell.exe" -encodedcommand iabuahqazabz...`
+##############
+Your response:
+{
+    "context": "As part of a recent multi-stage security incident involving initial access & collection on multiple endpoints, a file `powershell.exe` was launched on host `vnevado-dc`, which might be an indicator of an attacker using Ntdsutil to gather information for persistence or to move laterally in a network or organization. Note: Ntdsutil is a command line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). It was launched to maintain the database of AD DS.",
+    "question": "When was the last time the file `powershell.exe` was launched on host `vnevado-dc`, and what was the process ID?",
+    "answer": "Time: 2024-08-01t12:37:29.6522416, Process Id: 2556"
+}
+##############
+##############
+Security Incident: Multi-stage incident involving Execution & Discovery on one endpoint, Description: nan, Severity: Informational, Time of incident: from 2024-06-26 11:57:25.302556+00:00 to 2024-06-26 13:17:18.874531+00:00, Additional Details: {"alertsCount":11,"bookmarksCount":0,"commentsCount":1,"alertProductNames":["Microsoft Defender Advanced Threat Protection"],"tactics":[],"techniques":["T1059","T1112","T1547","T1053","T1018","T1069","T1087","T1135","T1558"]}
+
+Start Alert:
+Time: 8/14/2024, 10:34:41.429 PM
+Name: Suspicious credential dump from NTDS.dit
+Description: Attackers dump NTDS.dit in order to obtain user's credentials which are stored in the domain controller.
+Entities from this alert:
+Type: process, Field: ProcessId__CreatedTimeUtc__CommandLine, Value: `6748__2024-08-01t12:37:30.2769191z__"ntdsutil.exe" "ac i ntds" ifm "create full c:\\temp" q q`
+Type: process, Field: ExtractedFileName, Value: `ntdsutil.exe`
+
+End Alert:
+Time: 8/14/2024, 10:37:13.064 PM
+Name: Suspicious Azure Resource Management activities by a risky user
+Description: Suspicious cloud Azure Resource Management (ARM) activities were performed by a user account that signed in to a risky session. This alert was triggered based on a Microsoft Defender for Cloud alert related to ARM and Microsoft Entra ID Protection risk scores.
+Entities from this alert:
+Type: account, Field: Email, Value: `Megan Bower@vnevado.alpineskihouse.co`
+##############
+Your response:
+{
+    "context": "A Multi-stage security incident involving Execution & Discovery on one endpoint was reported by Microsoft Defender Advanced Threat Protection along with 11 flagged alerts. As part of investigating this incident, we observed a file `ntdsutil.exe` was launched with this command line: `ntdsutil.exe ac i ntds ifm create full c:\temp q q`. The Process ID was 6748. This process might be an indicator of an attacker dumping NTDS.dit in order to obtain user's credentials which are stored in the domain controller.",
+    "question: "Related to this alert, there is also a suspicious Azure Resource Management (ARM) activities, which is likely from the same user. Can you get the email of the user who performed the suspicious ARM activities?",
+    "answer": "Megan Bower@vnevado.alpineskihouse.co",
+}
+##############
+##############
+Security Incident: SAP financial process manipulation (attack disruption), Description: nan, Severity: High, Time of incident: from 2024-07-22 08:18:18.418000+00:00 to 2024-07-22 09:46:21+00:00, Additional Details: {"alertsCount":11,"bookmarksCount":0,"commentsCount":0,"alertProductNames":["Azure Active Directory Identity Protection","Microsoft Cloud App Security","Microsoft 365 Defender"],"tactics":[],"techniques":["T1110","T1564","T1114","T1586","T1078"]}
+
+Start Alert:
+Time: 8/14/2024, 10:37:13.079 PM
+Name: Malicious URL was clicked on that device
+Description: Malicious URL was clicked on that device
+Entities from this alert:
+Type: url, Field: Url, Value: `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/`
+Type: process, Field: ProcessId__CreatedTimeUtc__CommandLine, Value: `4256__2024-08-01t13:42:52.04__"msedge.exe" --type=utility --utility-sub-type=network.mojom.networkservice --lang=en-us --service-sandbox-type=none --field-trial-handle=1912,i,9358546549091360037,1317674413260171076,262144 --variations-seed-version --mojo-platform-channel-handle=3124 /prefetch:11`
+
+End Alert:
+Time: 8/14/2024, 10:34:41.429 PM
+Name: Suspicious credential dump from NTDS.dit
+Description: Attackers dump NTDS.dit in order to obtain user's credentials which are stored in the domain controller.
+Entities from this alert:
+Type: process, Field: ExtractedFileName, Value: `ntdsutil.exe`
+##############
+Your response:
+{
+    "context": "A security incident involving SAP financial process manipulation (attack disruption) occured in our organization as indicated by 11 flagged alerts. One part of this security incident is that a malicious URL `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/` was clicked on Microsoft Edge browser, the ProcessId__CreatedTimeUtc__CommandLine is `4256__2024-08-01t13:42:52.04__"msedge.exe" --type=utility --utility-sub-type=network.mojom.networkservice --lang=en-us --service-sandbox-type=none --field-trial-handle=1912,i,9358546549091360037,1317674413260171076,262144 --variations-seed-version --mojo-platform-channel-handle=3124 /prefetch:11`.",
+    "question": "Related to this alert, there is also a suspicious credential dump from NTDS.dit. Can you get the file name of the process that was used to dump the NTDS.dit?",
+    "answer": "ntdsutil.exe",
+}
+##############
+"""
+
+
 #TODO: tweak prompt
 QAGEN_PROMPT_ORIGIN = """Your goal is to ask a security question from the given data from a security analyst's perspective.
 You are given the start alert and end alert, and corresponding entities. The two alerts are connected by a alert-entity path. The start and end alert might be the same.

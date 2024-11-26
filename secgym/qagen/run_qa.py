@@ -9,21 +9,22 @@ def get_args():
     parser.add_argument("--graph_path", "-g", type=str, default="sample_incident.graphml", help="Path to the alert graph")
     parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
     parser.add_argument("--include_entry", action="store_true", help="Include full alert entry in the question prompt")
-    parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for QA generation")
+    parser.add_argument("--model", "-m", type=str, default="o1", help="Model to use for QA generation")
     parser.add_argument("--solution_model", "-s", type=str, default="gpt-4o", help="Model to use for solution generation")
+    parser.add_argument("--include_incident", action="store_true", help="Include incident context in the question prompt")
     args = parser.parse_args()
     return args
 
 args = get_args()
 graph_files = [
-    # 'incident_34.graphml',
-    # 'incident_166.graphml',
+     #'incident_34.graphml',
+     #'incident_166.graphml',
     'incident_55.graphml',
-    # 'incident_5.graphml',
-    # 'incident_38.graphml',
-    # 'incident_134.graphml',
-    # 'incident_39.graphml',
-    'incident_322.graphml'
+     #'incident_5.graphml',
+     #'incident_38.graphml',
+     #'incident_134.graphml',
+     #'incident_39.graphml',
+    #'incident_322.graphml'
  ]
 
 
@@ -47,6 +48,8 @@ graph_files = [
 qa_file_suffix = "qa"
 if args.include_entry:
     qa_file_suffix += "_entry"
+if args.include_incident:
+    qa_file_suffix += "_incident"
 qa_file_suffix += f"_{args.model}"
 if args.solution_model is not None and args.solution_model != args.model:
     qa_file_suffix += f"_{args.solution_model}"
@@ -61,5 +64,13 @@ for file in graph_files:
         solution_gen_model=args.solution_model,
         cache_seed=41,
         include_entry=False,
+        include_incident=True,
     )
+
+    # prompt = f"Security Incident: {qagenena.alert_graph.incident['Title']}, Description: {qagenena.alert_graph.incident['Description']}, Severity: {qagenena.alert_graph.incident['Severity']}, Time of incident: from {qagenena.alert_graph.incident['FirstActivityTime']} to {qagenena.alert_graph.incident['LastActivityTime']}, Additional Details: {qagenena.alert_graph.incident['AdditionalData']} \n"
+    # print(prompt)
+    # exit()
+    #print(qagenena.alert_graph.incident)
+    #print(qagenena.alert_graph.incident['AdditionalData'])
+    #exit()
     qagenena.generate_qa()

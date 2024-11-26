@@ -7,10 +7,72 @@ token_provider = get_bearer_token_provider(
     AzureCliCredential(), "https://cognitiveservices.azure.com/.default"
 )
 
-
-      # "base_url": "https://medeina-openai-dev-011.openai.azure.com/",
-      # https://yadaoai.openai.azure.com/ gpt4-o
-      # gpt-4o-2024-05-13 aif-complex-tasks-west-us-3
+CONFIG_LIST = [
+  {
+    "model": "gpt-4o-0513-spot",
+    "base_url": "https://devpythiaaoaiauseast.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["gpt-4o"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-0513-spot",
+    "base_url": "https://devpythiaaoaiswedencentral.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["gpt-4o"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4-0125-spot",
+    "base_url": "https://devpythiaaoaicanadacentral.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["gpt-4o"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["gpt-4o"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-2",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["gpt-4o"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+      "model": "o1-preview-2024-09-12-global",
+      "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+      "api_type": "azure",
+      "api_version": "2024-08-01-preview",
+      "tags": ["o1"],
+      "azure_ad_token_provider": token_provider
+  },
+  {
+      "model": "o1-preview",
+      "base_url": "https://ai-nguyenthanhai426837561304.cognitiveservices.azure.com",
+      "api_type": "azure",
+      "api_version": "2024-08-01-preview",
+      "tags": ["o1"],
+      "azure_ad_token_provider": token_provider
+  },
+    {
+      "model": "o1-preview",
+      "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+      "api_type": "azure",
+      "api_version": "2024-08-01-preview",
+      "tags": ["o1"],
+      "azure_ad_token_provider": token_provider
+  }
+]
 
 config_list_o1 = [
     {
@@ -307,6 +369,7 @@ config_list_4_combin = [
 if __name__ == "__main__":
 
   from autogen import OpenAIWrapper
+  import autogen
 
 #   client = OpenAIWrapper(config_list=config_list_35, cache_seed=None)
 #   print("Test gpt 35", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
@@ -317,11 +380,15 @@ if __name__ == "__main__":
   # client = OpenAIWrapper(config_list=config_list_4o_mini, cache_seed=None)
   # print("Test gpt 4o-mini", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
-  client = OpenAIWrapper(config_list=config_list_o1, cache_seed=None)
-  print("Test gpt 4o1", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+  # client = OpenAIWrapper(config_list=config_list_o1, cache_seed=None)
+  # print("Test gpt 4o1", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
   # client = OpenAIWrapper(config_list=config_list_4_0125, cache_seed=None)
   # print("Test gpt4 0125", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
 #   client = OpenAIWrapper(config_list=config_list_4_turbo, cache_seed=None)
 #   print("Test gpt4 turbo", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+  config = autogen.filter_config(CONFIG_LIST, filter_dict={'tags': ["gpt-4o"]})
+
+  client = OpenAIWrapper(config_list=config, cache_seed=None)
+  print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)

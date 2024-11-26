@@ -24,16 +24,28 @@ def LLM_call(instruction: str, task: str, config_list: list, return_cost:bool = 
         config_list=config_list,
         **args
     )
+    #print(args)
+    #print(config_list)
     for r in range(retry):
         try:
             messages = [{'role': 'system', 'content': instruction}, {'role': 'user', 'content': task}]
             if is_o1:
                 messages[0]['role'] = 'user'
+            #print(is_o1)
+            #print(messages)
             response = client.create(messages=messages)
         except APITimeoutError as e:
             continue
         break
-    print(response)
+    # try:
+    #     messages = [{'role': 'system', 'content': instruction}, {'role': 'user', 'content': task}]
+    #     #print(messages)
+    #     if is_o1:
+    #         messages[0]['role'] = 'user'
+    #     response = client.create(messages=messages)
+    # except APITimeoutError as e:
+    #     print(f"API Timeout Error: {e}")
+    print(response.choices[0].message.content)
     if return_cost:
         return response.choices[0].message.content, response.cost
     return response.choices[0].message.content

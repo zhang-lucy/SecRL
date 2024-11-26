@@ -4,7 +4,7 @@ import pandas as pd
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
 from secgym.utils import process_entity_identifiers
-from secgym.qagen.qa_gen_prompts import REWRITE_PROMPT, SOLUTIN_GEN_PROMPT, QAGEN_PROMPT_NO_ENTRY, QAGEN_PROMPT_WITH_ENTRY
+from secgym.qagen.qa_gen_prompts import REWRITE_PROMPT, SOLUTIN_GEN_PROMPT, QAGEN_PROMPT_NO_ENTRY, QAGEN_PROMPT_WITH_ENTRY, TWEAKED_QAGEN_PROMPT_ORIGIN
 import autogen
 
 class QAGen:
@@ -17,12 +17,14 @@ class QAGen:
                  include_entry: bool = False,
                  qa_gen_model = "gpt-4o",
                  solution_gen_model = "gpt-4o",
+                 include_incident = False,
                 ) -> None:
         self.qa_path = qa_path
         self.cache_seed = cache_seed
         self.graph_path = graph_path
         self.config_list = config_list
         self.include_entry = include_entry
+        self.include_incident = include_incident
 
         self.qa_gen_model = qa_gen_model
         self.qa_gen_config_list = autogen.filter_config(config_list, filter_dict={'tags': [qa_gen_model]})
@@ -79,12 +81,16 @@ Description: {alert['Description']}
         return entity_str
     
     def qagen_prompt_format(self, path_dict, include_entry=None):
-        if include_entry is None:
-            include_entry = self.include_entry
+
+        if self.include_incident:
+            prompt = f"Security Incident: {self.alert_graph.incident['Title']}, Description: {self.alert_graph.incident['Description']}, Severity: {self.alert_graph.incident['Severity']}, Time of incident: from {self.alert_graph.incident['FirstActivityTime']} to {self.alert_graph.incident['LastActivityTime']}, Additional Details: {self.alert_graph.incident['AdditionalData']} \n"
+        else:
+            prompt = ""
+
             
         compelte_solution_path = path_dict['shortest_alert_path'] + path_dict['end_entities']
         assert len(compelte_solution_path) % 2 == 0
-        prompt = "Start Entity:\n" + self.get_entity_str(path_dict['start_entities']) + "\n"
+        prompt += "Start Entity:\n" + self.get_entity_str(path_dict['start_entities']) + "\n"
         for i in range(0, len(compelte_solution_path), 2):
             if i == 0:
                 prompt += "Start Alert:\n"
@@ -180,13 +186,13 @@ Description: {alert['Description']}
                 if self.include_entry:
                     prompt = QAGEN_PROMPT_WITH_ENTRY
                 else:
-                    prompt = QAGEN_PROMPT_NO_ENTRY
+                    prompt = TWEAKED_QAGEN_PROMPT_ORIGIN#QAGEN_PROMPT_NO_ENTRY
                 is_o1 = True if "o1" in self.qa_gen_model else False
 
                 if is_o1:
                     response_format = None
                 else:
-                    response_format={"type": "json_object"},
+                    response_format={"type": "json_object"}
                 
                 response, cost = LLM_call(
                     instruction=prompt,
@@ -218,8 +224,9 @@ Description: {alert['Description']}
                         instruction=REWRITE_PROMPT,
                         task=final_str + "\nQuestion: \n" + json.dumps(response_data),
                         config_list=self.qa_gen_config_list,
-                        response_format={"type": "json_object"},
+                        response_format=response_format,
                         cache_seed=self.cache_seed,
+                        is_o1=is_o1,
                         return_cost=True
                     )
                     self.accum_cost += cost
