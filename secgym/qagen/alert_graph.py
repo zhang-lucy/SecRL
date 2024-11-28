@@ -359,10 +359,10 @@ class AlertGraph:
                 print(f"Alert pair: {alert1} -> {alert2}, start entities: {selected_from_a1}, end entity: {selected_from_a2}, shortest alert path: {shortest_alert_path}")
                 print(f"-"*100)
         
-        if num_select > 0:
+        if num_select < len(alert_paths):
             alert_paths = self.select_alert_paths(alert_paths, num_select)
 
-        print(f"Total alert paths: {len(alert_paths)}. Expected: alert_num ^ 2 = {len(alert_nodes) ** 2}, Selected: {num_select}")
+        print(f"Total alert paths: {len(alert_paths)}. Expected: alert_num ^ 2 = {len(alert_nodes) ** 2}, Selected: {len(alert_paths)}")
         return alert_paths
 
     @staticmethod
@@ -377,6 +377,8 @@ class AlertGraph:
         Returns:
             list[dict]: List of selected alert paths.
         """
+        if m >= len(alert_paths):
+            return alert_paths 
         # Group paths by difficulty
         difficulty_groups = defaultdict(list)
         for path in alert_paths:
@@ -399,10 +401,10 @@ class AlertGraph:
         # allocated_counts = [int(r * m) for r in ratios]
         allocated_counts = [min(int(r * m), len(difficulty_groups[d])) for r, d in zip(ratios, difficulties)]
 
-        # print(f"Difficulty : Ratios")
-        # for i, difficulty in enumerate(difficulties):
-        #     print(f"{difficulty} : {ratios[i]}")
-        # print(f"Allocated counts: {allocated_counts}", f"Leftover: {m - sum(allocated_counts)}")
+        print(f"Difficulty : Ratios")
+        for i, difficulty in enumerate(difficulties):
+            print(f"{difficulty} : {ratios[i]}")
+        print(len(alert_paths), f"Allocated counts: {allocated_counts}", f"Leftover: {m - sum(allocated_counts)}")
 
         # Handle leftover counts
         leftover = m - sum(allocated_counts)
@@ -410,9 +412,11 @@ class AlertGraph:
             for i in range(len(difficulties)-1, -1, -1):  # Favor higher difficulties
                 if leftover == 0:
                     break
-                allocated_counts[i] += 1
-                leftover -= 1
+                if allocated_counts[i] < len(difficulty_groups[difficulties[i]]):
+                    allocated_counts[i] += 1
+                    leftover -= 1
         
+        print(allocated_counts)
         # Randomly select paths based on allocated counts
         selected_paths = []
         for i, difficulty in enumerate(difficulties):
