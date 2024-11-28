@@ -18,6 +18,7 @@ class QAGen:
                  qa_gen_model = "gpt-4o",
                  solution_gen_model = "gpt-4o",
                  include_incident = False,
+                 max_question_count = 100
                 ) -> None:
         self.qa_path = qa_path
         self.cache_seed = cache_seed
@@ -39,7 +40,7 @@ class QAGen:
         self.alert_graph = AlertGraph()
         self.alert_graph.load_graph_from_graphml(self.graph_path)
         print("Alert graph loaded.")
-        self.all_paths = self.alert_graph.get_alert_paths()
+        self.all_paths = self.alert_graph.get_alert_paths(num_select=max_question_count)
         
         self.all_questions = []
         self.trial = trial  

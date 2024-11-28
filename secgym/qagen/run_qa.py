@@ -65,12 +65,7 @@ for file in graph_files:
         cache_seed=41,
         include_entry=False,
         include_incident=True,
+        max_question_count=100
     )
 
-    # prompt = f"Security Incident: {qagenena.alert_graph.incident['Title']}, Description: {qagenena.alert_graph.incident['Description']}, Severity: {qagenena.alert_graph.incident['Severity']}, Time of incident: from {qagenena.alert_graph.incident['FirstActivityTime']} to {qagenena.alert_graph.incident['LastActivityTime']}, Additional Details: {qagenena.alert_graph.incident['AdditionalData']} \n"
-    # print(prompt)
-    # exit()
-    #print(qagenena.alert_graph.incident)
-    #print(qagenena.alert_graph.incident['AdditionalData'])
-    #exit()
-    qagenena.generate_qa()
+    # qagenena.generate_qa()
