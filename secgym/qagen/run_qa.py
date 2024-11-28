@@ -9,9 +9,9 @@ def get_args():
     parser.add_argument("--graph_path", "-g", type=str, default="sample_incident.graphml", help="Path to the alert graph")
     parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
     parser.add_argument("--include_entry", action="store_true", help="Include full alert entry in the question prompt")
-    parser.add_argument("--model", "-m", type=str, default="o1", help="Model to use for QA generation")
+    parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for QA generation")
     parser.add_argument("--solution_model", "-s", type=str, default="gpt-4o", help="Model to use for solution generation")
-    parser.add_argument("--include_incident", action="store_true", help="Include incident context in the question prompt")
+    parser.add_argument("--include_incident", action="store_false", help="Include incident context in the question prompt")
     args = parser.parse_args()
     return args
 
@@ -24,7 +24,7 @@ graph_files = [
      #'incident_38.graphml',
      #'incident_134.graphml',
      #'incident_39.graphml',
-    #'incident_322.graphml'
+    'incident_322.graphml'
  ]
 
 
@@ -63,8 +63,8 @@ for file in graph_files:
         qa_gen_model=args.model,
         solution_gen_model=args.solution_model,
         cache_seed=41,
-        include_entry=False,
-        include_incident=True,
+        include_entry=args.include_entry,
+        include_incident=args.include_incident,
         max_question_count=100
     )
 
