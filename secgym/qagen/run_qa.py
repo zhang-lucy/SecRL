@@ -20,10 +20,10 @@ graph_files = [
      #'incident_34.graphml',
      #'incident_166.graphml',
     'incident_55.graphml',
-     #'incident_5.graphml',
-     #'incident_38.graphml',
-     #'incident_134.graphml',
-     #'incident_39.graphml',
+     'incident_5.graphml',
+     'incident_38.graphml',
+     'incident_134.graphml',
+     'incident_39.graphml',
     'incident_322.graphml'
  ]
 
@@ -68,4 +68,4 @@ for file in graph_files:
         max_question_count=100
     )
 
-    # qagenena.generate_qa()
+    qagenena.generate_qa()

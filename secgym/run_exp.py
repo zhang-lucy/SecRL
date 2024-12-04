@@ -90,6 +90,7 @@ if __name__ == "__main__":
     model = "gpt-4o"
     submit_summary = False
     max_steps = 15
+    layer = "alert"
 
     model_config_map = {
         #"gpt-3.5": config_list_35,
@@ -98,7 +99,7 @@ if __name__ == "__main__":
     }
     agent_config_list = model_config_map[model]
 
-    post_fix = f"_{model}_{cache_seed}"
+    post_fix = f"_{model}_{cache_seed}_{layer}"
     if add_hint:
         post_fix += "_hint"
     if submit_summary:
