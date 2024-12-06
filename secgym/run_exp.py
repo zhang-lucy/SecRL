@@ -113,11 +113,12 @@ if __name__ == "__main__":
         submit_summary=submit_summary,
         temperature=temperature,
     )
+    agent_name = agent.name
 
     for attack in ATTACKS:
         print(f"Running attack: {attack}")
-        save_agent_file = f"results/{attack}_agent_log{post_fix}.json"
-        save_env_file = f"results/{attack}_env_log{post_fix}.json"
+        save_agent_file = f"results/{agent_name}/{attack}_agent_log{post_fix}.json"
+        save_env_file = f"results/{agent_name}/{attack}_env_log{post_fix}.json"
 
         thug_env = ThuGEnv(
             attack=attack,

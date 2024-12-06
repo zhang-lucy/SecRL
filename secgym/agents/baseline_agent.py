@@ -38,7 +38,7 @@ class BaselineAgent:
                  cache_seed=41,
                  max_steps=15,
                  submit_summary=False,
-                 temperature=0
+                 temperature=0,
                  ):
         self.config_list = config_list
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed, temperature=temperature)
@@ -48,6 +48,10 @@ class BaselineAgent:
         self.max_steps = max_steps
         self.submit_summary = submit_summary
         self.step_count = 0
+
+    @property
+    def name(self):
+        return "BaselineAgent"
 
     def _call_llm(self, messages):
         response = self.client.create(
