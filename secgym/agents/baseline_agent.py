@@ -7,7 +7,7 @@ You need to answer a given security question by querying the database.
 The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
 Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
 
-Your repsone should always be a thought-action pair:
+Your response should always be a thought-action pair:
 Thought: <your reasoning>
 Action: <your SQL query>
 
@@ -21,7 +21,7 @@ You need to answer a given security question by querying the database.
 The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
 Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
 
-Your repsone should always be a thought-action pair:
+Your response should always be a thought-action pair:
 Thought: <your reasoning>
 Action: <your SQL query>
 

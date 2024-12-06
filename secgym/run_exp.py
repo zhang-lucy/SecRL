@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
-from secgym.myconfig import config_list_4o 
+from secgym.myconfig import config_list_4o, config_list_4o_mini
 #config_list_4_turbo, config_list_35
 
 def run_experiment(
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     cache_seed = 46
     temperature = 0
     add_hint = False
-    model = "gpt-4o"
+    model = "gpt-4o-mini"
     submit_summary = False
     max_steps = 15
     layer = "alert"
@@ -95,6 +95,7 @@ if __name__ == "__main__":
     model_config_map = {
         #"gpt-3.5": config_list_35,
         "gpt-4o": config_list_4o,
+        "gpt-4o-mini": config_list_4o_mini,
         #"gpt-4turbo": config_list_4_turbo,
     }
     agent_config_list = model_config_map[model]
@@ -137,5 +138,5 @@ if __name__ == "__main__":
         agent.reset()
 
         with open('results.txt', 'a') as f:
-            f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}\n")
+            f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}, Layer: {layer}\n")
             f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")
