@@ -61,6 +61,10 @@ class BaselineAgent:
         self.submit_summary = submit_summary
         self.step_count = 0
 
+    @property
+    def name(self):
+        return "PromptSauceAgent"
+
     def _call_llm(self, messages):
         response = self.client.create(
             messages=messages,

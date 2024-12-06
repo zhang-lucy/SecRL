@@ -330,7 +330,7 @@ if __name__ == "__main__":
         exit(0)
 
     # 1. create a .sql file from the CSV  filesin the 'large_data' folder
-    skip_tables = ["AzureDiagnostics", "LAQueryLogs","SecurityIncident"] #TODO: add alertinfo and alertevidence, "AlertEvidence", "AlertInfo","SecurityAlert","SecurityIncident",
+    skip_tables = ["AzureDiagnostics", "LAQueryLogs"] #TODO: add alertinfo and alertevidence, "AlertEvidence", "AlertInfo","SecurityAlert","SecurityIncident",
     # skip_tables += ["DeviceFileEvents"]
     create_sql_file_from_csv_folder(
         csv_folder=csv_folder,
