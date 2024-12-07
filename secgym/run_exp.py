@@ -91,7 +91,7 @@ if __name__ == "__main__":
     model = "gpt-4o"
     submit_summary = True
     max_steps = 15
-    layer = "incident"
+    layer = "alert"
 
     model_config_map = {
         #"gpt-3.5": config_list_35,
@@ -140,5 +140,5 @@ if __name__ == "__main__":
         agent.reset()
 
         with open('results.txt', 'a') as f:
-            f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}, Layer: {layer}\n, Agent: {a}")
+            f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}, Layer: {layer}, Agent: {agent_name}\n")
             f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")
