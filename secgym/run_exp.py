@@ -90,8 +90,8 @@ if __name__ == "__main__":
     add_hint = False
     model = "gpt-4o"
     submit_summary = True
-    max_steps = 15
-    layer = "alert"
+    max_steps = 100
+    layer = "incident"
 
     model_config_map = {
         #"gpt-3.5": config_list_35,
