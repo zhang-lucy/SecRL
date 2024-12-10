@@ -1,11 +1,13 @@
 #from agents.baseline_agent import BaselineAgent
-from agents.prompt_sauce_agent import BaselineAgent
+#from agents.prompt_sauce_agent import BaselineAgent
+from agents.cheating_agent import BaselineAgent
 import json
 from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
 from secgym.myconfig import config_list_4o, config_list_4o_mini
+from secgym.qagen.alert_graph import AlertGraph
 #config_list_4_turbo, config_list_35
 
 def run_experiment(
@@ -114,6 +116,7 @@ if __name__ == "__main__":
         cache_seed=cache_seed, 
         submit_summary=submit_summary,
         temperature=temperature,
+        max_steps=max_steps,
     )
     agent_name = agent.name
 
@@ -131,11 +134,21 @@ if __name__ == "__main__":
             max_steps=max_steps,
             eval_step=True,
         ) 
+        
+        #Only if cheating agent
+        graph_path = f"qagen/graph_files/{attack}.graphml"
+        alert_graph = AlertGraph()
+        alert_graph.load_graph_from_graphml(graph_path)
+        incident = alert_graph.incident
+        agent.incident = incident
+        # print(incident)
+        # exit()
+
         avg_success, tested_num, avg_reward = run_experiment(
             agent=agent,
             thug_env=thug_env,
             save_agent_file=save_agent_file,
-            num_test=-1 # set to -1 to run all questions
+            num_test=-1, # set to -1 to run all questions
         )
         agent.reset()
 
