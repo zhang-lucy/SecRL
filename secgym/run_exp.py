@@ -1,6 +1,6 @@
 #from agents.baseline_agent import BaselineAgent
-#from agents.prompt_sauce_agent import BaselineAgent
-from agents.cheating_agent import BaselineAgent
+from agents.prompt_sauce_agent import BaselineAgent
+#from agents.cheating_agent import BaselineAgent
 import json
 from datetime import datetime
 from typing import Union
@@ -87,13 +87,13 @@ if __name__ == "__main__":
     # cache_seed = 44
     # agent_config_list = config_list_4o
 
-    cache_seed = 46
+    cache_seed = 47
     temperature = 0
     add_hint = False
     model = "gpt-4o"
-    submit_summary = True
-    max_steps = 100
-    layer = "incident"
+    submit_summary = False
+    max_steps = 50
+    layer = "alert"
 
     model_config_map = {
         #"gpt-3.5": config_list_35,

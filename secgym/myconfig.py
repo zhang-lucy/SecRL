@@ -374,8 +374,8 @@ if __name__ == "__main__":
 #   client = OpenAIWrapper(config_list=config_list_35, cache_seed=None)
 #   print("Test gpt 35", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
-  # client = OpenAIWrapper(config_list=config_list_4o, cache_seed=None)
-  # print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+  client = OpenAIWrapper(config_list=config_list_4o, cache_seed=None)
+  print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
   # client = OpenAIWrapper(config_list=config_list_4o_mini, cache_seed=None)
   # print("Test gpt 4o-mini", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
@@ -388,7 +388,7 @@ if __name__ == "__main__":
 
 #   client = OpenAIWrapper(config_list=config_list_4_turbo, cache_seed=None)
 #   print("Test gpt4 turbo", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
-  config = autogen.filter_config(CONFIG_LIST, filter_dict={'tags': ["gpt-4o"]})
+  # config = autogen.filter_config(CONFIG_LIST, filter_dict={'tags': ["gpt-4o"]})
 
-  client = OpenAIWrapper(config_list=config, cache_seed=None)
-  print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+  # client = OpenAIWrapper(config_list=config, cache_seed=None)
+  # print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
