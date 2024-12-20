@@ -24,16 +24,16 @@ ATTACKS = {
     #     "port": "3306",
     #     "container_name": "incident_5"
     # },
-    # "incident_38": {
-    #     "qafile": "incident_38_qa_incident_o1_gpt-4o_c41.json",
-    #     "port": "3307",
-    #     "container_name": "incident_38"
-    # },
-    # "incident_34": {
-    #     "qafile": "incident_34_qa_incident_o1_gpt-4o_c41.json",
-    #     "port": "3308",
-    #     "container_name": "incident_34"
-    # },
+    "incident_38": {
+        "qafile": "incident_38_qa_incident_o1_gpt-4o_c41.json",
+        "port": "3307",
+        "container_name": "incident_38"
+    },
+    "incident_34": {
+        "qafile": "incident_34_qa_incident_o1_gpt-4o_c41.json",
+        "port": "3308",
+        "container_name": "incident_34"
+    },
     "incident_39": {
         "qafile": "incident_39_qa_incident_o1_gpt-4o_c41.json",
         "port": "3309",
