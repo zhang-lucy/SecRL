@@ -1,18 +1,22 @@
 #from agents.baseline_agent import BaselineAgent
-from agents.prompt_sauce_agent import BaselineAgent
+#from agents.prompt_sauce_agent import BaselineAgent
+#from agents.cheating_agent import BaselineAgent
+from agents.self_reflexion_agent import BaselineAgent
 import json
 from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
 from secgym.myconfig import config_list_4o, config_list_4o_mini
+from secgym.qagen.alert_graph import AlertGraph
 #config_list_4_turbo, config_list_35
 
 def run_experiment(
         agent,
         thug_env: ThuGEnv,
         save_agent_file: str,
-        num_test: Union[int, None] = None
+        num_test: Union[int, None] = None,
+        num_trials: int = 1
     ):
     if num_test is None:
         num_test = thug_env.num_questions
@@ -27,50 +31,79 @@ def run_experiment(
     #     trial_1 = json.load(f)
 
     for i in range(thug_env.num_questions):
-        if i == num_test:
-            print(f"Tested {num_test} questions. Stopping...")
-            break
-        observation, _ = thug_env.reset(i) # first observation is question dict
-        agent.reset()
-
-        # if trial_1[i]['reward'] == 1:
-        #     print(f"Skipping question {i+1} as it has been solved")
-        #     continue
-        # tmp = (thug_env.curr_question['start_node'], thug_env.curr_question['end_node'])
-        # if tmp not in [(12, 6), (6, 12), (8, 14), (14, 8), (14, 10), (14, 4), (4, 10), (4, 3)]:
-        #     continue
-        # temp hack
-        # if "SecurityExposureManagement" in thug_env.curr_question['tables']:
-        #     print(f"Skipping question {i+1}")
-        #     continue
-
-        tested_num += 1 
         
-        # run one episode
-        for s in range(thug_env.max_steps):
-            print(f"Observation: {observation}")
-            print("*"*50)
-            try:
-                action, submit = agent.act(observation)
-            except Exception as e:
-                print(f"Error: {e}")
-                reward = 0
-                break
-            observation, reward, _, _ = thug_env.step(action=action, submit=submit)
-
-            if submit:
-                break
+        #emptying the replay buffer for each question
+        agent.replay_buffer = []
+        tested_num += 1 # increment tested number of questions
         
-        accum_reward += reward
-        accum_success += reward == 1
 
-        result_dict ={
+        for trial in range(num_trials):
+        
+            if i == num_test:
+                print(f"Tested {num_test} questions. Stopping...")
+                break
+
+            observation, _ = thug_env.reset(i) # first observation is question dict
+            agent.reset()
+
+            # if trial_1[i]['reward'] == 1:
+            #     print(f"Skipping question {i+1} as it has been solved")
+            #     continue
+            # tmp = (thug_env.curr_question['start_node'], thug_env.curr_question['end_node'])
+            # if tmp not in [(12, 6), (6, 12), (8, 14), (14, 8), (14, 10), (14, 4), (4, 10), (4, 3)]:
+            #     continue
+            # temp hack
+            # if "SecurityExposureManagement" in thug_env.curr_question['tables']:
+            #     print(f"Skipping question {i+1}")
+            #     continue
+
+            # run one episode
+            for s in range(thug_env.max_steps):
+                print(f"Observation: {observation}")
+                print("*"*50)
+                try:
+                    action, submit = agent.act(observation)
+                except Exception as e:
+                    print(f"Error: {e}")
+                    reward = 0
+                    break
+                observation, reward, _, _ = thug_env.step(action=action, submit=submit)
+
+                if submit:
+                    break
+
+            # saving replay in agent memory
+            replay = {
+                "messages": agent.messages,
+                "incident": agent.incident,
+                "question": thug_env.curr_question,
                 "reward": reward,
-                "nodes": f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}",
-                "question_dict": thug_env.curr_question,
+                "trial": trial,
             }
+            agent.replay_buffer.append(replay)
+
+            #printing logs
+            print(f"Question {i+1} | Reward: {reward} || Accumlated Success: {accum_success}/{tested_num}={accum_success/(tested_num):.3f} | Avg Reward so far: {accum_reward/(tested_num):.3f}")  
+            print("*"*50, "\n", "*"*50)
+
+            #correct answer found -> stop trials
+            if reward == 1:
+                print(f"Skipping question {i+1} as it has been solved")
+                break
+        
+        #saving logs
+        result_dict ={
+                    "reward": reward,
+                    "nodes": f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}",
+                    "question_dict": thug_env.curr_question,
+                    "trial": trial,
+                }
         result_dict.update(agent.get_logging())
         accum_logs.append(result_dict)
+
+        accum_reward += reward
+        accum_success += reward == 1
+        
 
         with open(save_agent_file, "w") as f:
             json.dump(accum_logs, f, indent=4)
@@ -85,13 +118,13 @@ if __name__ == "__main__":
     # cache_seed = 44
     # agent_config_list = config_list_4o
 
-    cache_seed = 46
+    cache_seed = 111
     temperature = 0
     add_hint = False
     model = "gpt-4o"
-    submit_summary = True
+    submit_summary = False
     max_steps = 15
-    layer = "incident"
+    layer = "alert"
 
     model_config_map = {
         #"gpt-3.5": config_list_35,
@@ -114,6 +147,7 @@ if __name__ == "__main__":
         cache_seed=cache_seed, 
         submit_summary=submit_summary,
         temperature=temperature,
+        max_steps=max_steps,
     )
     agent_name = agent.name
 
@@ -131,14 +165,25 @@ if __name__ == "__main__":
             max_steps=max_steps,
             eval_step=True,
         ) 
+        
+        #Only if cheating agent
+        graph_path = f"qagen/graph_files/{attack}.graphml"
+        alert_graph = AlertGraph()
+        alert_graph.load_graph_from_graphml(graph_path)
+        incident = alert_graph.incident
+        agent.incident = incident
+        # print(incident)
+        # exit()
+
         avg_success, tested_num, avg_reward = run_experiment(
             agent=agent,
             thug_env=thug_env,
             save_agent_file=save_agent_file,
-            num_test=-1 # set to -1 to run all questions
+            num_test=-1, # set to -1 to run all questions
+            num_trials=3
         )
         agent.reset()
 
         with open('results.txt', 'a') as f:
-            f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}, Layer: {layer}\n, Agent: {a}")
+            f.write(f"Model: {model}, Cache Seed: {cache_seed}, Hint: {add_hint}, Submit Summary: {submit_summary}, Temperature: {temperature}, Layer: {layer}, Agent: {agent_name}\n")
             f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")

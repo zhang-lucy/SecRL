@@ -4,7 +4,6 @@ import os
 import re
 from secgym.myconfig import config_list_4o
 from secgym.utils import msging, get_full_question
-from tenacity import retry, wait_fixed
 
 from textwrap import dedent
 CHECK_ANSWER_PROMPT = dedent("""Given a golden answer and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
@@ -54,7 +53,6 @@ class Evaluator:
             )
         self.use_llm = True
 
-    @retry(wait=wait_fixed(60))
     def checking(self, 
                  question: dict, 
                  submitted_answer: str, 
@@ -81,8 +79,16 @@ class Evaluator:
             for k in question["solution"]:
                 print(k)
             print(f"-----> Solution Evaluation Result:\n {response}\n--------------------")
-            response = json.loads(response)
-
+            try:
+                response = json.loads(response)
+            except Exception as e:
+                if "json" in str(e):
+                    response = response.split("```json")[1].split("```")[0]
+                    response = json.loads(response)
+                else:
+                    print("Error:", e)
+                    return 0
+            
             discount_factor = 0.4
             # reverse the response
             current_score = 1
@@ -104,7 +110,6 @@ class Evaluator:
             # all false
             return total_score
 
-    @retry(wait=wait_fixed(60))
     def check_single_response(self, question: dict, submitted_answer: str):
         response = self.client.create(messages=[
             msging(CHECK_ANSWER_PROMPT, role="system"), 

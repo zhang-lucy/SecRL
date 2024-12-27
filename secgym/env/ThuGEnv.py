@@ -19,11 +19,11 @@ from secgym.env.evaluator import Evaluator
 # }
 
 ATTACKS = {
-    "incident_5": {
-        "qafile": "incident_5_qa_incident_o1_gpt-4o_c41.json",
-        "port": "3306",
-        "container_name": "incident_5"
-    },
+    # "incident_5": {
+    #     "qafile": "incident_5_qa_incident_o1_gpt-4o_c41.json",
+    #     "port": "3306",
+    #     "container_name": "incident_5"
+    # },
     "incident_38": {
         "qafile": "incident_38_qa_incident_o1_gpt-4o_c41.json",
         "port": "3307",
