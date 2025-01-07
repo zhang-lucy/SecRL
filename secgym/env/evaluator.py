@@ -14,20 +14,28 @@ You are given:
 - A question
 - The golden answer
 - The submitted answer
-                        
-Only return "True" or "False".
+
+First give a brief analysis using 1-2 short sentences, then give your decision.
+Follow this format:
+Analysis: <your analysis>
+Decision: <"True" or "False">       
 """ 
 )
 
 CHECK_SOLUTION_PROMPT = dedent("""Given a question and a ground truth solutionm, please evaluate a given solution based on the ground truth solution.
 
-The ground truth solution contains several steps. Please check if the given solution contain any of the steps in the ground truth solution.
-
-Your response should be in JSON format:
+The ground truth solution may contain several steps. Please check if the given solution contain any of the steps in the ground truth solution.
+Please go through each step in the ground truth solution and evaluate whether the given solution contains the key information in the step.
+                               
+Your response should be in JSON format following this format:
 {{
-    "<step_i>" : "<"True" or "False">,
+    "<i>" : {
+            "analysis": "<your analysis>",
+            "decision": "<"True" or "False">,
+        }
     ...
 }}
+i is the step number from the ground truth solution.
 """)
 
 
@@ -39,19 +47,65 @@ EVAL_SOLUTION_TEMPLATE = dedent("""Question: {question}
 Golden Solution: {golden_solution}
 Submitted Answer: {submitted_answer}""")
 
+ANSWER_CHECKING_REFLECTION_PROMPT = """Given a question and a ground truth solution, there is an evaluation of a given solution.
+Please review the evaluation and double-check whether the evaluation is correct. Please follow the following format:
 
+Reflection: <your reflection>
+Decision: <"True" or "False">
+"""
+
+SOLUTION_CHECKING_REFLECTION_PROMPT = """Given a question and a ground truth solution, there is an evaluation of a given solution.
+The ground truth solution contains several steps, and the evaluation is based on the steps in the ground truth solution.
+Please review the evaluation and double-check whether the evaluation is correct. 
+
+Your response should be in JSON format:
+{{
+    "<step_i>" : {
+            "reflection": "<your reflection>",
+            "decision": "<"True" or "False">,
+        }
+    ...
+}}
+"""
 
 class Evaluator:
 
     def __init__(self,
                  config_list,
                  cache_seed: int = 41,
+                 ans_check_reflection: bool = False,
+                 sol_check_reflection: bool = False
                  ) -> None:
         self.client = OpenAIWrapper(
             config_list=config_list,
             cache_seed=cache_seed
             )
         self.use_llm = True
+        self.ans_check_reflection = ans_check_reflection
+        self.sol_check_reflection = sol_check_reflection
+    
+    def _get_json_response(
+        self,
+        system_prompt,
+        task,
+    ):
+        messages=[
+            msging(system_prompt, role="system"), 
+            msging(task, role="user")
+        ]
+        response = self.client.create(messages=messages, response_format= { "type": "json_object" })
+        response = response.choices[0].message.content
+        try:
+            response = json.loads(response)
+        except Exception as e:
+            if "json" in str(e):
+                response = response.split("```json")[1].split("```")[0]
+                response = json.loads(response)
+            else:
+                print("Error:", e)
+                return 0
+        return response
+            
 
     def checking(self, 
                  question: dict, 
@@ -66,35 +120,28 @@ class Evaluator:
                 return 0
             
             # check process if solution is provided
-            messages=[
-                msging(CHECK_SOLUTION_PROMPT, role="system"), 
-                msging(EVAL_SOLUTION_TEMPLATE.format(question=get_full_question(question), golden_solution=question["solution"], submitted_answer=submitted_answer), role="user")
-            ]
-            # print(f"Question: {question.get('context', '')} {question['question']}\n")
-
-            response = self.client.create(messages=messages, response_format= { "type": "json_object" })
-            response = response.choices[0].message.content
-            
+            solution_str = EVAL_SOLUTION_TEMPLATE.format(question=get_full_question(question), golden_solution=question["solution"], submitted_answer=submitted_answer) 
+            print(solution_str)
+            response = self._get_json_response(CHECK_SOLUTION_PROMPT, solution_str)
             print("Ground Truth Solution:")
             for k in question["solution"]:
                 print(k)
-            print(f"-----> Solution Evaluation Result:\n {response}\n--------------------")
-            try:
-                response = json.loads(response)
-            except Exception as e:
-                if "json" in str(e):
-                    response = response.split("```json")[1].split("```")[0]
-                    response = json.loads(response)
-                else:
-                    print("Error:", e)
-                    return 0
+            print(f"-----> Solution Evaluation Result:\n {str(response)}\n--------------------")
+
+            if self.sol_check_reflection:
+                reflection_str = solution_str + "\n" + json.dumps(response)
+                response = self._get_json_response(SOLUTION_CHECKING_REFLECTION_PROMPT, reflection_str)
+                print(f"-----> Solution Evaluation Reflection: \n{str(response)}\n--------------------")
             
             discount_factor = 0.4
             # reverse the response
             current_score = 1
             total_score = 0
 
-            step_eval = list(response.values())
+            step_eval = []
+            for _, v in response.items():
+                step_eval.append(v["decision"])
+            # step_eval = list(response.values())
             step_eval.reverse()
             for b in step_eval:
                 if b == "True":
@@ -111,14 +158,29 @@ class Evaluator:
             return total_score
 
     def check_single_response(self, question: dict, submitted_answer: str):
+        input_str = EVAL_ANSWER_TEMPLATE.format(question=get_full_question(question), golden_answer=question["answer"], submitted_answer=submitted_answer)
         response = self.client.create(messages=[
             msging(CHECK_ANSWER_PROMPT, role="system"), 
-            msging(EVAL_ANSWER_TEMPLATE.format(question=get_full_question(question), golden_answer=question["answer"], submitted_answer=submitted_answer), role="user")
+            msging(input_str, role="user")
         ])
         response = response.choices[0].message.content
+        decision = re.search(r"Decision: (True|False)", response)
+        decision = decision.group(1)
         print("Ground Truth Answer:", question["answer"])
         print(f"-----> Answer Evaluation Result: {response}")
-        if response == "True":
+
+        if self.ans_check_reflection:
+            messages=[
+                msging(ANSWER_CHECKING_REFLECTION_PROMPT, role="system"), 
+                msging(input_str+"\n"+response, role="user")
+            ]
+            response = self.client.create(messages=messages)
+            response = response.choices[0].message.content
+            decision = re.search(r"Decision: (True|False)", response)
+            decision = decision.group(1)
+            print(f"-----> Answer Evaluation Reflection: {response}")
+
+        if decision == "True":
             return 1
         return 0
         

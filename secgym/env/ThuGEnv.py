@@ -93,7 +93,9 @@ class ThuGEnv(gym.Env):
             database_name: str = "env_monitor_db", # sql database name
             # port: str = "3306",
             add_hint: bool = False,
-            eval_step: bool = False
+            eval_step: bool = False,
+            ans_check_reflection: bool = False,
+            sol_check_reflection: bool = False
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
@@ -151,7 +153,7 @@ class ThuGEnv(gym.Env):
         self.all_logs = []
 
         # evaluator
-        self.evaluator = Evaluator(config_list=config_list)
+        self.evaluator = Evaluator(config_list=config_list, ans_check_reflection=ans_check_reflection, sol_check_reflection=sol_check_reflection)
 
     def get_attack_list(self):
         """Get the list of attacks.
