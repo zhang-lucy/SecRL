@@ -115,8 +115,6 @@ class AlertGraph:
             #TODO: Add edge attributes for extra_info, use gpt to generate the relationship
             self.graph.add_edge(alert_node_id, entity_node_id)
 
-            
-
     def save_to_graphml(self, filepath: str) -> None:
         """
         Saves the graph to a GraphML file.
@@ -126,22 +124,13 @@ class AlertGraph:
         nx.write_graphml(self.graph, filepath)
         print(f"Graph saved to {filepath}")
 
-    def plot_custom_graph(self, 
-                        root=0, 
-                        figsize=(22, 16),
-                        base_node_size=15000, 
-                        max_line_length=80, 
-                        show_plot=True, 
-                        save_figure=False, 
-                        file_path=None,
-                        layout='spring'
-                        ):
+    def _prepare_node_to_plot(self, graph, base_node_size=15000, max_line_length=80):
         # Define node sizes and colors based on type
         node_sizes = []
         node_colors = []
         labels = {}
 
-        for node, data in self.graph.nodes(data=True):
+        for node, data in graph.nodes(data=True):
             if data.get('type') == 'alert':
                 # Show just the alert name
                 label = f"ID: {node}\n{data.get('name', '')}"
@@ -162,6 +151,71 @@ class AlertGraph:
                 labels[node] = label[:max_line_length+7]
                 node_sizes.append(base_node_size // 3)  # Smaller size for type entity
                 node_colors.append('#FFB6C1')  # Light pink color for type entity
+        
+        return node_sizes, node_colors, labels
+    
+    def plot_question_graph(self, question, figsize=(22, 16), show_plot=True, save_figure=False, file_path=None):
+        """
+        Plots a subgraph containing start entities, shortest alert path, and end entities based on the `question` dict.
+        
+        Parameters:
+        - question (dict): Contains the fields:
+            - start_alert: int
+            - end_alert: int
+            - start_entities: list[int]
+            - end_entities: list[int]
+            - shortest_alert_path: list[int]
+        - figsize (tuple): Size of the plot.
+        - show_plot (bool): Whether to display the plot.
+        - save_figure (bool): Whether to save the plot as an image.
+        - file_path (str): File path to save the plot.
+        """
+        # Extract nodes from the question dictionary
+        start_entities = question.get('start_entities', [])
+        shortest_alert_path = question.get('shortest_alert_path', [])
+        end_entities = question.get('end_entities', [])
+
+        # Combine all nodes to include in the subgraph
+        included_nodes = set(start_entities + shortest_alert_path + end_entities)
+
+        # Create the subgraph
+        subgraph = self.graph.subgraph(included_nodes)
+
+        # Prepare node sizes, colors, and labels using the helper function
+        node_sizes, node_colors, labels = self._prepare_node_to_plot(subgraph)
+
+        # Use a simple layout since the graph is chain-like
+        pos = nx.spring_layout(subgraph, seed=42)  # Spring layout ensures chain-like visualization
+
+        # Set up the figure size
+        plt.figure(figsize=figsize)
+
+        # Draw the subgraph
+        nx.draw(subgraph, with_labels=True, labels=labels, node_size=node_sizes, node_color=node_colors, font_size=10)
+
+        # Save the plot if required
+        if save_figure and file_path:
+            plt.savefig(file_path, dpi=600)
+        
+        # Show the plot if required
+        if show_plot:
+            plt.show()
+        else:
+            plt.close()
+
+    def plot_custom_graph(self, 
+                        root=0, 
+                        figsize=(22, 16),
+                        base_node_size=15000, 
+                        max_line_length=80, 
+                        show_plot=True, 
+                        save_figure=False, 
+                        file_path=None,
+                        layout='spring'
+                        ):
+        
+        # Prepare the node sizes, colors, and labels
+        node_sizes, node_colors, labels = self._prepare_node_to_plot(self.graph, base_node_size, max_line_length)
 
         # Define the custom tree layout
         if layout == 'tree':
