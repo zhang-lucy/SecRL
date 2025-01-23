@@ -2,6 +2,10 @@
 
 ## Data Download
 
+The data can be downloaded from the following sources:
+- Directly from Hugging Face
+- From Azure
+
 ### Download from Hugging Face directly
 
 
