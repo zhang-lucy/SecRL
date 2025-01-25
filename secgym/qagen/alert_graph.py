@@ -366,11 +366,13 @@ class AlertGraph:
                 if len(filtered_end_entities) > 0:
                     selected_from_a2 = random.sample(filtered_end_entities, 1)
                 else:
-                    print(f"Warning: No entity with node_type host or process connected to alert {alert2}, select from all entities.")
+                    if verbose:
+                        print(f"Warning: No entity with node_type host or process connected to alert {alert2}, select from all entities.")
                     selected_from_a2 = random.sample(farthest_end_entities, 1)
             else: # start and end alert is the same
                 if len(farthest_start_entities) - 1 <= 0:
-                    print(f"Alert {alert1} has only one entity connected, skip.")
+                    if verbose:
+                        print(f"Alert {alert1} has only one entity connected, skip.")
                     continue
                 # if k >= len(farthest_start_entities):
                 #     print(f"Warning: Construct path using the same alert, expect {k} entities to be as inital context, but only {len(farthest_start_entities)} entities available in alert id {alert1}.")
@@ -390,11 +392,13 @@ class AlertGraph:
                 val_a1 = self.graph.nodes[entity]['value']
                 val_a2 = self.graph.nodes[selected_from_a2[0]]['value']
                 if val_a1 in val_a2 or val_a2 in val_a1:
-                    print(f"Warning: Remove the same entity from start and end entities.")
+                    if verbose:
+                        print(f"Warning: Remove the same entity from start and end entities.")
                     selected_from_a1.remove(entity)
                     break
             if len(selected_from_a1) == 0:
-                print(f"Warning: No entity selected from alert {alert1}, skip.")
+                if verbose:
+                    print(f"Warning: No entity selected from alert {alert1}, skip.")
                 continue
             # if selected_from_a2[0]['value'] in selected_from_a1:
             #     selected_from_a1.remove(selected_from_a2[0])
@@ -413,7 +417,7 @@ class AlertGraph:
                 print(f"Alert pair: {alert1} -> {alert2}, start entities: {selected_from_a1}, end entity: {selected_from_a2}, shortest alert path: {shortest_alert_path}")
                 print(f"-"*100)
         
-        if num_select < len(alert_paths):
+        if num_select > 0 and num_select < len(alert_paths):
             alert_paths = self.select_alert_paths(alert_paths, num_select)
 
         print(f"Total alert paths: {len(alert_paths)}. Expected: alert_num ^ 2 = {len(alert_nodes) ** 2}, Selected: {len(alert_paths)}")

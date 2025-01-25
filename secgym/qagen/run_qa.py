@@ -2,6 +2,7 @@ from secgym.myconfig import CONFIG_LIST
 from secgym.qagen.qa_gen import QAGen
 import os
 import argparse
+import json
 
 def get_args():
     parser = argparse.ArgumentParser(description="Run Alert QA Generation")
@@ -12,13 +13,14 @@ def get_args():
     parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for QA generation")
     parser.add_argument("--solution_model", "-s", type=str, default="gpt-4o", help="Model to use for solution generation")
     parser.add_argument("--include_incident", action="store_false", help="Include incident context in the question prompt")
+    parser.add_argument("--split", "-s", type=str, default="test", help="Split to generate QA for")
     args = parser.parse_args()
     return args
 
 args = get_args()
 graph_files = [
-     #'incident_34.graphml',
-     #'incident_166.graphml',
+     'incident_34.graphml',
+     'incident_166.graphml',
     'incident_55.graphml',
      'incident_5.graphml',
      'incident_38.graphml',
@@ -26,7 +28,6 @@ graph_files = [
      'incident_39.graphml',
     'incident_322.graphml'
  ]
-
 
 # Changes: You can pass in one config list with different models
 # BE SURE TO include a "tags": [<model_name>] for each dictionary in the config_list to include the model name
@@ -55,17 +56,65 @@ if args.solution_model is not None and args.solution_model != args.model:
     qa_file_suffix += f"_{args.solution_model}"
 qa_file_suffix += f"_c{args.cache_seed}.json"
 
-for file in graph_files:
-    qagenena = QAGen(
-        qa_path=f"../env/questions/{file.split('.')[0]}_{qa_file_suffix}",
-        graph_path=os.path.join("graph_files", file),
-        config_list=CONFIG_LIST,
-        qa_gen_model=args.model,
-        solution_gen_model=args.solution_model,
-        cache_seed=41,
-        include_entry=args.include_entry,
-        include_incident=args.include_incident,
-        max_question_count=100
-    )
 
-    qagenena.generate_qa()
+set_split = args.split
+original_qa_path = "../env/questions"
+saved_paths_path = "./graph_path"
+
+t = 0
+print(f"Generating QA for the {set_split} set...")
+for file in graph_files:
+    skip_count = 0
+    qagenena = QAGen(config_list=CONFIG_LIST, cache_seed=41)
+
+    # load the question file if it exists
+    qas = []
+    origin_qa_file = f"{original_qa_path}/{file.split('.')[0]}_{qa_file_suffix}"
+    if os.path.exists(origin_qa_file):
+        with open(origin_qa_file, "r") as f:
+            qas = json.load(f)    
+    # construct (start_alert, end_alert) : question dict
+    existing_qa_map = {}
+    for qa in qas:
+        existing_qa_map[(qa["start_alert"], qa["end_alert"])] = qa
+    
+    # open graph paths file json
+    with open(os.path.join(saved_paths_path, file.split('.')[0] + ".json"), "r") as f:
+        graph_paths = json.load(f)
+
+    all_questions = []
+    test_set = graph_paths[set_split]
+    for path_dict in test_set:
+        start_alert = path_dict["start_alert"]
+        end_alert = path_dict["end_alert"]
+        if (start_alert, end_alert) in existing_qa_map:
+            all_questions.append(existing_qa_map[(start_alert, end_alert)])
+            print(f"Reusing question for {start_alert} -> {end_alert}")
+        else:
+            print(f"Generating question for {start_alert} -> {end_alert}")
+            question = qagenena.generate_one_question(path_dict)
+            all_questions.append(question)
+        # save the questions
+        # Note this is a new path
+        with open(f"{original_qa_path}/{set_split}/{file.split('.')[0]}_{qa_file_suffix}", "w") as f:
+            json.dump(all_questions, f, indent=4)
+    t+=len(test_set)
+
+print(f"Total {set_split} questions: {t}")
+
+
+
+# Generate new QA
+# for file in graph_files:
+#     qagenena = QAGen(
+#         config_list=CONFIG_LIST,
+#         qa_path=f"../env/questions/{file.split('.')[0]}_{qa_file_suffix}",
+#         graph_path=os.path.join("graph_files", file),
+#         qa_gen_model=args.model,
+#         solution_gen_model=args.solution_model,
+#         cache_seed=41,
+#         include_entry=args.include_entry,
+#         include_incident=args.include_incident,
+#         max_question_count=100
+#     )
+#     qagenena.generate_qa()

@@ -9,10 +9,10 @@ import autogen
 
 class QAGen:
     def __init__(self,
-                 qa_path: str,
-                 graph_path: str,
                  config_list: list,
-                 cache_seed: int,
+                 qa_path: str = None,
+                 graph_path: str = None,
+                 cache_seed: int = None,
                  trial: int = 5,
                  include_entry: bool = False,
                  qa_gen_model = "gpt-4o",
@@ -26,6 +26,7 @@ class QAGen:
         self.config_list = config_list
         self.include_entry = include_entry
         self.include_incident = include_incident
+        self.max_question_count = max_question_count
 
         self.qa_gen_model = qa_gen_model
         self.qa_gen_config_list = autogen.filter_config(config_list, filter_dict={'tags': [qa_gen_model]})
@@ -37,14 +38,22 @@ class QAGen:
         if len(self.solution_gen_config_list) == 0:
             raise ValueError(f"Solution generation model {solution_gen_model} not found in the config list, please put 'tags': ['{solution_gen_model}'] in the config list to inicate this model")
 
-        self.alert_graph = AlertGraph()
-        self.alert_graph.load_graph_from_graphml(self.graph_path)
-        print("Alert graph loaded.")
-        self.all_paths = self.alert_graph.get_alert_paths(num_select=max_question_count)
-        
+        if self.graph_path:
+            self.alert_graph = AlertGraph()
+            self.alert_graph.load_graph_from_graphml(self.graph_path)
+            print("Alert graph loaded.")
+            self.all_paths = self.alert_graph.get_alert_paths(num_select=self.max_question_count)
+            
         self.all_questions = []
         self.trial = trial  
         self.accum_cost = 0
+    
+    def setup_graph(self, graph_path):
+        self.graph_path = graph_path
+        self.alert_graph = AlertGraph()
+        self.alert_graph.load_graph_from_graphml(self.graph_path)
+        print("Alert graph loaded.")
+        self.all_paths = self.alert_graph.get_alert_paths(num_select=self.max_question_count)
 
     def format_alert_entity_str(self, alert_node: int, entities:list):
         entity_str = ""
@@ -162,119 +171,123 @@ Description: {alert['Description']}
         # check every required field is present & no other fields are present
         return len(generated_qa) == len(required_fields) and all([field in generated_qa for field in required_fields]) 
 
+    def generate_one_question(self, path_dict):
+        # Construct the prompt
+        final_str = self.qagen_prompt_format(path_dict)
+        final_str += "\n##############\nYour response:\n"
 
-    def generate_qa(self):
-        for i, path_dict in enumerate(self.all_paths):
-            print(f"Generating {i+1} th question, cost so far: {self.accum_cost}")
-            print(path_dict)
-            # Construct the prompt
-            final_str = self.qagen_prompt_format(path_dict)
-            final_str += "\n##############\nYour response:\n"
+        print("-" * 10, "Input Prompt", "-" * 10)
+        print(final_str)
 
-            print("-" * 10, "Input Prompt", "-" * 10)
-            print(final_str)
+        print("-" * 10, "Response from LLM", "-" * 10)
+        response_data = {}
+        # Generate QA, try 5 times
+        for j in range(self.trial):
+            if self.include_entry:
+                prompt = QAGEN_PROMPT_WITH_ENTRY
+            else:
+                prompt = TWEAKED_QAGEN_PROMPT_ORIGIN#QAGEN_PROMPT_NO_ENTRY
+            is_o1 = True if "o1" in self.qa_gen_model else False
 
-            print("-" * 10, "Response from LLM", "-" * 10)
-            # print(self.solution_prompt_format(path_dict))
-            # if i > 3:
-            #     exit()
-            # else:
-            #     continue
-            # continue
-            response_data = {}
-            # Generate QA, try 5 times
-            for j in range(self.trial):
-                if self.include_entry:
-                    prompt = QAGEN_PROMPT_WITH_ENTRY
-                else:
-                    prompt = TWEAKED_QAGEN_PROMPT_ORIGIN#QAGEN_PROMPT_NO_ENTRY
-                is_o1 = True if "o1" in self.qa_gen_model else False
+            if is_o1:
+                response_format = None
+            else:
+                response_format={"type": "json_object"}
+            
+            response, cost = LLM_call(
+                instruction=prompt,
+                task=final_str,
+                config_list=self.qa_gen_config_list,
+                response_format=response_format,
+                cache_seed=self.cache_seed+j,
+                is_o1=is_o1,
+                return_cost=True
+            )
+            self.accum_cost += cost
+            if "```json" in response:
+                # extract ```json``` part
+                response = response.split("```json")[1].split("```")[0].strip()
+            try:
+                response_data = json.loads(response)
+            except json.JSONDecodeError:
+                print("JSON Decoding Error:\n", response)
+                continue
 
-                if is_o1:
-                    response_format = None
-                else:
-                    response_format={"type": "json_object"}
-                
+            if not self.validate_qa_dict(response_data):
+                print("Invalid fields in generated question\n", response)
+                continue
+
+            # We need to make sure the answer is not leaked in the context or question
+            # If the answer is in the context or question, we need to rewrite the context, question, and answer
+            if response_data['answer'] in response_data['question'] or response_data['answer'] in response_data['context']:
                 response, cost = LLM_call(
-                    instruction=prompt,
-                    task=final_str,
+                    instruction=REWRITE_PROMPT,
+                    task=final_str + "\nQuestion: \n" + json.dumps(response_data),
                     config_list=self.qa_gen_config_list,
                     response_format=response_format,
-                    cache_seed=self.cache_seed+j,
+                    cache_seed=self.cache_seed,
                     is_o1=is_o1,
                     return_cost=True
                 )
                 self.accum_cost += cost
-                if "```json" in response:
-                    # extract ```json``` part
-                    response = response.split("```json")[1].split("```")[0].strip()
+                print("-" * 10, "Rewrite QA", "-" * 10)
+                print(response)
                 try:
                     response_data = json.loads(response)
                 except json.JSONDecodeError:
-                    print("JSON Decoding Error:\n", response)
-                    continue
+                    print("JSON Decoding Error from rewrite:\n", response)
+                    continue  
 
-                if not self.validate_qa_dict(response_data):
-                    print("Invalid fields in generated question\n", response)
-                    continue
-    
-                # We need to make sure the answer is not leaked in the context or question
-                # If the answer is in the context or question, we need to rewrite the context, question, and answer
-                if response_data['answer'] in response_data['question'] or response_data['answer'] in response_data['context']:
-                    response, cost = LLM_call(
-                        instruction=REWRITE_PROMPT,
-                        task=final_str + "\nQuestion: \n" + json.dumps(response_data),
-                        config_list=self.qa_gen_config_list,
-                        response_format=response_format,
-                        cache_seed=self.cache_seed,
-                        is_o1=is_o1,
-                        return_cost=True
-                    )
-                    self.accum_cost += cost
-                    print("-" * 10, "Rewrite QA", "-" * 10)
-                    print(response)
-                    try:
-                        response_data = json.loads(response)
-                    except json.JSONDecodeError:
-                        print("JSON Decoding Error from rewrite:\n", response)
-                        continue  
+            if not self.validate_qa_dict(response_data):
+                print("Invalid fields from rewrite. continue.\n", response)
+                continue
 
-                if not self.validate_qa_dict(response_data):
-                    print("Invalid fields from rewrite. continue.\n", response)
-                    continue
-
-                if not (response_data['answer'] in response_data['question'] or response_data['answer'] in response_data['context']):
-                    # double check the answer is not leaked
-                    break
-                    
-            # generate the solution path
-            for j in range(self.trial):
-                response, cost = LLM_call(
-                    instruction=SOLUTIN_GEN_PROMPT,
-                    task=self.solution_prompt_format(path_dict),
-                    config_list=self.solution_gen_config_list,
-                    response_format={"type": "json_object"},
-                    cache_seed=self.cache_seed+j,
-                    return_cost=True
-                )
-                self.accum_cost += cost
-                try:
-                    solution_path = json.loads(response)
-                    response_data.update(solution_path)
-                except json.JSONDecodeError:
-                    print("JSON Decoding Error from solution generation:\n", response)
-                    continue
+            if not (response_data['answer'] in response_data['question'] or response_data['answer'] in response_data['context']):
+                # double check the answer is not leaked
                 break
                 
-            print("-" * 10, "Solution Path", "-" * 10)
-            print(response)
-            print("-"*100)
-            print("-"*100)
+        # generate the solution path
+        for j in range(self.trial):
+            response, cost = LLM_call(
+                instruction=SOLUTIN_GEN_PROMPT,
+                task=self.solution_prompt_format(path_dict),
+                config_list=self.solution_gen_config_list,
+                response_format={"type": "json_object"},
+                cache_seed=self.cache_seed+j,
+                return_cost=True
+            )
+            self.accum_cost += cost
+            try:
+                solution_path = json.loads(response)
+                response_data.update(solution_path)
+            except json.JSONDecodeError:
+                print("JSON Decoding Error from solution generation:\n", response)
+                continue
+            break
+            
+        print("-" * 10, "Solution Path", "-" * 10)
+        print(response)
+        print("-"*100)
+        print("-"*100)
 
-            # append the path used to generate the QA
-            response_data.update(path_dict)
+        # append the path used to generate the QA
+        response_data.update(path_dict)
+        return response_data
 
-            # Save the QA
+    def generate_qa(self, graph_path=None, qa_path=None):
+        if graph_path:
+            self.setup_graph(graph_path)
+        if self.qa_path and qa_path:
+            print(f"Updating QA path from {self.qa_path} to {qa_path}")
+            self.qa_path = qa_path
+        if self.graph_path is None:
+            raise ValueError("Please provide both the graph path")
+        if self.qa_path is None:
+            raise ValueError("Please provide the path to save the generated QA")
+        for i, path_dict in enumerate(self.all_paths):
+            print(f"Generating {i+1} th question, cost so far: {self.accum_cost}")
+            print(path_dict)
+            response_data = self.generate_one_question(path_dict)
             self.all_questions.append(response_data)
             with open(self.qa_path, "w") as f:
                 json.dump(self.all_questions, f, indent=4)
