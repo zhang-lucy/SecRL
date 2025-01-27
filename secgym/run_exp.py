@@ -15,7 +15,8 @@ def run_experiment(
         thug_env: ThuGEnv,
         save_agent_file: str,
         num_test: Union[int, None] = None,
-        num_trials: int = 1
+        num_trials: int = 1,
+        overwrite: bool = False,
     ):
     if num_test is None:
         num_test = thug_env.num_questions
@@ -25,6 +26,16 @@ def run_experiment(
     accum_logs = []
     tested_num = 0
 
+    # load logs if not overwrite
+    if not overwrite and os.path.exists(save_agent_file):
+        with open(save_agent_file, "r") as f:
+            accum_logs = json.load(f)
+            accum_reward = sum([log["reward"] for log in accum_logs])
+            accum_success = sum([log["reward"] for log in accum_logs])
+            tested_num = len(accum_logs)
+            tested_question_keys = set([log["nodes"] for log in accum_logs])
+            print(f"Loaded logs from {save_agent_file}")
+        
     for i in range(thug_env.num_questions):
         #emptying the replay buffer for each question
         if agent.name == "ReflexionAgent":
@@ -38,6 +49,9 @@ def run_experiment(
 
             observation, _ = thug_env.reset(i) # first observation is question dict
             agent.reset()
+            current_question_key = f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}"
+            if current_question_key in tested_question_keys:
+                print(f"Skipping question with key {current_question_key}")
 
             # run one episode
             for s in range(thug_env.max_steps):
@@ -78,7 +92,7 @@ def run_experiment(
         #saving logs
         result_dict = {
             "reward": reward,
-            "nodes": f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}",
+            "nodes": current_question_key,
             "question_dict": thug_env.curr_question,
             "trial": trial,
         }
@@ -166,8 +180,7 @@ if __name__ == "__main__":
         save_agent_file = f"{base_dir}/{sub_dir}/env_{attack}.json" 
         save_env_file = f"{base_dir}/{sub_dir}/agent_{attack}.json"
 
-        # exit()
-        break
+        # break
 
         thug_env = ThuGEnv(
             attack=attack,
@@ -176,7 +189,7 @@ if __name__ == "__main__":
             max_steps=max_steps,
             eval_step=eval_step, # boolean: whether to evaluate each step
         )
-        thug_env.check_layer(layer) # check if revelant layer is in the database
+        thug_env.check_layer(layer) # check if revelant tables is in the database for the layer
         
         avg_success, tested_num, avg_reward = run_experiment(
             agent=test_agent,
