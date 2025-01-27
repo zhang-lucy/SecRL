@@ -71,7 +71,7 @@ for file in graph_files:
         cache_seed=41
     )
 
-    # load the question file if it exists
+    # load the original question file if it exists
     qas = []
     origin_qa_file = f"{original_qa_path}/{file.split('.')[0]}_{qa_file_suffix}"
     if os.path.exists(origin_qa_file):
@@ -86,9 +86,17 @@ for file in graph_files:
     with open(os.path.join(saved_paths_path, file.split('.')[0] + ".json"), "r") as f:
         question_paths = json.load(f)
 
+    # resume from new qa file if it exists
+    current_qa_path = f"{original_qa_path}/{set_split}/{file.split('.')[0]}_{qa_file_suffix}"
+    if os.path.exists(current_qa_path):
+        with open(current_qa_path, "r") as f:
+            new_qas = json.load(f)
+            for qa in new_qas:
+                existing_qa_map[(qa["start_alert"], qa["end_alert"])] = qa
+                        
     all_questions = []
-    test_set = question_paths[set_split]
-    for path_dict in test_set:
+    path_from_split = question_paths[set_split]
+    for path_dict in path_from_split:
         start_alert = path_dict["start_alert"]
         end_alert = path_dict["end_alert"]
         if (start_alert, end_alert) in existing_qa_map:
@@ -102,7 +110,7 @@ for file in graph_files:
         # Note this is a new path
         with open(f"{original_qa_path}/{set_split}/{file.split('.')[0]}_{qa_file_suffix}", "w") as f:
             json.dump(all_questions, f, indent=4)
-    t+=len(test_set)
+    t+=len(path_from_split)
 
 print(f"Total {set_split} questions: {t}")
 
