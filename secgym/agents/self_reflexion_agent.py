@@ -1,6 +1,6 @@
 from autogen import OpenAIWrapper
 from .agent_utils import sql_parser, msging
-from tenacity import retry, wait_fixed
+# from tenacity import retry, wait_fixed
 import random
 
 BASE_PROMPT = """You are a security analyst working on investigating a security incident. 
@@ -18,9 +18,10 @@ Your response should always be a thought-action pair:
 Thought: <your reasoning>
 Action: <your SQL query>
 
-Thought can reason about the current situation, and Action can be two types: 
-(1) execute[<your query>], which executes the SQL query: 
-(2) submit[<your answer>], which indicates that the previous observation is the answer
+In Thought, you can analyse and reason about the current situation, 
+Action can be one of the following: 
+(1) execute[<your query>], which executes the SQL query
+(2) submit[<your answer>], which is the final answer to the question
 """
 
 BASE_SUMMARY_PROMPT = """You are a security analyst working on investigating a security incident. 
@@ -38,14 +39,15 @@ Your response should always be a thought-action pair:
 Thought: <your reasoning>
 Action: <your SQL query>
 
-Thought can reason about the current situation, and Action can be two types: 
-(1) execute[<your query>], which executes the SQL query: 
-(2) submit[<your answer>], which indicates that the previous observation is the answer
+In Thought, you can analyse and reason about the current situation, 
+Action can be one of the following: 
+(1) execute[<your query>], which executes the SQL query
+(2) submit[<your answer>], which is the final answer to the question
 
 When submitting an answer, please summarize key information from intermediate steps that lead to your answer.
 """
 
-class BaselineAgent:
+class ReflexionAgent:
     def __init__(self,
                  config_list,
                  cache_seed=41,
@@ -67,7 +69,7 @@ class BaselineAgent:
 
     @property
     def name(self):
-        return "PromptSauceAgent"
+        return "ReflexionAgent"
 
     def _call_llm(self, messages):
         response = self.client.create(

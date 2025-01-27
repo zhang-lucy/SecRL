@@ -329,8 +329,15 @@ if __name__ == "__main__":
         debug_tables(args)
         exit(0)
 
+    # - Log level: minimum info, everything should be excluded
+    skip_tables = ["AzureDiagnostics", "LAQueryLogs", "SecurityIncident", "SecurityAlert", "AlertEvidence", "AlertInfo"]
+    # - Incident level: Have access to security incidents, but not the alerts
+    skip_tables = ["AzureDiagnostics", "LAQueryLogs", "SecurityAlert", "AlertEvidence", "AlertInfo"]
+    # - Alert level: Have access to all:
+    skip_tables = ["AzureDiagnostics", "LAQueryLogs"]
+
     # 1. create a .sql file from the CSV  filesin the 'large_data' folder
-    skip_tables = ["AzureDiagnostics", "LAQueryLogs", "SecurityIncident"] #TODO: add alertinfo and alertevidence, "AlertEvidence", "AlertInfo","SecurityAlert","Alert","SecurityIncident",
+    skip_tables = ["AzureDiagnostics", "LAQueryLogs", "SecurityIncident"] #TODO: add "AlertEvidence", "AlertInfo","SecurityAlert"
     # skip_tables += ["DeviceFileEvents"]
     create_sql_file_from_csv_folder(
         csv_folder=csv_folder,

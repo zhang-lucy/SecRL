@@ -1,6 +1,6 @@
 from autogen import OpenAIWrapper
 from .agent_utils import sql_parser, msging
-from tenacity import retry, wait_fixed
+# from tenacity import retry, wait_fixed
 
 BASE_PROMPT = """You are a security analyst working on investigating a security incident. 
 You need to answer a given question about the security incident by querying the database of security logs provided to you.
@@ -17,15 +17,16 @@ Your response should always be a thought-action pair:
 Thought: <your reasoning>
 Action: <your SQL query>
 
-Thought can reason about the current situation, and Action can be two types: 
-(1) execute[<your query>], which executes the SQL query: 
-(2) submit[<your answer>], which indicates that the previous observation is the answer
+In Thought, you can analyse and reason about the current situation, 
+Action can be one of the following: 
+(1) execute[<your query>], which executes the SQL query
+(2) submit[<your answer>], which is the final answer to the question
 """
 
 BASE_SUMMARY_PROMPT = """You are a security analyst working on investigating a security incident. 
 You need to answer a given question about the security incident by querying the database of security logs provided to you.
-The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
-Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
+The logs are stored in a MySQL database, yodatabaseu can use SQL queries to retrieve entries as needed.
+Note there are more than 20 tables in the , so you may need to explore the schema or check example entries to understand the database structure.
 
 A security incident is composed of a group of related alerts connected by data elements or entities that are shared between the alerts such as User accounts, Hosts, Mailboxes, IP addresses, Files, Cloud applications, Processes, URLs etc. Alerts are signals that result from various threat detection activities. These signals indicate the occurrence of malicious or suspicious events in your environment. Besides the security alert signals, you can also find additional information in the raw logs like device events, user activities, network traffic, etc. 
 
@@ -37,14 +38,15 @@ Your response should always be a thought-action pair:
 Thought: <your reasoning>
 Action: <your SQL query>
 
-Thought can reason about the current situation, and Action can be two types: 
-(1) execute[<your query>], which executes the SQL query: 
-(2) submit[<your answer>], which indicates that the previous observation is the answer
+In Thought, you can analyse and reason about the current situation, 
+Action can be one of the following: 
+(1) execute[<your query>], which executes the SQL query
+(2) submit[<your answer>], which is the final answer to the question
 
 When submitting an answer, please summarize key information from intermediate steps that lead to your answer.
 """
 
-class BaselineAgent:
+class PromptSauceAgent:
     def __init__(self,
                  config_list,
                  cache_seed=41,

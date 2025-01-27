@@ -83,7 +83,7 @@ class ThuGEnv(gym.Env):
     def __init__(
             self,
             attack: Union[str, int],
-            config_list: List[Dict] = None,
+            eval_config_list: List[Dict] = None,
             noise_level: int = 0,
             save_file: Union[str, bool] = True,
             max_steps: int = 15,
@@ -153,7 +153,7 @@ class ThuGEnv(gym.Env):
         self.all_logs = []
 
         # evaluator
-        self.evaluator = Evaluator(config_list=config_list, ans_check_reflection=ans_check_reflection, sol_check_reflection=sol_check_reflection)
+        self.evaluator = Evaluator(config_list=eval_config_list, ans_check_reflection=ans_check_reflection, sol_check_reflection=sol_check_reflection)
 
     def get_attack_list(self):
         """Get the list of attacks.
@@ -340,6 +340,21 @@ class ThuGEnv(gym.Env):
         """Evaluate the answer and return the score.
         """
         return self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
+    
+    def check_layer(self, layer: str) -> None:
+        assert layer in ["alert", 'log'], "Layer should be either 'alert' or 'log'."
+
+        tables, _ = self.execute_query(f"SHOW TABLES;")
+
+        if layer == "log":
+            assert "AlertEvidence" not in tables, "With 'log' level, the table 'AlertEvidence' should not be present."
+            assert "AlertInfo" not in tables, "With 'log' level, the table 'AlertInfo' should not be present."
+            assert "SecurityAlert" not in tables, "With 'log' level, the table 'SecurityAlert' should not be present."
+        elif layer == "alert":
+            assert "AlertEvidence" in tables, "With 'alert' level, the table 'AlertEvidence' should be present."
+            assert "AlertInfo" in tables, "With 'alert' level, the table 'AlertInfo' should be present."
+            assert "SecurityAlert" in tables, "With 'alert' level, the table 'SecurityAlert' should be present."
+            
 
 
 if __name__ == "__main__":
