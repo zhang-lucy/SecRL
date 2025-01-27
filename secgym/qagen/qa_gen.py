@@ -10,8 +10,8 @@ import autogen
 class QAGen:
     def __init__(self,
                  config_list: list,
+                 graph_path: str,
                  qa_path: str = None,
-                 graph_path: str = None,
                  cache_seed: int = None,
                  trial: int = 5,
                  include_entry: bool = False,

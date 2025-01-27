@@ -13,7 +13,7 @@ def get_args():
     parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for QA generation")
     parser.add_argument("--solution_model", "-s", type=str, default="gpt-4o", help="Model to use for solution generation")
     parser.add_argument("--include_incident", action="store_false", help="Include incident context in the question prompt")
-    parser.add_argument("--split", "-s", type=str, default="test", help="Split to generate QA for")
+    parser.add_argument("--split", type=str, default="test", help="Split to generate QA for")
     args = parser.parse_args()
     return args
 
@@ -65,7 +65,11 @@ t = 0
 print(f"Generating QA for the {set_split} set...")
 for file in graph_files:
     skip_count = 0
-    qagenena = QAGen(config_list=CONFIG_LIST, cache_seed=41)
+    qagenena = QAGen(
+        config_list=CONFIG_LIST, 
+        graph_path=os.path.join("graph_files", file),
+        cache_seed=41
+    )
 
     # load the question file if it exists
     qas = []
@@ -80,10 +84,10 @@ for file in graph_files:
     
     # open graph paths file json
     with open(os.path.join(saved_paths_path, file.split('.')[0] + ".json"), "r") as f:
-        graph_paths = json.load(f)
+        question_paths = json.load(f)
 
     all_questions = []
-    test_set = graph_paths[set_split]
+    test_set = question_paths[set_split]
     for path_dict in test_set:
         start_alert = path_dict["start_alert"]
         end_alert = path_dict["end_alert"]

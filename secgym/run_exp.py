@@ -99,7 +99,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Run Experienments")
     parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for experiment")
     parser.add_argument("--eval_model", "-e", type=str, default="gpt-4o", help="Model to use for evaluation")
-    parser.add_argument("--cache_seed", type=int, default=111, help="Seed for the cache")
+    parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
     parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
     parser.add_argument("--max_steps", type=int, default=15, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
@@ -155,23 +155,26 @@ if __name__ == "__main__":
     else:
         raise ValueError(f"Invalid agent name: {args.agent}, please modify run_exp.py to include the agent")
 
-
-    post_fix = f"_{model}_{cache_seed}_{layer}"
-    os.makedirs("results", exist_ok=True)
+    base_dir = "final_results"
+    os.makedirs(base_dir, exist_ok=True)
     agent_name = test_agent.name
 
     for attack in ATTACKS:
         print(f"Running attack: {attack}")
-        save_agent_file = f"results/{agent_name}_{attack}_agent_log{post_fix}.json"
-        save_env_file = f"results/{agent_name}_{attack}_env_log{post_fix}.json"
+        sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}"
+        os.makedirs(f"{base_dir}/{sub_dir}", exist_ok=True)
+        save_agent_file = f"{base_dir}/{sub_dir}/env_{attack}.json" 
+        save_env_file = f"{base_dir}/{sub_dir}/agent_{attack}.json"
+
+        # exit()
+        break
 
         thug_env = ThuGEnv(
             attack=attack,
             eval_config_list=eval_config_list,
-            noise_level=0,
             save_file=save_env_file,
             max_steps=max_steps,
-            eval_step=eval_step,
+            eval_step=eval_step, # boolean: whether to evaluate each step
         )
         thug_env.check_layer(layer) # check if revelant layer is in the database
         
@@ -184,6 +187,6 @@ if __name__ == "__main__":
         )
         test_agent.reset()
 
-        with open('results.txt', 'a') as f:
-            f.write(f"Model: {model}, Attack: {attack}, Agent: {agent_name}, Cache Seed: {cache_seed}, Temperature: {temperature}, Layer: {layer}, Max Steps: {max_steps}, Eval Model: {eval_model}\n")
+        with open(f'{base_dir}/{sub_dir}/results.txt', 'a') as f:
+            f.write(f"Model: {model}, Attack: {attack}, Agent: {agent_name}, Cache Seed: {cache_seed}, Temperature: {temperature}, Layer: {layer}, Max Steps: {max_steps}, Eval Model: {eval_model}, Num Trials: {num_trials}\n")
             f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")
