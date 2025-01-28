@@ -11,7 +11,7 @@ def get_args():
     parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
     parser.add_argument("--include_entry", action="store_true", help="Include full alert entry in the question prompt")
     parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for QA generation")
-    parser.add_argument("--solution_model", "-s", type=str, default="gpt-4o", help="Model to use for solution generation")
+    parser.add_argument("--solution_model", "-s", type=str, default="o1-ga", help="Model to use for solution generation")
     parser.add_argument("--include_incident", action="store_false", help="Include incident context in the question prompt")
     parser.add_argument("--split", type=str, default="test", help="Split to generate QA for")
     args = parser.parse_args()

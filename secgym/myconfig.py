@@ -71,7 +71,15 @@ CONFIG_LIST = [
       "api_version": "2024-08-01-preview",
       "tags": ["o1"],
       "azure_ad_token_provider": token_provider
-  }
+  },
+  {
+      "model": "o1-ga-2024-12-17",
+      "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+      "api_type": "azure",
+      "api_version": "2024-12-01-preview",
+      "tags": ["o1-ga"],
+      "azure_ad_token_provider": token_provider
+  },
 ]
 
 config_list_o1 = [
