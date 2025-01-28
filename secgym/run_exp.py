@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
-from secgym.myconfig import config_list_4o, config_list_4o_mini
+from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
 from secgym.agents import BaselineAgent, CheatingAgent, PromptSauceAgent, ReflexionAgent
@@ -124,6 +124,12 @@ def get_args():
     args = parser.parse_args()
     return args
 
+import autogen
+def filter_config_list(config_list, model_name):
+    config_list = autogen.filter_config(config_list, {'tags': [model_name]})
+    if len(config_list) == 0:
+        raise ValueError(f"model {model_name} not found in the config list, please put 'tags': ['{model_name}'] in the config list to inicate this model")
+    return config_list
 
 if __name__ == "__main__":
     # curr_time = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -146,8 +152,8 @@ if __name__ == "__main__":
         "gpt-4o-mini": config_list_4o_mini,
         #"gpt-4turbo": config_list_4_turbo,
     }
-    agent_config_list = model_config_map[model]
-    eval_config_list = model_config_map[eval_model]
+    agent_config_list = filter_config_list(CONFIG_LIST, model)
+    eval_config_list = filter_config_list(CONFIG_LIST, eval_model)
 
     if args.agent == "baseline":
         test_agent = BaselineAgent(

@@ -77,6 +77,7 @@ class Evaluator:
                  ans_check_reflection: bool = False,
                  sol_check_reflection: bool = False
                  ) -> None:
+        #print(config_list)
         self.client = OpenAIWrapper(
             config_list=config_list,
             cache_seed=cache_seed
