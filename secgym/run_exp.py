@@ -25,6 +25,7 @@ def run_experiment(
     accum_success = 0
     accum_logs = []
     tested_num = 0
+    tested_question_keys = set()
 
     # load logs if not overwrite
     if not overwrite and os.path.exists(save_agent_file):
@@ -69,15 +70,15 @@ def run_experiment(
                     break
             
             # for Reflexion Agent
-            # saving replay in agent memory
-            replay = {
-                "messages": agent.messages,
-                "incident": agent.incident,
-                "question": thug_env.curr_question,
-                "reward": reward,
-                "trial": trial,
-            }
             if agent.name == "ReflexionAgent":
+                # saving replay in agent memory
+                replay = {
+                    "messages": agent.messages,
+                    "incident": agent.incident,
+                    "question": thug_env.curr_question,
+                    "reward": reward,
+                    "trial": trial,
+                }
                 agent.replay_buffer.append(replay)
 
             # printing logs
@@ -108,7 +109,7 @@ def run_experiment(
     
     return accum_success, tested_num, accum_reward
 
-
+#TODO: fix eval step default value
 def get_args():
     parser = argparse.ArgumentParser(description="Run Experienments")
     parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for experiment")
@@ -117,7 +118,7 @@ def get_args():
     parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
     parser.add_argument("--max_steps", type=int, default=30, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
-    parser.add_argument("--eval_step", action="store_true", help="Evaluate each step")
+    #parser.add_argument("--eval_step", action="store_true", help="Evaluate each step")
     parser.add_argument("--agent", type=str, default="baseline", help="Agent to use for the experiment")
     parser.add_argument("--num_trials", type=int, default=1, help="Number of trials to run for each question if not solved")
     args = parser.parse_args()
@@ -135,7 +136,7 @@ if __name__ == "__main__":
     max_steps = args.max_steps
     assert args.layer in ["log", "alert"], "Layer must be either 'log' or 'alert'"
     layer = args.layer
-    eval_step = args.eval_step
+    eval_step = True#args.eval_step
     num_trials = args.num_trials
 
     # need to be filled before running
