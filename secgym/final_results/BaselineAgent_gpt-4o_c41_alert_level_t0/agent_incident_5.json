@@ -1,0 +1,512 @@
+[
+    {
+        "success": false,
+        "steps": 22,
+        "reward": 0,
+        "success_query_count": 19,
+        "total_query_count": 21,
+        "question": {
+            "context": "A security incident involving the Manatee Tempest activity group was observed on host `vnevado-win10r` accessing the URL `vectorsandarrows.com` with the IP `198.43.121.209` using the command line process `curl http://vectorsandarrows.com` with Process ID 1332. This actor group, tracked by Microsoft as Manatee Tempest, is known for methods including drive-by download and malvertising to obtain initial access, and they often deliver Cobalt Strike beacons for lateral movement and ransomware deployment.",
+            "question": "In the context of this Manatee Tempest activity, what is the name of the compromised file exhibiting ransomware-like behavior?",
+            "answer": "kiters.7z.lockbit",
+            "solution": [
+                "An attack linked to the Manatee Tempest activity group involved the user account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.",
+                "Ransomware-like behavior was detected with the file `kiters.7z.lockbit` indicating potential lateral movement within the network."
+            ],
+            "start_alert": 135,
+            "end_alert": 147,
+            "start_entities": [
+                4,
+                5,
+                61,
+                64,
+                65
+            ],
+            "end_entities": [
+                44
+            ],
+            "shortest_alert_path": [
+                135,
+                3,
+                147
+            ]
+        },
+        "trajectory": [
+            {
+                "action": "SHOW TABLES",
+                "observation": "[('AADManagedIdentitySignInLogs',), ('AADNonInteractiveUserSignInLogs',), ('AADProvisioningLogs',), ('AADRiskyUsers',), ('AADServicePrincipalSignInLogs',), ('AADUserRiskEvents',), ('AlertEvidence',), ('AlertInfo',), ('AuditLogs',), ('AzureMetrics',), ('CloudAppEvents',), ('DeviceEvents',), ('DeviceFileCertificateInfo',), ('DeviceFileEvents',), ('DeviceImageLoadEvents',), ('DeviceInfo',), ('DeviceLogonEvents',), ('DeviceNetworkEvents',), ('DeviceNetworkInfo',), ('DeviceProcessEvents',), ('DeviceRegistryEvents',), ('EmailAttachmentInfo',), ('EmailEvents',), ('EmailUrlInfo',), ('Heartbeat',), ('IdentityDirectoryEvents',), ('IdentityLogonEvents',), ('IdentityQueryEvents',), ('MicrosoftAzureBastionAuditLogs',), ('MicrosoftGraphActivityLogs',), ('SecurityAlert',), ('SecurityIncident',), ('SigninLogs',), ('ThreatIntelligenceIndicator',), ('UrlClickEvents',), ('Usage',)]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win10r' AND ProcessId = 1332",
+                "observation": "ProgrammingError: Unknown column 'ProcessId' in 'where clause'",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": false,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE DeviceFileEvents",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginReferrerUrl', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsAzureInfoProtectionApplied', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('PreviousFileName', 'text', 'YES', '', None, ''), ('PreviousFolderPath', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('RequestAccountDomain', 'text', 'YES', '', None, ''), ('RequestAccountName', 'text', 'YES', '', None, ''), ('RequestAccountSid', 'text', 'YES', '', None, ''), ('RequestProtocol', 'text', 'YES', '', None, ''), ('RequestSourceIP', 'text', 'YES', '', None, ''), ('RequestSourcePort', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('SensitivityLabel', 'text', 'YES', '', None, ''), ('SensitivitySubLabel', 'text', 'YES', '', None, ''), ('ShareName', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win10r' AND InitiatingProcessId = '1332'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win10r' AND InitiatingProcessCommandLine LIKE '%curl http://vectorsandarrows.com%'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM SecurityAlert WHERE DeviceName = 'vnevado-win10r' AND (Title LIKE '%ransomware%' OR Description LIKE '%ransomware%')",
+                "observation": "ProgrammingError: Unknown column 'DeviceName' in 'where clause'",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": false,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE SecurityAlert",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('DisplayName', 'text', 'YES', '', None, ''), ('AlertName', 'text', 'YES', '', None, ''), ('AlertSeverity', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('VendorName', 'text', 'YES', '', None, ''), ('VendorOriginalId', 'text', 'YES', '', None, ''), ('SystemAlertId', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('SourceComputerId', 'text', 'YES', '', None, ''), ('AlertType', 'text', 'YES', '', None, ''), ('ConfidenceLevel', 'text', 'YES', '', None, ''), ('ConfidenceScore', 'text', 'YES', '', None, ''), ('IsIncident', 'text', 'YES', '', None, ''), ('StartTime', 'text', 'YES', '', None, ''), ('EndTime', 'text', 'YES', '', None, ''), ('ProcessingEndTime', 'text', 'YES', '', None, ''), ('RemediationSteps', 'text', 'YES', '', None, ''), ('ExtendedProperties', 'text', 'YES', '', None, ''), ('Entities', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('WorkspaceSubscriptionId', 'text', 'YES', '', None, ''), ('WorkspaceResourceGroup', 'text', 'YES', '', None, ''), ('ExtendedLinks', 'text', 'YES', '', None, ''), ('ProductName', 'text', 'YES', '', None, ''), ('ProductComponentName', 'text', 'YES', '', None, ''), ('AlertLink', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('CompromisedEntity', 'text', 'YES', '', None, ''), ('Tactics', 'text', 'YES', '', None, ''), ('Techniques', 'text', 'YES', '', None, ''), ('SubTechniques', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM SecurityAlert WHERE CompromisedEntity = 'vnevado-win10r' AND (Description LIKE '%ransomware%' OR DisplayName LIKE '%ransomware%')",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE SecurityIncident",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('IncidentName', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('Severity', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('Classification', 'text', 'YES', '', None, ''), ('ClassificationComment', 'text', 'YES', '', None, ''), ('ClassificationReason', 'text', 'YES', '', None, ''), ('Owner', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('ProviderIncidentId', 'text', 'YES', '', None, ''), ('FirstActivityTime', 'text', 'YES', '', None, ''), ('LastActivityTime', 'text', 'YES', '', None, ''), ('FirstModifiedTime', 'text', 'YES', '', None, ''), ('LastModifiedTime', 'text', 'YES', '', None, ''), ('CreatedTime', 'text', 'YES', '', None, ''), ('ClosedTime', 'text', 'YES', '', None, ''), ('IncidentNumber', 'text', 'YES', '', None, ''), ('RelatedAnalyticRuleIds', 'text', 'YES', '', None, ''), ('AlertIds', 'text', 'YES', '', None, ''), ('BookmarkIds', 'text', 'YES', '', None, ''), ('Comments', 'text', 'YES', '', None, ''), ('Tasks', 'text', 'YES', '', None, ''), ('Labels', 'text', 'YES', '', None, ''), ('IncidentUrl', 'text', 'YES', '', None, ''), ('AdditionalData', 'text', 'YES', '', None, ''), ('ModifiedBy', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM SecurityIncident WHERE Description LIKE '%vnevado-win10r%' AND (Description LIKE '%ransomware%' OR Title LIKE '%ransomware%')",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win10r'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win10r'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE AlertEvidence",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Categories', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('EntityType', 'text', 'YES', '', None, ''), ('EvidenceRole', 'text', 'YES', '', None, ''), ('EvidenceDirection', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('ThreatFamily', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('NetworkMessageId', 'text', 'YES', '', None, ''), ('EmailSubject', 'text', 'YES', '', None, ''), ('ApplicationId', 'text', 'YES', '', None, ''), ('Application', 'text', 'YES', '', None, ''), ('OAuthApplicationId', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM AlertEvidence WHERE DeviceName = 'vnevado-win10r' AND (Title LIKE '%ransomware%' OR Categories LIKE '%ransomware%' OR AttackTechniques LIKE '%ransomware%')",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE DeviceEvents",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('LocalPort', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RemoteDeviceName', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceEvents WHERE DeviceName = 'vnevado-win10r'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win10r'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM SecurityIncident WHERE Description LIKE '%vnevado-win10r%'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE AlertInfo",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Category', 'text', 'YES', '', None, ''), ('Severity', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM AlertInfo WHERE Title LIKE '%ransomware%' OR Category LIKE '%ransomware%' OR AttackTechniques LIKE '%ransomware%'",
+                "observation": "[('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:50.905677+00:00', '2024-06-20 09:10:50.905677+00:00', 'da5984c937-d71d-4fb9-9eb9-e0eddb531b1c_1', 'System recovery setting tampering', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:51.876113+00:00', '2024-06-20 09:10:51.876113+00:00', 'da7d47542a-7c5a-4fd4-85f2-640f2bf0927b_1', 'System recovery setting tampering', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:52.026181+00:00', '2024-06-20 09:10:52.026181+00:00', 'daa259edb8-0995-4afc-b70b-cbbba9bebb7c_1', 'Manatee Tempest activity group', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:53.683099+00:00', '2024-06-20 09:10:53.683099+00:00', 'da9f578cfb-d500-4479-a0f2-8b490cdbae45_1', 'Manatee Tempest activity group', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:56.151100+00:00', '2024-06-20 09:10:56.151100+00:00', 'da0442b61c-838e-42d8-bc82-9d3289e7a56c_1', 'File backups were deleted', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:58.080961+00:00', '2024-06-20 09:10:58.080961+00:00', 'da31526b47-539d-4278-883d-42f1b1594c59_1', 'File backups were deleted', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:29:41.284899+00:00', '2024-06-20 09:29:41.284899+00:00', 'da3fcede41-9fdb-4dfb-9fd0-69f1c6fa88bf_1', 'System recovery setting tampering', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:29:42.634113+00:00', '2024-06-20 09:29:42.634113+00:00', 'da3b2b2e6a-02f5-4d0d-b684-adfd4192581c_1', 'Manatee Tempest activity group', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:29:49.297135+00:00', '2024-06-20 09:29:49.297135+00:00', 'da732002d6-ca77-492d-887b-e3c56bdd900f_1', 'File backups were deleted', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:03.749465+00:00', '2024-06-20 09:32:03.749465+00:00', 'da3e6bd315-8c89-4a24-8579-9601035ef416_1', 'System recovery setting tampering', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:05.060115+00:00', '2024-06-20 09:32:05.060115+00:00', 'da019e64d3-70c9-4596-9e68-c0a1f0fc2ffc_1', 'Manatee Tempest activity group', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:10.525805+00:00', '2024-06-20 09:32:10.525805+00:00', 'da8313bb62-7ad6-4943-9279-05aaaaf671ff_1', 'File backups were deleted', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:20.289101+00:00', '2024-06-20 09:32:20.289101+00:00', 'dafadc0357-1176-417b-9869-7c0510067853_1', 'Ransomware behavior detected in the file system', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:20.612221+00:00', '2024-06-20 09:32:20.612221+00:00', 'da134a6a5b-93d0-4944-a57a-848d390e6af4_1', 'Possible compromised user account delivering ransomware-related files', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Lateral Tool Transfer (T1570)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:20.612221+00:00', '2024-06-20 09:32:20.612221+00:00', 'da637a090f-0fc6-44d4-93e4-016842ad44cc_1', 'Potentially compromised assets exhibiting ransomware-like behavior', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:20.612221+00:00', '2024-06-20 09:32:20.612221+00:00', 'dad7132158-cbfb-4237-9832-69b8c1f1b030_1', 'Potentially compromised assets exhibiting ransomware-like behavior', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:20.612221+00:00', '2024-06-20 09:32:20.612221+00:00', 'daaf51eb1d-0c41-464f-98fa-ca7054101167_1', 'Ransomware payload remotely launched. ', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:32:20.612221+00:00', '2024-06-20 09:32:20.612221+00:00', 'da711f85f1-75a0-43eb-bbe1-4aaeb2ae77e7_1', 'Ransomware payload remotely launched. ', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:34:37.301293+00:00', '2024-06-20 09:34:37.301293+00:00', 'da652181bd-0b03-40dd-89b2-932432ee1b9c_1', 'Ransomware behavior detected in the file system', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:34:37.872610+00:00', '2024-06-20 09:34:37.872610+00:00', 'da57bd49e5-099e-4216-b710-ab8a1547cc64_1', 'Possible compromised user account delivering ransomware-related files', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Lateral Tool Transfer (T1570)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:34:37.872610+00:00', '2024-06-20 09:34:37.872610+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:34:37.872610+00:00', '2024-06-20 09:34:37.872610+00:00', 'daeb95e7ec-6f37-488c-a894-7aeeae8486ca_1', 'Potentially compromised assets exhibiting ransomware-like behavior', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:34:37.872610+00:00', '2024-06-20 09:34:37.872610+00:00', 'dac1429476-17cf-4a88-93f3-f12d906bb71f_1', 'Ransomware payload remotely launched. ', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:34:37.872610+00:00', '2024-06-20 09:34:37.872610+00:00', 'da9c440897-d150-41b4-9b1a-b847c355136b_1', 'Ransomware payload remotely launched. ', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:35:04.084426+00:00', '2024-06-20 09:35:04.084426+00:00', 'dad35af110-f09a-461d-b9eb-dd5ca3808737_1', 'Possible ransomware activity based on a known malicious extension', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"SMB/Windows Admin Shares (T1021.002)\",\"Data from Network Shared Drive (T1039)\",\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:35:49.924336+00:00', '2024-06-20 09:35:49.924336+00:00', 'daef4e2f89-e7fc-4966-9941-5a7ec722c110_1', 'Possible ransomware activity based on a known malicious extension', 'Ransomware', 'High', 'Microsoft Defender for Endpoint', 'EDR', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:38:20+00:00', '2024-06-20 09:38:20+00:00', 'ca6673f98cb9f35a1e3beaa2cb', 'Ransomware activity', 'Impact', 'High', 'Microsoft Defender for Cloud Apps', 'Cloud App Security', '[\"Data Encrypted for Impact (T1486)\"]', '', 'AlertInfo')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM AlertEvidence WHERE AlertId IN ('da5984c937-d71d-4fb9-9eb9-e0eddb531b1c_1', 'da7d47542a-7c5a-4fd4-85f2-640f2bf0927b_1', 'daa259edb8-0995-4afc-b70b-cbbba9bebb7c_1', 'da9f578cfb-d500-4479-a0f2-8b490cdbae45_1', 'da0442b61c-838e-42d8-bc82-9d3289e7a56c_1', 'da31526b47-539d-4278-883d-42f1b1594c59_1', 'da3fcede41-9fdb-4dfb-9fd0-69f1c6fa88bf_1', 'da3b2b2e6a-02f5-4d0d-b684-adfd4192581c_1', 'da732002d6-ca77-492d-887b-e3c56bdd900f_1', 'da3e6bd315-8c89-4a24-8579-9601035ef416_1', 'da019e64d3-70c9-4596-9e68-c0a1f0fc2ffc_1', 'da8313bb62-7ad6-4943-9279-05aaaaf671ff_1', 'dafadc0357-1176-417b-9869-7c0510067853_1', 'da134a6a5b-93d0-4944-a57a-848d390e6af4_1', 'da637a090f-0fc6-44d4-93e4-016842ad44cc_1', 'dad7132158-cbfb-4237-9832-69b8c1f1b030_1', 'daaf51eb1d-0c41-464f-98fa-ca7054101167_1', 'da711f85f1-75a0-43eb-bbe1-4aaeb2ae77e7_1', 'da652181bd-0b03-40dd-89b2-932432ee1b9c_1', 'da57bd49e5-099e-4216-b710-ab8a1547cc64_1', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'daeb95e7ec-6f37-488c-a894-7aeeae8486ca_1', 'dac1429476-17cf-4a88-93f3-f12d906bb71f_1', 'da9c440897-d150-41b4-9b1a-b847c355136b_1', 'dad35af110-f09a-461d-b9eb-dd5ca3808737_1', 'daef4e2f89-e7fc-4966-9941-5a7ec722c110_1', 'ca6673f98cb9f35a1e3beaa2cb')",
+                "observation": "Retrieved 1224 entries. Displaying first 15 entries.\n[('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'dac1429476-17cf-4a88-93f3-f12d906bb71f_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Machine', 'Impacted', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '898b0b9401f2867ad49f951dfd0090d29ec08c42', 'vnevado-win11t.vnevado.alpineskihouse.co', '', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'dac1429476-17cf-4a88-93f3-f12d906bb71f_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Ip', 'Related', '', '', '', '', '', '', '', '99.83.111.100', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '{\"Type\":\"ip\",\"Role\":1,\"MergeByKey\":\"GumDRlwtFTrTkUDXueo/q1HZ6U0=\",\"MergeByKeyHex\":\"1AE983465C2D153AD39140D7B9EA3FAB51D9E94D\",\"Address\":\"99.83.111.100\",\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Malicious\",\"AnalysisDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastVerdict\":\"Malicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Incriminated\",\"IsIoc\":true,\"ReferenceId\":\"86d5d802-459a-4550-bdf0-90ac8b08c0df:inferred-b984b8a54511910b\",\"ObservedByDevice\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', '[\"Ransomware\"]', '[\"Data Encrypted for Impact (T1486)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Machine', 'Impacted', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '898b0b9401f2867ad49f951dfd0090d29ec08c42', 'vnevado-win11t.vnevado.alpineskihouse.co', '', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', '[\"Ransomware\"]', '[\"Data Encrypted for Impact (T1486)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'User', 'Impacted', '', '', '', '', '', '', '', '', '', 'dp5hn', 'VNEVADO', 'S-1-5-21-1840191660-8534830288-125585561-1522', '731adb71-b11c-4bbf-850b-57989b350e96', 'dp5hn@vnevado.alpineskihouse.co', '', '', '', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"account\",\"Role\":0,\"MergeByKey\":\"GzK40zkjp8ASzp0CnpUgl+CIXps=\",\"MergeByKeyHex\":\"1B32B8D33923A7C012CE9D029E952097E0885E9B\",\"Asset\":true,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":true,\"Host\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"$id\":\"2\",\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"Metadata\":{\"MachineEnrichmentInfo\":\"{\"\"MachineId\"\":\"\"898b0b9401f2867ad49f951dfd0090d29ec08c42\"\",\"\"HostName\"\":\"\"vnevado-win11t\"\",\"\"DnsDomain\"\":\"\"vnevado.alpineskihouse.co\"\",\"\"MachineFqdn\"\":\"\"vnevado-win11t.vnevado.alpineskihouse.co\"\",\"\"IpAddress\"\":\"\"83.162.58.168\"\",\"\"FoundBy\"\":[3],\"\"LastSeen\"\":\"\"2024-06-20T08:46:03.4019501Z\"\",\"\"RbacGroupId\"\":28,\"\"MachineTagsJson\"\":\"\"[\\\\\"\"AlpineSkiHouse\\\\\"\",\\\\\"\"LiveResponse\\\\\"\"]\"\",\"\"MachineGroup\"\":null,\"\"OsPlatform\"\":\"\"Windows11\"\",\"\"SenseClientVersion\"\":\"\"10.8750.22621.3737\"\",\"\"CriticalityLevel\"\":3}\"},\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]},\"Name\":\"dp5hn\",\"ReferenceId\":\"e334c6af-79eb-4af5-b849-b171ec0bcd6c:012ecfb1f6c7\",\"NTDomain\":\"VNEVADO\",\"UPNSuffix\":\"vnevado.alpineskihouse.co\",\"Sid\":\"S-1-5-21-1840191660-8534830288-125585561-1522\",\"AadUserId\":\"731adb71-b11c-4bbf-850b-57989b350e96\",\"UserPrincipalName\":\"dp5hn@vnevado.alpineskihouse.co\",\"DisplayName\":\"Grace Chen\"}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', '[\"Ransomware\"]', '[\"Data Encrypted for Impact (T1486)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Ip', 'Related', '', '', '', '', '', '', '', '99.83.111.100', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '{\"Type\":\"ip\",\"Role\":1,\"MergeByKey\":\"GumDRlwtFTrTkUDXueo/q1HZ6U0=\",\"MergeByKeyHex\":\"1AE983465C2D153AD39140D7B9EA3FAB51D9E94D\",\"Address\":\"99.83.111.100\",\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Malicious\",\"AnalysisDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastVerdict\":\"Malicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Incriminated\",\"IsIoc\":true,\"ReferenceId\":\"86d5d802-459a-4550-bdf0-90ac8b08c0df:inferred-b984b8a54511910b\",\"ObservedByDevice\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', '[\"Ransomware\"]', '[\"Data Encrypted for Impact (T1486)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Process', 'Related', '', 'ntoskrnl.exe', 'C:WindowsSystem32', '7fe78f91310839df0993510df2bccab4a51618fa', 'd2c63f71382ab464c9b243e4f19f123fb4b44917468ddb6928a57f90fe94664a', '12064112.0', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '{\"Type\":\"process\",\"Role\":1,\"MergeByKey\":\"5owar57/GX552yZqmFd1eScpQng=\",\"MergeByKeyHex\":\"E68C1AAF9EFF197E79DB266A9857757927294278\",\"ProcessId\":\"4\",\"CreationTimeUtc\":\"2024-06-13T07:29:43.3644207Z\",\"CreatedTimeUtc\":\"2024-06-13T07:29:43.3644207Z\",\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"ElevationToken\":\"Default\",\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":true,\"Host\":{\"$ref\":\"3\"},\"ImageFile\":{\"Type\":\"file\",\"CreatedTimeUtc\":\"2024-06-12T14:16:31.7155814Z\",\"Host\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:42.4727152Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"$id\":\"3\",\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"Metadata\":{\"MachineEnrichmentInfo\":\"{\"\"MachineId\"\":\"\"898b0b9401f2867ad49f951dfd0090d29ec08c42\"\",\"\"HostName\"\":\"\"vnevado-win11t\"\",\"\"DnsDomain\"\":\"\"vnevado.alpineskihouse.co\"\",\"\"MachineFqdn\"\":\"\"vnevado-win11t.vnevado.alpineskihouse.co\"\",\"\"IpAddress\"\":\"\"83.162.58.168\"\",\"\"FoundBy\"\":[3],\"\"LastSeen\"\":\"\"2024-06-20T08:46:03.4019501Z\"\",\"\"RbacGroupId\"\":28,\"\"MachineTagsJson\"\":\"\"[\\\\\"\"AlpineSkiHouse\\\\\"\",\\\\\"\"LiveResponse\\\\\"\"]\"\",\"\"MachineGroup\"\":null,\"\"OsPlatform\"\":\"\"Windows11\"\",\"\"SenseClientVersion\"\":\"\"10.8750.22621.3737\"\",\"\"CriticalityLevel\"\":3}\"},\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]},\"FirstSeen\":\"2024-06-11T17:04:48.7048799Z\",\"$id\":\"2\",\"Name\":\"ntoskrnl.exe\",\"FileHashes\":[{\"Type\":\"filehash\",\"$id\":\"4\",\"Algorithm\":\"SHA1\",\"Value\":\"7fe78f91310839df0993510df2bccab4a51618fa\"},{\"Type\":\"filehash\",\"$id\":\"5\",\"Algorithm\":\"MD5\",\"Value\":\"bb4c983627632ef38b8c1bbe4a5650ee\"},{\"Type\":\"filehash\",\"$id\":\"6\",\"Algorithm\":\"SHA256\",\"Value\":\"d2c63f71382ab464c9b243e4f19f123fb4b44917468ddb6928a57f90fe94664a\"}],\"Directory\":\"C:\\\\Windows\\\\System32\",\"SizeInBytes\":12064112,\"LsHash\":\"9fdde96abb5d5a5e77e6eb97ebdfdd55febb7ad979f575ed6e76775dfde6576eebafdab6fef5e69bb59a9ba9a55b6ea579ee9fa67d9eb766ba6b67d5f6db9efb\",\"IsPe\":true,\"LastAccessTimeUtc\":\"2024-06-13T07:29:55.4774362Z\",\"LastWriteTimeUtc\":\"2024-06-12T14:16:32.5752665Z\",\"Publisher\":\"Microsoft Corporation\",\"KnownPrevalence\":183277},\"ReferenceId\":\"feb5b659-5847-4ef9-8917-713e13cd8e2e:4271db179197\",\"Account\":{\"IsDomainJoined\":true,\"Type\":\"account\",\"Role\":1,\"Asset\":false,\"Host\":{\"$ref\":\"3\"},\"$id\":\"7\",\"Name\":\"SYSTEM\",\"NTDomain\":\"NT AUTHORITY\",\"Sid\":\"S-2-2-78\"}}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'da9c440897-d150-41b4-9b1a-b847c355136b_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Process', 'Related', '', 'ntoskrnl.exe', 'C:WindowsSystem32', '7fe78f91310839df0993510df2bccab4a51618fa', 'd2c63f71382ab464c9b243e4f19f123fb4b44917468ddb6928a57f90fe94664a', '12064112.0', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '{\"Type\":\"process\",\"Role\":1,\"MergeByKey\":\"5owar57/GX552yZqmFd1eScpQng=\",\"MergeByKeyHex\":\"E68C1AAF9EFF197E79DB266A9857757927294278\",\"ProcessId\":\"4\",\"CreationTimeUtc\":\"2024-06-13T07:29:43.3644207Z\",\"CreatedTimeUtc\":\"2024-06-13T07:29:43.3644207Z\",\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"ElevationToken\":\"Default\",\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":true,\"Host\":{\"$ref\":\"3\"},\"ImageFile\":{\"Type\":\"file\",\"CreatedTimeUtc\":\"2024-06-12T14:16:31.7155814Z\",\"Host\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"$id\":\"3\",\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"IpInterfaces\":[{\"Type\":\"ip\",\"Address\":\"83.162.58.168\",\"$id\":\"4\"},{\"Type\":\"ip\",\"Address\":\"fe80::c609:29ff:5016:7cf2\",\"$id\":\"5\"},{\"Type\":\"ip\",\"Address\":\"69.109.58.181\",\"$id\":\"6\"},{\"Type\":\"ip\",\"Address\":\"::1\",\"$id\":\"7\"},{\"Type\":\"ip\",\"Address\":\"::ffff:83.162.58.168\",\"$id\":\"8\"}],\"Metadata\":{\"MachineEnrichmentInfo\":\"{\"\"MachineId\"\":\"\"898b0b9401f2867ad49f951dfd0090d29ec08c42\"\",\"\"HostName\"\":\"\"vnevado-win11t\"\",\"\"DnsDomain\"\":\"\"vnevado.alpineskihouse.co\"\",\"\"MachineFqdn\"\":\"\"vnevado-win11t.vnevado.alpineskihouse.co\"\",\"\"IpAddress\"\":\"\"83.162.58.168\"\",\"\"FoundBy\"\":[3],\"\"LastSeen\"\":\"\"2024-06-20T08:46:03.4019501Z\"\",\"\"RbacGroupId\"\":28,\"\"MachineTagsJson\"\":\"\"[\\\\\"\"AlpineSkiHouse\\\\\"\",\\\\\"\"LiveResponse\\\\\"\"]\"\",\"\"MachineGroup\"\":null,\"\"OsPlatform\"\":\"\"Windows11\"\",\"\"SenseClientVersion\"\":\"\"10.8750.22621.3737\"\",\"\"CriticalityLevel\"\":3}\"},\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"EnrichmentType\":\"MachineIpInterfacesEnrichment\",\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]},\"FirstSeen\":\"2024-06-11T17:04:48.7048799Z\",\"$id\":\"2\",\"Name\":\"ntoskrnl.exe\",\"FileHashes\":[{\"Type\":\"filehash\",\"$id\":\"9\",\"Algorithm\":\"SHA1\",\"Value\":\"7fe78f91310839df0993510df2bccab4a51618fa\"},{\"Type\":\"filehash\",\"$id\":\"10\",\"Algorithm\":\"MD5\",\"Value\":\"bb4c983627632ef38b8c1bbe4a5650ee\"},{\"Type\":\"filehash\",\"$id\":\"11\",\"Algorithm\":\"SHA256\",\"Value\":\"d2c63f71382ab464c9b243e4f19f123fb4b44917468ddb6928a57f90fe94664a\"}],\"Directory\":\"C:\\\\Windows\\\\System32\",\"SizeInBytes\":12064112,\"LsHash\":\"9fdde96abb5d5a5e77e6eb97ebdfdd55febb7ad979f575ed6e76775dfde6576eebafdab6fef5e69bb59a9ba9a55b6ea579ee9fa67d9eb766ba6b67d5f6db9efb\",\"IsPe\":true,\"LastAccessTimeUtc\":\"2024-06-13T07:29:55.4774362Z\",\"LastWriteTimeUtc\":\"2024-06-12T14:16:32.5752665Z\",\"Publisher\":\"Microsoft Corporation\",\"KnownPrevalence\":183277},\"ReferenceId\":\"feb5b659-5847-4ef9-8917-713e13cd8e2e:4271db179197\",\"Account\":{\"IsDomainJoined\":true,\"Type\":\"account\",\"Role\":1,\"Asset\":false,\"Host\":{\"$ref\":\"3\"},\"$id\":\"12\",\"Name\":\"SYSTEM\",\"NTDomain\":\"NT AUTHORITY\",\"Sid\":\"S-2-2-78\"}}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'da9c440897-d150-41b4-9b1a-b847c355136b_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'User', 'Impacted', '', '', '', '', '', '', '', '', '', 'dp5hn', 'VNEVADO', 'S-1-5-21-1840191660-8534830288-125585561-1522', '731adb71-b11c-4bbf-850b-57989b350e96', 'dp5hn@vnevado.alpineskihouse.co', '', '', '', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"account\",\"Role\":0,\"MergeByKey\":\"GzK40zkjp8ASzp0CnpUgl+CIXps=\",\"MergeByKeyHex\":\"1B32B8D33923A7C012CE9D029E952097E0885E9B\",\"Asset\":true,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":true,\"Host\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"$id\":\"2\",\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"IpInterfaces\":[{\"Type\":\"ip\",\"Address\":\"83.162.58.168\",\"$id\":\"3\"},{\"Type\":\"ip\",\"Address\":\"fe80::c609:29ff:5016:7cf2\",\"$id\":\"4\"},{\"Type\":\"ip\",\"Address\":\"69.109.58.181\",\"$id\":\"5\"},{\"Type\":\"ip\",\"Address\":\"::1\",\"$id\":\"6\"},{\"Type\":\"ip\",\"Address\":\"::ffff:83.162.58.168\",\"$id\":\"7\"}],\"Metadata\":{\"MachineEnrichmentInfo\":\"{\"\"MachineId\"\":\"\"898b0b9401f2867ad49f951dfd0090d29ec08c42\"\",\"\"HostName\"\":\"\"vnevado-win11t\"\",\"\"DnsDomain\"\":\"\"vnevado.alpineskihouse.co\"\",\"\"MachineFqdn\"\":\"\"vnevado-win11t.vnevado.alpineskihouse.co\"\",\"\"IpAddress\"\":\"\"83.162.58.168\"\",\"\"FoundBy\"\":[3],\"\"LastSeen\"\":\"\"2024-06-20T08:46:03.4019501Z\"\",\"\"RbacGroupId\"\":28,\"\"MachineTagsJson\"\":\"\"[\\\\\"\"AlpineSkiHouse\\\\\"\",\\\\\"\"LiveResponse\\\\\"\"]\"\",\"\"MachineGroup\"\":null,\"\"OsPlatform\"\":\"\"Windows11\"\",\"\"SenseClientVersion\"\":\"\"10.8750.22621.3737\"\",\"\"CriticalityLevel\"\":3}\"},\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"EnrichmentType\":\"MachineIpInterfacesEnrichment\",\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]},\"Name\":\"dp5hn\",\"ReferenceId\":\"e334c6af-79eb-4af5-b849-b171ec0bcd6c:012ecfb1f6c7\",\"NTDomain\":\"VNEVADO\",\"UPNSuffix\":\"vnevado.alpineskihouse.co\",\"Sid\":\"S-1-5-21-1840191660-8534830288-125585561-1522\",\"AadUserId\":\"731adb71-b11c-4bbf-850b-57989b350e96\",\"UserPrincipalName\":\"dp5hn@vnevado.alpineskihouse.co\",\"DisplayName\":\"Grace Chen\"}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'dac1429476-17cf-4a88-93f3-f12d906bb71f_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'User', 'Impacted', '', '', '', '', '', '', '', '', '', 'dp5hn', 'VNEVADO', 'S-1-5-21-1840191660-8534830288-125585561-1522', '731adb71-b11c-4bbf-850b-57989b350e96', 'dp5hn@vnevado.alpineskihouse.co', '', '', '', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"account\",\"Role\":0,\"MergeByKey\":\"GzK40zkjp8ASzp0CnpUgl+CIXps=\",\"MergeByKeyHex\":\"1B32B8D33923A7C012CE9D029E952097E0885E9B\",\"Asset\":true,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Malicious\",\"AnalysisDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastVerdict\":\"Malicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Incriminated\",\"IsIoc\":true,\"Host\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"$id\":\"2\",\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"Metadata\":{\"MachineEnrichmentInfo\":\"{\"\"MachineId\"\":\"\"898b0b9401f2867ad49f951dfd0090d29ec08c42\"\",\"\"HostName\"\":\"\"vnevado-win11t\"\",\"\"DnsDomain\"\":\"\"vnevado.alpineskihouse.co\"\",\"\"MachineFqdn\"\":\"\"vnevado-win11t.vnevado.alpineskihouse.co\"\",\"\"IpAddress\"\":\"\"83.162.58.168\"\",\"\"FoundBy\"\":[3],\"\"LastSeen\"\":\"\"2024-06-20T08:46:03.4019501Z\"\",\"\"RbacGroupId\"\":28,\"\"MachineTagsJson\"\":\"\"[\\\\\"\"AlpineSkiHouse\\\\\"\",\\\\\"\"LiveResponse\\\\\"\"]\"\",\"\"MachineGroup\"\":null,\"\"OsPlatform\"\":\"\"Windows11\"\",\"\"SenseClientVersion\"\":\"\"10.8750.22621.3737\"\",\"\"CriticalityLevel\"\":3}\"},\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]},\"Name\":\"dp5hn\",\"ReferenceId\":\"e334c6af-79eb-4af5-b849-b171ec0bcd6c:012ecfb1f6c7\",\"NTDomain\":\"VNEVADO\",\"UPNSuffix\":\"vnevado.alpineskihouse.co\",\"Sid\":\"S-1-5-21-1840191660-8534830288-125585561-1522\",\"AadUserId\":\"731adb71-b11c-4bbf-850b-57989b350e96\",\"UserPrincipalName\":\"dp5hn@vnevado.alpineskihouse.co\",\"DisplayName\":\"Grace Chen\"}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'dac1429476-17cf-4a88-93f3-f12d906bb71f_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Process', 'Related', '', 'ntoskrnl.exe', 'C:WindowsSystem32', '7fe78f91310839df0993510df2bccab4a51618fa', 'd2c63f71382ab464c9b243e4f19f123fb4b44917468ddb6928a57f90fe94664a', '12064112.0', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '{\"Type\":\"process\",\"Role\":1,\"MergeByKey\":\"5owar57/GX552yZqmFd1eScpQng=\",\"MergeByKeyHex\":\"E68C1AAF9EFF197E79DB266A9857757927294278\",\"ProcessId\":\"4\",\"CreationTimeUtc\":\"2024-06-13T07:29:43.3644207Z\",\"CreatedTimeUtc\":\"2024-06-13T07:29:43.3644207Z\",\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"ElevationToken\":\"Default\",\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":true,\"Host\":{\"$ref\":\"3\"},\"ImageFile\":{\"Type\":\"file\",\"CreatedTimeUtc\":\"2024-06-12T14:16:31.7155814Z\",\"Host\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:11.7183586Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"$id\":\"3\",\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"Metadata\":{\"MachineEnrichmentInfo\":\"{\"\"MachineId\"\":\"\"898b0b9401f2867ad49f951dfd0090d29ec08c42\"\",\"\"HostName\"\":\"\"vnevado-win11t\"\",\"\"DnsDomain\"\":\"\"vnevado.alpineskihouse.co\"\",\"\"MachineFqdn\"\":\"\"vnevado-win11t.vnevado.alpineskihouse.co\"\",\"\"IpAddress\"\":\"\"83.162.58.168\"\",\"\"FoundBy\"\":[3],\"\"LastSeen\"\":\"\"2024-06-20T08:46:03.4019501Z\"\",\"\"RbacGroupId\"\":28,\"\"MachineTagsJson\"\":\"\"[\\\\\"\"AlpineSkiHouse\\\\\"\",\\\\\"\"LiveResponse\\\\\"\"]\"\",\"\"MachineGroup\"\":null,\"\"OsPlatform\"\":\"\"Windows11\"\",\"\"SenseClientVersion\"\":\"\"10.8750.22621.3737\"\",\"\"CriticalityLevel\"\":3}\"},\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]},\"FirstSeen\":\"2024-06-11T17:04:48.7048799Z\",\"$id\":\"2\",\"Name\":\"ntoskrnl.exe\",\"FileHashes\":[{\"Type\":\"filehash\",\"$id\":\"4\",\"Algorithm\":\"SHA1\",\"Value\":\"7fe78f91310839df0993510df2bccab4a51618fa\"},{\"Type\":\"filehash\",\"$id\":\"5\",\"Algorithm\":\"MD5\",\"Value\":\"bb4c983627632ef38b8c1bbe4a5650ee\"},{\"Type\":\"filehash\",\"$id\":\"6\",\"Algorithm\":\"SHA256\",\"Value\":\"d2c63f71382ab464c9b243e4f19f123fb4b44917468ddb6928a57f90fe94664a\"}],\"Directory\":\"C:\\\\Windows\\\\System32\",\"SizeInBytes\":12064112,\"LsHash\":\"9fdde96abb5d5a5e77e6eb97ebdfdd55febb7ad979f575ed6e76775dfde6576eebafdab6fef5e69bb59a9ba9a55b6ea579ee9fa67d9eb766ba6b67d5f6db9efb\",\"IsPe\":true,\"LastAccessTimeUtc\":\"2024-06-13T07:29:55.4774362Z\",\"LastWriteTimeUtc\":\"2024-06-12T14:16:32.5752665Z\",\"Publisher\":\"Microsoft Corporation\",\"KnownPrevalence\":183277},\"ReferenceId\":\"feb5b659-5847-4ef9-8917-713e13cd8e2e:4271db179197\",\"Account\":{\"IsDomainJoined\":true,\"Type\":\"account\",\"Role\":1,\"Asset\":false,\"Host\":{\"$ref\":\"3\"},\"$id\":\"7\",\"Name\":\"SYSTEM\",\"NTDomain\":\"NT AUTHORITY\",\"Sid\":\"S-2-2-78\"}}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'da9c440897-d150-41b4-9b1a-b847c355136b_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Machine', 'Impacted', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '898b0b9401f2867ad49f951dfd0090d29ec08c42', 'vnevado-win11t.vnevado.alpineskihouse.co', '83.162.58.168', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"IpInterfaces\":[{\"Type\":\"ip\",\"Address\":\"83.162.58.168\",\"$id\":\"2\"},{\"Type\":\"ip\",\"Address\":\"fe80::c609:29ff:5016:7cf2\",\"$id\":\"3\"},{\"Type\":\"ip\",\"Address\":\"69.109.58.181\",\"$id\":\"4\"},{\"Type\":\"ip\",\"Address\":\"::1\",\"$id\":\"5\"},{\"Type\":\"ip\",\"Address\":\"::ffff:83.162.58.168\",\"$id\":\"6\"}],\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"EnrichmentType\":\"MachineIpInterfacesEnrichment\",\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'da9c440897-d150-41b4-9b1a-b847c355136b_1', 'Ransomware payload remotely launched. ', '[\"Ransomware\"]', '[\"Remote Services (T1021)\",\"Data Encrypted for Impact (T1486)\",\"Inhibit System Recovery (T1490)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Ip', 'Related', '', '', '', '', '', '', '', '99.83.111.100', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '{\"Type\":\"ip\",\"Role\":1,\"MergeByKey\":\"GumDRlwtFTrTkUDXueo/q1HZ6U0=\",\"MergeByKeyHex\":\"1AE983465C2D153AD39140D7B9EA3FAB51D9E94D\",\"Address\":\"99.83.111.100\",\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:00.3038375Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":true,\"ReferenceId\":\"86d5d802-459a-4550-bdf0-90ac8b08c0df:inferred-b984b8a54511910b\",\"ObservedByDevice\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', '[\"Ransomware\"]', '[\"Data Encrypted for Impact (T1486)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Machine', 'Impacted', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '898b0b9401f2867ad49f951dfd0090d29ec08c42', 'vnevado-win11t.vnevado.alpineskihouse.co', '', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', '[\"Ransomware\"]', '[\"Data Encrypted for Impact (T1486)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'User', 'Impacted', '', '', '', '', '', '', '', '', '', 'dp5hn', 'VNEVADO', 'S-1-5-21-1840191660-8534830288-125585561-1522', '731adb71-b11c-4bbf-850b-57989b350e96', 'dp5hn@vnevado.alpineskihouse.co', '', '', '', '', '', '', '', '', '', '{\"IsDomainJoined\":true,\"Type\":\"account\",\"Role\":0,\"MergeByKey\":\"GzK40zkjp8ASzp0CnpUgl+CIXps=\",\"MergeByKeyHex\":\"1B32B8D33923A7C012CE9D029E952097E0885E9B\",\"Asset\":true,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":true,\"Host\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"MergeByKey\":\"6iXissj0fU1vd5klgK/hCkjm/VA=\",\"MergeByKeyHex\":\"EA25E2B2C8F47D4D6F77992580AFE10A48E6FD50\",\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Suspicious\",\"AnalysisDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastVerdict\":\"Suspicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Suspicious\",\"IsIoc\":false,\"$id\":\"2\",\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"Metadata\":{\"MachineEnrichmentInfo\":\"{\"\"MachineId\"\":\"\"898b0b9401f2867ad49f951dfd0090d29ec08c42\"\",\"\"HostName\"\":\"\"vnevado-win11t\"\",\"\"DnsDomain\"\":\"\"vnevado.alpineskihouse.co\"\",\"\"MachineFqdn\"\":\"\"vnevado-win11t.vnevado.alpineskihouse.co\"\",\"\"IpAddress\"\":\"\"83.162.58.168\"\",\"\"FoundBy\"\":[3],\"\"LastSeen\"\":\"\"2024-06-20T08:46:03.4019501Z\"\",\"\"RbacGroupId\"\":28,\"\"MachineTagsJson\"\":\"\"[\\\\\"\"AlpineSkiHouse\\\\\"\",\\\\\"\"LiveResponse\\\\\"\"]\"\",\"\"MachineGroup\"\":null,\"\"OsPlatform\"\":\"\"Windows11\"\",\"\"SenseClientVersion\"\":\"\"10.8750.22621.3737\"\",\"\"CriticalityLevel\"\":3}\"},\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]},\"Name\":\"dp5hn\",\"ReferenceId\":\"e334c6af-79eb-4af5-b849-b171ec0bcd6c:012ecfb1f6c7\",\"NTDomain\":\"VNEVADO\",\"UPNSuffix\":\"vnevado.alpineskihouse.co\",\"Sid\":\"S-1-5-21-1840191660-8534830288-125585561-1522\",\"AadUserId\":\"731adb71-b11c-4bbf-850b-57989b350e96\",\"UserPrincipalName\":\"dp5hn@vnevado.alpineskihouse.co\",\"DisplayName\":\"Grace Chen\"}', '', '', '', '', 'AlertEvidence'), ('e34d562e-ef12-4c4e-9bc0-7c6ae357c015', '2024-06-20 09:10:44.182747+00:00', '2024-06-20 09:10:44.182747+00:00', 'daa55a5b73-042c-4b65-a890-332e7c9a6c6e_1', 'Potentially compromised assets exhibiting ransomware-like behavior', '[\"Ransomware\"]', '[\"Data Encrypted for Impact (T1486)\"]', 'Microsoft Defender for Endpoint', 'EDR', 'Ip', 'Related', '', '', '', '', '', '', '', '99.83.111.100', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '{\"Type\":\"ip\",\"Role\":1,\"MergeByKey\":\"GumDRlwtFTrTkUDXueo/q1HZ6U0=\",\"MergeByKeyHex\":\"1AE983465C2D153AD39140D7B9EA3FAB51D9E94D\",\"Address\":\"99.83.111.100\",\"ThreatAnalysisSummary\":[{\"AnalyzersResult\":[],\"Verdict\":\"Malicious\",\"AnalysisDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastVerdict\":\"Malicious\",\"RemediationProviders\":[{\"Type\":\"remediation-provider\",\"RemediationState\":\"Active\",\"RemediationDate\":\"2024-06-20T09:36:12.0364473Z\"}],\"LastRemediationState\":\"Active\",\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"DetectionStatus\":\"Detected\",\"SuspicionLevel\":\"Incriminated\",\"IsIoc\":true,\"ReferenceId\":\"86d5d802-459a-4550-bdf0-90ac8b08c0df:inferred-b984b8a54511910b\",\"ObservedByDevice\":{\"IsDomainJoined\":true,\"Type\":\"host\",\"Role\":0,\"Asset\":true,\"DnsDomain\":\"vnevado.alpineskihouse.co\",\"HostName\":\"vnevado-win11t\",\"MachineId\":\"898b0b9401f2867ad49f951dfd0090d29ec08c42\",\"MachineIdType\":3,\"RbacScopes\":{\"ScopesPerType\":{\"Workloads\":{\"Scopes\":[\"Mdatp\"],\"Mode\":\"All\"},\"MachineGroupIds\":{\"Scopes\":[\"28\"],\"Mode\":\"Any\"}}},\"NetBiosName\":\"vnevado-win11t.vnevado.alpineskihouse.co\",\"OSFamily\":\"Windows\",\"OSVersion\":\"10.0\",\"DetailedRoles\":[\"PrimaryDevice\"],\"LeadingHost\":true,\"HostMachineId\":null,\"Tags\":[{\"ProviderName\":\"Microsoft Defender for Endpoint\",\"TagId\":\"187c056c-9256-42d4-8989-4c56a9a2ca4d\",\"TagName\":\"Ransomware\",\"TagType\":\"BuiltIn\"}]}}', '', '', '', '', 'AlertEvidence')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "The compromised file exhibiting ransomware-like behavior is `ntoskrnl.exe`.",
+                "observation": "",
+                "reward": 0,
+                "done": true,
+                "info": {
+                    "query_success": true,
+                    "submit": true
+                }
+            }
+        ]
+    },
+    {
+        "success": false,
+        "steps": 13,
+        "reward": 0,
+        "success_query_count": 9,
+        "total_query_count": 12,
+        "question": {
+            "context": "During a security investigation on July 4, 2024, at 22:35:02.654051+00:00, a known credential theft tool was detected. This tool was used to execute a `mimikatz.exe` process on the host `vnevado-win10v` with the IP address `107.224.99.179`. The intention was to dump users' credentials, keys, plain-text passwords, and more.",
+            "question": "As a part of the investigation, which file was used by the Mimikatz credential theft tool on this device?",
+            "answer": "mimidrv.sys",
+            "solution": [
+                "A known credential theft tool execution command line was detected targeting the user with SID `S-5-7-21-1843151660-3234030288-105586167-1422`.",
+                "The Mimikatz credential theft tool, specifically the file `mimidrv.sys`, was detected on this device."
+            ],
+            "start_alert": 129,
+            "end_alert": 151,
+            "start_entities": [
+                33,
+                16,
+                24,
+                35,
+                31,
+                30,
+                34,
+                18,
+                20,
+                17
+            ],
+            "end_entities": [
+                152
+            ],
+            "shortest_alert_path": [
+                129,
+                17,
+                151
+            ]
+        },
+        "trajectory": [
+            {
+                "action": "SHOW TABLES",
+                "observation": "[('AADManagedIdentitySignInLogs',), ('AADNonInteractiveUserSignInLogs',), ('AADProvisioningLogs',), ('AADRiskyUsers',), ('AADServicePrincipalSignInLogs',), ('AADUserRiskEvents',), ('AlertEvidence',), ('AlertInfo',), ('AuditLogs',), ('AzureMetrics',), ('CloudAppEvents',), ('DeviceEvents',), ('DeviceFileCertificateInfo',), ('DeviceFileEvents',), ('DeviceImageLoadEvents',), ('DeviceInfo',), ('DeviceLogonEvents',), ('DeviceNetworkEvents',), ('DeviceNetworkInfo',), ('DeviceProcessEvents',), ('DeviceRegistryEvents',), ('EmailAttachmentInfo',), ('EmailEvents',), ('EmailUrlInfo',), ('Heartbeat',), ('IdentityDirectoryEvents',), ('IdentityLogonEvents',), ('IdentityQueryEvents',), ('MicrosoftAzureBastionAuditLogs',), ('MicrosoftGraphActivityLogs',), ('SecurityAlert',), ('SecurityIncident',), ('SigninLogs',), ('ThreatIntelligenceIndicator',), ('UrlClickEvents',), ('Usage',)]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessName = 'mimikatz.exe' AND DeviceName = 'vnevado-win10v' AND DeviceIPAddress = '107.224.99.179' AND EventTime BETWEEN '2024-07-04 22:34:00' AND '2024-07-04 22:36:00'",
+                "observation": "ProgrammingError: Unknown column 'ProcessName' in 'where clause'",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": false,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE DeviceProcessEvents",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('ProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessSignerType', 'text', 'YES', '', None, ''), ('InitiatingProcessSignatureStatus', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceProcessEvents WHERE FileName = 'mimikatz.exe' AND DeviceName = 'vnevado-win10v' AND ProcessCreationTime BETWEEN '2024-07-04 22:34:00' AND '2024-07-04 22:36:00'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win10v' AND FileName LIKE '%mimikatz%' AND ProcessCreationTime BETWEEN '2024-07-04 22:00:00' AND '2024-07-04 23:00:00'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win10v' AND FileName LIKE '%mimikatz%' AND Timestamp BETWEEN '2024-07-04 22:00:00' AND '2024-07-04 23:00:00'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM AlertEvidence WHERE DeviceName = 'vnevado-win10v' AND AlertTime BETWEEN '2024-07-04 22:00:00' AND '2024-07-04 23:00:00'",
+                "observation": "ProgrammingError: Unknown column 'AlertTime' in 'where clause'",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": false,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE AlertEvidence",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Categories', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('EntityType', 'text', 'YES', '', None, ''), ('EvidenceRole', 'text', 'YES', '', None, ''), ('EvidenceDirection', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('ThreatFamily', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('NetworkMessageId', 'text', 'YES', '', None, ''), ('EmailSubject', 'text', 'YES', '', None, ''), ('ApplicationId', 'text', 'YES', '', None, ''), ('Application', 'text', 'YES', '', None, ''), ('OAuthApplicationId', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM AlertEvidence WHERE DeviceName = 'vnevado-win10v' AND (TimeGenerated BETWEEN '2024-07-04 22:00:00' AND '2024-07-04 23:00:00' OR Timestamp BETWEEN '2024-07-04 22:00:00' AND '2024-07-04 23:00:00')",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM SecurityAlert WHERE DeviceName = 'vnevado-win10v' AND AlertTime BETWEEN '2024-07-04 22:00:00' AND '2024-07-04 23:00:00'",
+                "observation": "ProgrammingError: Unknown column 'DeviceName' in 'where clause'",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": false,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE SecurityAlert",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('DisplayName', 'text', 'YES', '', None, ''), ('AlertName', 'text', 'YES', '', None, ''), ('AlertSeverity', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('VendorName', 'text', 'YES', '', None, ''), ('VendorOriginalId', 'text', 'YES', '', None, ''), ('SystemAlertId', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('SourceComputerId', 'text', 'YES', '', None, ''), ('AlertType', 'text', 'YES', '', None, ''), ('ConfidenceLevel', 'text', 'YES', '', None, ''), ('ConfidenceScore', 'text', 'YES', '', None, ''), ('IsIncident', 'text', 'YES', '', None, ''), ('StartTime', 'text', 'YES', '', None, ''), ('EndTime', 'text', 'YES', '', None, ''), ('ProcessingEndTime', 'text', 'YES', '', None, ''), ('RemediationSteps', 'text', 'YES', '', None, ''), ('ExtendedProperties', 'text', 'YES', '', None, ''), ('Entities', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('WorkspaceSubscriptionId', 'text', 'YES', '', None, ''), ('WorkspaceResourceGroup', 'text', 'YES', '', None, ''), ('ExtendedLinks', 'text', 'YES', '', None, ''), ('ProductName', 'text', 'YES', '', None, ''), ('ProductComponentName', 'text', 'YES', '', None, ''), ('AlertLink', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('CompromisedEntity', 'text', 'YES', '', None, ''), ('Tactics', 'text', 'YES', '', None, ''), ('Techniques', 'text', 'YES', '', None, ''), ('SubTechniques', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM SecurityAlert WHERE StartTime BETWEEN '2024-07-04 22:00:00' AND '2024-07-04 23:00:00'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "Further investigation required outside of database queries to identify the specific file used by Mimikatz on the host vnevado-win10v. The available logs in the database do not directly reveal this information based on the queries executed.",
+                "observation": "",
+                "reward": 0,
+                "done": true,
+                "info": {
+                    "query_success": true,
+                    "submit": true
+                }
+            }
+        ]
+    },
+    {
+        "success": false,
+        "steps": 5,
+        "reward": 0,
+        "success_query_count": 4,
+        "total_query_count": 4,
+        "question": {
+            "context": "A security incident involving Manatee Tempest activity group has been detected, encompassing numerous file system changes on the device `vnevado-win10r`, possibly indicating mass encryption by ransomware. Given that numerous files were appended with a known malicious extension, we need to investigate the file names affected in detail.",
+            "question": "What is the name of the file that had a malicious extension indicative of ransomware activity?",
+            "answer": "characterical.zip.lockbit",
+            "solution": [
+                "The account `dp5hn` may be associated with the Manatee Tempest activity group, which is known for deploying ransomware.",
+                "A possible ransomware activity has been detected with file `characterical.zip.lockbit` showing signs of mass encryption indicative of ransomware."
+            ],
+            "start_alert": 135,
+            "end_alert": 159,
+            "start_entities": [
+                4,
+                5,
+                61,
+                64,
+                65
+            ],
+            "end_entities": [
+                95
+            ],
+            "shortest_alert_path": [
+                135,
+                1,
+                159
+            ]
+        },
+        "trajectory": [
+            {
+                "action": "SHOW TABLES",
+                "observation": "[('AADManagedIdentitySignInLogs',), ('AADNonInteractiveUserSignInLogs',), ('AADProvisioningLogs',), ('AADRiskyUsers',), ('AADServicePrincipalSignInLogs',), ('AADUserRiskEvents',), ('AlertEvidence',), ('AlertInfo',), ('AuditLogs',), ('AzureMetrics',), ('CloudAppEvents',), ('DeviceEvents',), ('DeviceFileCertificateInfo',), ('DeviceFileEvents',), ('DeviceImageLoadEvents',), ('DeviceInfo',), ('DeviceLogonEvents',), ('DeviceNetworkEvents',), ('DeviceNetworkInfo',), ('DeviceProcessEvents',), ('DeviceRegistryEvents',), ('EmailAttachmentInfo',), ('EmailEvents',), ('EmailUrlInfo',), ('Heartbeat',), ('IdentityDirectoryEvents',), ('IdentityLogonEvents',), ('IdentityQueryEvents',), ('MicrosoftAzureBastionAuditLogs',), ('MicrosoftGraphActivityLogs',), ('SecurityAlert',), ('SecurityIncident',), ('SigninLogs',), ('ThreatIntelligenceIndicator',), ('UrlClickEvents',), ('Usage',)]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT * FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win10r'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "DESCRIBE DeviceFileEvents",
+                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginReferrerUrl', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsAzureInfoProtectionApplied', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('PreviousFileName', 'text', 'YES', '', None, ''), ('PreviousFolderPath', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('RequestAccountDomain', 'text', 'YES', '', None, ''), ('RequestAccountName', 'text', 'YES', '', None, ''), ('RequestAccountSid', 'text', 'YES', '', None, ''), ('RequestProtocol', 'text', 'YES', '', None, ''), ('RequestSourceIP', 'text', 'YES', '', None, ''), ('RequestSourcePort', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('SensitivityLabel', 'text', 'YES', '', None, ''), ('SensitivitySubLabel', 'text', 'YES', '', None, ''), ('ShareName', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "SELECT FileName FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win10r'",
+                "observation": "[]",
+                "reward": 0,
+                "done": false,
+                "info": {
+                    "query_success": true,
+                    "submit": false
+                }
+            },
+            {
+                "action": "Unable to identify the file with a malicious extension indicative of ransomware activity due to lack of results from queries. Further information or a different approach may be required to proceed.",
+                "observation": "",
+                "reward": 0,
+                "done": true,
+                "info": {
+                    "query_success": true,
+                    "submit": true
+                }
+            }
+        ]
+    }
+]
