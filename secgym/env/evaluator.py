@@ -22,21 +22,22 @@ Decision: <"True" or "False">
 """ 
 )
 
-CHECK_SOLUTION_PROMPT = dedent("""Given a question and a ground truth solutionm, please evaluate a given solution based on the ground truth solution.
+CHECK_SOLUTION_PROMPT = """Given a question and a ground truth solutionm, please evaluate a given solution based on the ground truth solution.
 
 The ground truth solution may contain several steps. Please check if the given solution contain any of the steps in the ground truth solution.
 Please go through each step in the ground truth solution and evaluate whether the given solution contains the key information in the step.
                                
 Your response should be in JSON format following this format:
-{{
+i is the step number from the ground truth solution, starting from 0
+
+{
     "<i>" : {
             "analysis": "<your analysis>",
             "decision": "<"True" or "False">,
         }
     ...
-}}
-i is the step number from the ground truth solution.
-""")
+}
+"""
 
 
 EVAL_ANSWER_TEMPLATE = dedent("""Question: {question}
