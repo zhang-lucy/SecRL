@@ -151,6 +151,10 @@ class ThuGEnv(gym.Env):
         self.curr_question: Union[dict, None] = None
         self.curr_trajectory = []
         self.all_logs = []
+        if os.path.exists(self.save_file):
+            print(f"Warning: Save file {self.save_file} already exists, by default will append to the file.")
+            with open(self.save_file, "r") as f:
+                self.all_logs = json.load(f)
 
         # evaluator
         self.evaluator = Evaluator(config_list=eval_config_list, ans_check_reflection=ans_check_reflection, sol_check_reflection=sol_check_reflection)
@@ -191,7 +195,6 @@ class ThuGEnv(gym.Env):
             "total_query_count": total_query_count,
             "question": self.curr_question,
             "trajectory": self.curr_trajectory,
-
         }
     
     def save_logging(self):
