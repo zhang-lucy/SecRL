@@ -115,7 +115,7 @@ def get_args():
     parser.add_argument("--eval_model", "-e", type=str, default="gpt-4o", help="Model to use for evaluation")
     parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
     parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
-    parser.add_argument("--max_steps", type=int, default=15, help="Maximum number of steps for the agent")
+    parser.add_argument("--max_steps", type=int, default=30, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
     parser.add_argument("--eval_step", action="store_true", help="Evaluate each step")
     parser.add_argument("--agent", type=str, default="baseline", help="Agent to use for the experiment")
