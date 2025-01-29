@@ -50,38 +50,42 @@ Golden Solution:
 Submitted Answer: 
 {submitted_answer}""")
 
-CHECK_SOLUTION_PROMPT = """Given a security question and a  truth solution, please evaluate the correctness of the a given answer based on the ground truth solution.ground
-The ground truth solution may contain several steps. Please check if the given solution contain any of the steps in the ground truth solution.
-Please go through each step in the ground truth solution and evaluate whether the given solution contains the key information (Indicator of comprise) in the step.
+CHECK_SOLUTION_PROMPT = """Given a security question, a submitted answer, and a ground truth solution, please evaluate the correctness of the submitted answer.
+The ground truth solution may contain several steps. Please go through each step of the ground truth solution and evaluate whether the given answer correctly contains the key information (Indicator of Comprise) of that step.
 Note that the key information should not be the ones that is already present in the question.
          
 Your response should be in JSON format:
 {
     "<step_i>" : {
             "analysis": "<your analysis>",
-            "decision": "<"True" or "False">,
+            "is_step_correct": "<"True" or "False">,
         },
     ...
 }
-step_i is the step number from the ground truth solution, starting from 0. For each step, you must have `analysis` and `decision` fields.
+step_i is the step number from the ground truth solution, starting from 0. 
+For each step, you must have two fields:
+- `analysis`: a quick analysis of whether this step is correct.
+- `is_step_correct`: whether the answer contains key info from this step and is correct.
 """
 
-SOLUTION_CHECKING_REFLECTION_PROMPT = """Given a security question and a  truth solution, please evaluate the correctness of the a given answer based on the ground truth solution.ground
-The ground truth solution may contain several steps. Please check if the given solution contain any of the steps in the ground truth solution.
-Please go through each step in the ground truth solution and evaluate whether the given solution contains the key information (Indicator of comprise) in the step.
+SOLUTION_CHECKING_REFLECTION_PROMPT = """Given a security question, a submitted answer, and a ground truth solution, please evaluate the correctness of the submitted answer.
+The ground truth solution may contain several steps. Please go through each step of the ground truth solution and evaluate whether the given answer correctly contains the key information (Indicator of Comprise) of that step.
 Note that the key information should not be the ones that is already present in the question.
 
-You will also be given a previous evaluation of this solution. Reflect on the previous evaluation and give the final evaluation whether each step in the solution is correct or not.
+You will also be given a previous evaluation of this solution. Based the collected info and this previous evaluation, please make the final decision on whether the submitted answer is correct.
 
 Your response should be in JSON format:
 {
     "<step_i>" : {
-            "reflection": "<your reflection>",
-            "decision": "<"True" or "False">,
-        }
+            "analysis": "<your analysis>",
+            "is_step_correct": "<"True" or "False">,
+        },
     ...
 }
-step_i is the step number from the ground truth solution, starting from 0. For each step, you must have `reflection` and `decision` fields.
+step_i is the step number from the ground truth solution, starting from 0. 
+For each step, you must have two fields:
+- `analysis`: a quick analysis of whether this step is correct based on the given information and the previous evaluation.
+- `is_step_correct`: whether the answer contains key info from this step and is correct.
 """
 
 class Evaluator:
@@ -179,14 +183,14 @@ class Evaluator:
             total_reward = 0
             step_eval = []
             for _, v in response.items():
-                step_eval.append(v["decision"])
+                step_eval.append(v["is_step_correct"])
             # step_eval = list(response.values())
             step_eval.reverse()
             for b in step_eval:
                 if b == "True":
                     total_reward += current_reward
                 if total_reward == 1:
-                    return 1
+                    break
                 current_reward *= discount_factor
 
             eval_dict["reward"] = total_reward
