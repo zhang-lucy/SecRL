@@ -62,9 +62,10 @@ def run_experiment(
                     action, submit = agent.act(observation)
                 except Exception as e:
                     print(f"Error: {e}")
+                    info = {}
                     reward = 0
                     break
-                observation, reward, _, _ = thug_env.step(action=action, submit=submit)
+                observation, reward, _, info = thug_env.step(action=action, submit=submit)
 
                 if submit:
                     break
@@ -96,6 +97,7 @@ def run_experiment(
             "nodes": current_question_key,
             "question_dict": thug_env.curr_question,
             "trial": trial,
+            "info": info,
         }
         result_dict.update(agent.get_logging())
         accum_logs.append(result_dict)

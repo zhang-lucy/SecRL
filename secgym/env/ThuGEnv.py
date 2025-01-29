@@ -256,18 +256,20 @@ class ThuGEnv(gym.Env):
 
             reward = 0
             done = False
+            info = {}
         else:
             print("Warning: Maximum steps reached. Ending the episode.")
             observation = ""
             reward = 0
             done = True
+            info = {}
         
         self.step_count += 1
         
-        info = {
-            "query_success": query_success, 
-            "submit": submit,
-        }
+        info.update({
+            "query_success": query_success,
+            "submit": submit
+        })
 
         self.curr_trajectory.append(
             {
@@ -336,10 +338,11 @@ class ThuGEnv(gym.Env):
         Returns:
             Tuple[np.ndarray, float, bool, Dict]: The observation, reward, done, and info.
         """
+        eval_dict = self._eval(answer)
+        reward = eval_dict["reward"]
+        return "", reward, True, eval_dict
 
-        return "", self._eval(answer), True, {}
-
-    def _eval(self, answer: str) -> float:
+    def _eval(self, answer: str) -> dict:
         """Evaluate the answer and return the score.
         """
         return self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
