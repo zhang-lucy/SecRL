@@ -1,5 +1,5 @@
 from autogen import OpenAIWrapper
-from .agent_utils import sql_parser, msging
+from .agent_utils import sql_parser, msging, call_llm
 # from tenacity import retry, wait_fixed
 import random
 
@@ -53,7 +53,9 @@ class ReflexionAgent:
                  cache_seed=41,
                  max_steps=15,
                  submit_summary=False,
-                 temperature=0
+                 temperature=0,
+                 retry_num=10,
+                 retry_wait_time=5,
                  ):
         self.config_list = config_list
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed, temperature=temperature)
@@ -65,16 +67,15 @@ class ReflexionAgent:
         self.step_count = 0
         self.incident = None
         self.replay_buffer = []
-
+        self.retry_num = retry_num
+        self.retry_wait_time = retry_wait_time
 
     @property
     def name(self):
         return "ReflexionAgent"
 
     def _call_llm(self, messages):
-        response = self.client.create(
-            messages=messages,
-        )
+        response = call_llm(self.client, messages, self.retry_num, self.retry_wait_time)
         return response.choices[0].message.content
     
     def reflect(self):
@@ -101,7 +102,7 @@ class ReflexionAgent:
         #(END OF EXAMPLES)
         REFLECT_PROMPT = f"""You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a question to answer. You were unsuccessful in answering the question either because you guessed the wrong answer with submit[<answer>] or there is a phrasing discrepancy with your provided answer and the answer key. In a few sentences, Diagnose a possible reason for failure or phrasing discrepancy and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.
         Previous trials:
-        {[f"Trial {i}, Reward: {replay["reward"]}, Transcript: {replay["messages"]}" for i,replay in enumerate(replays)]}
+        {[f"Trial {i}, Reward: {replay['reward']}, Transcript: {replay['messages']}" for i,replay in enumerate(replays)]}
         Reflection:
         """
         #print(REFLECT_PROMPT)

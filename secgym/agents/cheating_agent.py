@@ -1,5 +1,5 @@
 from autogen import OpenAIWrapper
-from .agent_utils import sql_parser, msging
+from .agent_utils import sql_parser, msging, call_llm
 # from tenacity import retry, wait_fixed
 
 BASE_PROMPT = """You are a security analyst working on investigating a security incident. 
@@ -53,6 +53,8 @@ class CheatingAgent:
                  max_steps=15,
                  submit_summary=False,
                  temperature=0,
+                 retry_num=10,
+                 retry_wait_time=5,
                  ):
         self.config_list = config_list
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed, temperature=temperature)
@@ -64,14 +66,15 @@ class CheatingAgent:
         self.step_count = 0
         self.incident = None
 
+        self.retry_num = retry_num
+        self.retry_wait_time = retry_wait_time
+
     @property
     def name(self):
         return "CheatingAgent"
 
     def _call_llm(self, messages):
-        response = self.client.create(
-            messages=messages,
-        )
+        response = call_llm(self.client, messages, self.retry_num, self.retry_wait_time)
         return response.choices[0].message.content
         
     def act(self, observation: str):
