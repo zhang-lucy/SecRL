@@ -27,8 +27,7 @@ You are given:
 - A question
 - The golden answer
 - The submitted answer
-You are also give a previous evaluation of this submitted answer. 
-Please serve as a second reviewer to double-check whether the answer is correct.
+You are also give a previous evaluation of this submitted answer. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. To this end, please serve as a second reviewer to double-check whether the answer is correct.
 
 Reflection: <your reflection>
 Decision: <"True" or "False", whether the submitted answer is correct>
@@ -72,7 +71,7 @@ SOLUTION_CHECKING_REFLECTION_PROMPT = """Given a security question, a submitted 
 The ground truth solution may contain several steps. Please go through each step of the ground truth solution and evaluate whether the given answer correctly contains the key information (Indicator of Comprise) of that step.
 Note that the key information should not be the ones that is already present in the question.
 
-You will also be given a previous evaluation of this solution. Based the collected info and this previous evaluation, please make the final decision on whether the submitted answer is correct.
+You will also be given a previous evaluation of this solution. Based the collected info and this previous evaluation, please serve as a second reviewer to make the final decision on whether the submitted answer is correct. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. 
 
 Your response should be in JSON format:
 {

@@ -116,9 +116,9 @@ def get_args():
     parser = argparse.ArgumentParser(description="Run Experienments")
     parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for experiment")
     parser.add_argument("--eval_model", "-e", type=str, default="gpt-4o", help="Model to use for evaluation")
-    parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
+    parser.add_argument("--cache_seed", type=int, default=69, help="Seed for the cache")
     parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
-    parser.add_argument("--max_steps", type=int, default=30, help="Maximum number of steps for the agent")
+    parser.add_argument("--max_steps", type=int, default=25, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
     #parser.add_argument("--eval_step", action="store_true", help="Evaluate each step")
     parser.add_argument("--agent", type=str, default="baseline", help="Agent to use for the experiment")
@@ -197,6 +197,8 @@ if __name__ == "__main__":
             save_file=save_env_file,
             max_steps=max_steps,
             eval_step=eval_step, # boolean: whether to evaluate each step
+            ans_check_reflection=True, # boolean: whether to check reflection in the answer
+            sol_check_reflection=True, # boolean: whether to check reflection in the solution
         )
         thug_env.check_layer(layer) # check if revelant tables is in the database for the layer
         
