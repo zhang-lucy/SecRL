@@ -345,7 +345,14 @@ class ThuGEnv(gym.Env):
     def _eval(self, answer: str) -> dict:
         """Evaluate the answer and return the score.
         """
-        return self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
+        try:
+            eval_dict = self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
+        except Exception as e:
+            eval_dict = {
+                "reward": 0,
+                "error": str(e)
+            }
+        return eval_dict
     
     def check_layer(self, layer: str) -> None:
         assert layer in ["alert", 'log'], "Layer should be either 'alert' or 'log'."
