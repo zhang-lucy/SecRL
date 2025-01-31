@@ -96,13 +96,29 @@ class Evaluator:
                  sol_check_reflection: bool = False
                  ) -> None:
         #print(config_list)
-        self.client = OpenAIWrapper(
-            config_list=config_list,
-            cache_seed=cache_seed
-            )
+        self.llm_config = {
+            "config_list": config_list,
+            "cache_seed": cache_seed,
+        }
+        self.cache_seed = cache_seed
+        self.client = OpenAIWrapper(**self.llm_config)
         self.use_llm = True
         self.ans_check_reflection = ans_check_reflection
         self.sol_check_reflection = sol_check_reflection
+    
+    def _retry_create(self, messages, **kwargs):
+        """Retry at None response"""
+        response = self.client.create(messages=messages, **kwargs)
+        for i in range(10):
+            if response.choices[0].message.content is not None:
+                break
+            self.llm_config["cache_seed"] = self.cache_seed+1+i
+            self.client = OpenAIWrapper(**self.llm_config)
+            response = self.client.create(messages=messages, stop=stop)
+        
+        self.llm_config["cache_seed"] = self.cache_seed
+        self.client = OpenAIWrapper(**self.llm_config)
+        return response
     
     def _get_json_response(
         self,
@@ -113,20 +129,26 @@ class Evaluator:
             msging(system_prompt, role="system"), 
             msging(task, role="user")
         ]
-        response = self.client.create(messages=messages, response_format= { "type": "json_object" }).choices[0].message.content
-        print("\n\n")
-        print(response)
-        if "```json" in response:
-            print("Spearating ```json placeholder")
-            response = response.split("```json")[1].split("```")[0]
-        try:
-            response = json.loads(response)
-            return response, True
-        except Exception as e:
-            print(f"Error: {e}: {response}")
+        for i in range(10):
+            try:
+                response = self._retry_create(messages=messages, response_format= { "type": "json_object" }).choices[0].message.content
+                if "```json" in response:
+                    print("Spearating ```json placeholder")
+                    response = response.split("```json")[1].split("```")[0]
+                response = json.loads(response)
+                break
+            except Exception as e:
+                print(f"Error: {e}: {response}, retry {i+1} time.")
+                self.llm_config["cache_seed"] = self.cache_seed+10+i
+                self.client = OpenAIWrapper(**self.llm_config)
+        
+        self.llm_config["cache_seed"] = self.cache_seed
+        self.client = OpenAIWrapper(**self.llm_config)
+        if not isinstance(response, dict):
+            print("Failed to get response")
             return response, False
-            
-
+        return response, True
+    
     def checking(self, 
                  question: dict, 
                  submitted_answer: str, 
@@ -142,6 +164,16 @@ class Evaluator:
                     print("Warning: No solution in the question. Skipping solution checking...")
                 return eval_dict
             
+            # 2. Check if the solution is correct
+            eval_dict.update(self.check_solution(question, submitted_answer))
+            return eval_dict
+
+    def check_solution(self,
+                       question: dict,
+                       submitted_answer: str
+                       ) -> dict:
+            
+            eval_dict = {}
             # 2. Check if the solution is correct
             if isinstance(question["solution"], list):
                 golden_solution = ""
@@ -201,11 +233,14 @@ class Evaluator:
             return eval_dict
 
     def check_single_response(self, question: dict, submitted_answer: str) -> dict:
+        # Call LLM to evaluate the answer
         input_str = EVAL_ANSWER_TEMPLATE.format(question=get_full_question(question), golden_answer=question["answer"], submitted_answer=submitted_answer)
-        response = self.client.create(messages=[
+        response = self._retry_create(messages=[
             msging(CHECK_ANSWER_PROMPT, role="system"), 
             msging(input_str, role="user")
         ])
+
+        # Parse the response
         response = response.choices[0].message.content
         decision = re.search(r"Decision: (True|False)", response)
         decision = decision.group(1)
@@ -213,15 +248,17 @@ class Evaluator:
         print(f"-----> Answer Evaluation Result: {response}")
         return_dict = {"check_ans_response": response, "reward": int(decision == "True")}
 
+        # Reflection
         if self.ans_check_reflection:
             messages=[
                 msging(ANSWER_CHECKING_REFLECTION_PROMPT, role="system"), 
                 msging(input_str+"\n"+response, role="user")
             ]
-            reflect_response = self.client.create(messages=messages).choices[0].message.content
-            return_dict["check_ans_reflection"] = reflect_response
+            reflect_response = self._retry_create(messages=messages).choices[0].message.content
+
             decision = re.search(r"Decision: (True|False)", reflect_response)
             decision = decision.group(1)
+            return_dict["check_ans_reflection"] = reflect_response
             return_dict['reward'] = int(decision == "True")
             print(f"-----> Answer Evaluation Reflection: {reflect_response}")
         return return_dict
