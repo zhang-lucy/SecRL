@@ -20,11 +20,7 @@ from secgym.env.evaluator import Evaluator
 
 ATTACKS = {
     "incident_5": {
-<<<<<<< HEAD
-        "qafile": "legacy/old_high_score/test/incident_5_qa_incident_o1-ga_c42.json",
-=======
         "qafile": "min_overlap/test/incident_5_qa_incident_o1-ga_c42.json",
->>>>>>> 5b5321b74415a53df389275e1a5854dda3bee753
         "port": "3306",
         "container_name": "incident_5"
     },
