@@ -58,8 +58,24 @@ qa_file_suffix += f"_c{args.cache_seed}.json"
 
 
 set_split = args.split
-original_qa_path = "../env/questions"
-saved_paths_path = "./graph_path"
+original_qa_path = "../env/questions/legacy/old_high_score/test"
+
+relevance_type = "low"
+
+if relevance_type == "low":
+    saved_paths_path = "./low_split"
+    new_qa_path = f"../env/questions/min_overlap/{set_split}"
+elif relevance_type == "high":
+    saved_paths_path = "./high_split"
+    new_qa_path = f"../env/questions/max_overlap/{set_split}"
+elif relevance_type == "median":
+    saved_paths_path = "./median_split"
+    new_qa_path = f"../env/questions/median_overlap/{set_split}"
+else:
+    raise ValueError("Invalid relevance type")
+
+os.makedirs(new_qa_path, exist_ok=True)
+
 
 t = 0
 print(f"Generating QA for the {set_split} set...")
@@ -71,7 +87,7 @@ for file in graph_files:
         cache_seed=41
     )
 
-    # load the original question file if it exists
+    # 1. load the original question file if it exists
     qas = []
     origin_qa_file = f"{original_qa_path}/{file.split('.')[0]}_{qa_file_suffix}"
     if os.path.exists(origin_qa_file):
@@ -87,7 +103,7 @@ for file in graph_files:
         question_paths = json.load(f)
 
     # resume from new qa file if it exists
-    current_qa_path = f"{original_qa_path}/{set_split}/{file.split('.')[0]}_{qa_file_suffix}"
+    current_qa_path = f"{new_qa_path}/{file.split('.')[0]}_{qa_file_suffix}"
     if os.path.exists(current_qa_path):
         with open(current_qa_path, "r") as f:
             new_qas = json.load(f)
@@ -108,7 +124,7 @@ for file in graph_files:
             all_questions.append(question)
         # save the questions
         # Note this is a new path
-        with open(f"{original_qa_path}/{set_split}/{file.split('.')[0]}_{qa_file_suffix}", "w") as f:
+        with open(current_qa_path, "w") as f:
             json.dump(all_questions, f, indent=4)
     t+=len(path_from_split)
 
