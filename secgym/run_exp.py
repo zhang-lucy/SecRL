@@ -32,7 +32,7 @@ def run_experiment(
         with open(save_agent_file, "r") as f:
             accum_logs = json.load(f)
             accum_reward = sum([log["reward"] for log in accum_logs])
-            accum_success = sum([log["reward"] for log in accum_logs])
+            accum_success = sum([log["reward"]==1 for log in accum_logs])
             tested_num = len(accum_logs)
             tested_question_keys = set([log["nodes"] for log in accum_logs])
             print(f"Loaded logs from {save_agent_file}")
@@ -93,8 +93,8 @@ def run_experiment(
         
         #saving logs
         result_dict = {
-            "reward": reward,
             "nodes": current_question_key,
+            "reward": reward,
             "question_dict": thug_env.curr_question,
             "trial": trial,
             "info": info,
@@ -186,8 +186,8 @@ if __name__ == "__main__":
         print(f"Running attack: {attack}")
         sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}"
         os.makedirs(f"{base_dir}/{sub_dir}", exist_ok=True)
-        save_agent_file = f"{base_dir}/{sub_dir}/env_{attack}.json" 
-        save_env_file = f"{base_dir}/{sub_dir}/agent_{attack}.json"
+        save_agent_file = f"{base_dir}/{sub_dir}/agent_{attack}.json" 
+        save_env_file = f"{base_dir}/{sub_dir}/env_{attack}.json"
 
         # break
 
