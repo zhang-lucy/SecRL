@@ -80,6 +80,87 @@ CONFIG_LIST = [
       "tags": ["o1-ga"],
       "azure_ad_token_provider": token_provider
   },
+
+  {
+    "model": "gpt-4o-mini",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-2",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-3",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-4",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+    {
+    "model": "gpt-4o-mini-5",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-6",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-7",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-8",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+    {
+    "model": "gpt-4o-mini-9",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-4o-mini-10",
+    "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["4o-mini"],
+    "azure_ad_token_provider": token_provider
+  },
 ]
 
 config_list_o1 = [
