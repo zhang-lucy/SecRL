@@ -316,7 +316,7 @@ if __name__ == "__main__":
     parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
     parser.add_argument('--respawn', action='store_true', help='Delete and recreate the container')
     parser.add_argument('--debug', action='store_true', help='Debug mode')
-    parser.add_argument('--layer', type=str, default="alert", help='Layer to use for the agent')
+    parser.add_argument('--layer', type=str, default="log", help='Layer to use for the agent')
     args = parser.parse_args()
     # make sure the data is downloaded and stored in the 'large_data' folder
 
