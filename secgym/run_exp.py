@@ -114,14 +114,14 @@ def run_experiment(
 #TODO: fix eval step default value
 def get_args():
     parser = argparse.ArgumentParser(description="Run Experienments")
-    parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for experiment")
+    parser.add_argument("--model", "-m", type=str, default="4o-mini", help="Model to use for experiment")
     parser.add_argument("--eval_model", "-e", type=str, default="gpt-4o", help="Model to use for evaluation")
-    parser.add_argument("--cache_seed", type=int, default=75, help="Seed for the cache")
+    parser.add_argument("--cache_seed", type=int, default=78, help="Seed for the cache")
     parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
     parser.add_argument("--max_steps", type=int, default=25, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="log", help="Layer to use for the agent")
     #parser.add_argument("--eval_step", action="store_true", help="Evaluate each step")
-    parser.add_argument("--agent", type=str, default="prompt_sauce", help="Agent to use for the experiment")
+    parser.add_argument("--agent", type=str, default="baseline", help="Agent to use for the experiment")
     parser.add_argument("--num_trials", type=int, default=1, help="Number of trials to run for each question if not solved")
     args = parser.parse_args()
     return args
