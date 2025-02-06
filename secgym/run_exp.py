@@ -43,13 +43,17 @@ def run_experiment(
             agent.replay_buffer = []
         tested_num += 1 # increment tested number of questions
 
+        trials = {}
         for trial in range(num_trials):
             if i == num_test:
                 print(f"Tested {num_test} questions. Stopping...")
                 break
-
+            
+            # reset environment and agent
             observation, _ = thug_env.reset(i) # first observation is question dict
             agent.reset()
+
+            # check if question has been tested before
             current_question_key = f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}"
             if current_question_key in tested_question_keys:
                 print(f"Skipping question with key {current_question_key}")
@@ -81,23 +85,29 @@ def run_experiment(
                     "trial": trial,
                 }
                 agent.replay_buffer.append(replay)
-
+            
             # printing logs
             print(f"Question {i+1} | Reward: {reward} || Accumlated Success: {accum_success}/{tested_num}={accum_success/(tested_num):.3f} | Avg Reward so far: {accum_reward/(tested_num):.3f}")  
             print("*"*50, "\n", "*"*50)
 
-            #correct answer found -> stop trials
+            trials[trial] = {
+                reward: reward,
+                "info": info,
+            }
+            trials[trial].update(agent.get_logging())
+
+            # correct answer found -> stop trials
             if reward == 1:
                 print(f"Skipping question {i+1} as it has been solved")
                 break
+
         
         #saving logs
         result_dict = {
             "nodes": current_question_key,
             "reward": reward,
             "question_dict": thug_env.curr_question,
-            "trial": trial,
-            "info": info,
+            "trials": trials,
         }
         result_dict.update(agent.get_logging())
         accum_logs.append(result_dict)
