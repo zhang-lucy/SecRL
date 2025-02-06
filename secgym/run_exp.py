@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
     for attack in ATTACKS:
         print(f"Running attack: {attack}")
-        sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}"
+        sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}_s{max_steps}_trial{num_trials}"
         os.makedirs(f"{base_dir}/{sub_dir}", exist_ok=True)
         save_agent_file = f"{base_dir}/{sub_dir}/agent_{attack}.json" 
         save_env_file = f"{base_dir}/{sub_dir}/env_{attack}.json"

@@ -142,6 +142,7 @@ class ThuGEnv(gym.Env):
         )
         if self.connection.is_connected():
             self.cursor = self.connection.cursor()
+            self.cursor.execute("SET SESSION MAX_EXECUTION_TIME=30000")
             self.cursor.execute(f"USE {database_name};")
         else:
             raise ValueError("Could not connect to the database.")
