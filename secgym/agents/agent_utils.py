@@ -29,12 +29,24 @@ def sql_parser(action: str, code_block=False):
         return action, True, submit
     return action, False, submit
 
-def call_llm(client:OpenAIWrapper, messages:List[str], retry_num=10, retry_wait_time=5) -> ChatCompletion:
+def call_llm(
+        client:OpenAIWrapper, 
+        model:str,
+        messages:List[str], 
+        retry_num=10, 
+        retry_wait_time=5,
+        temperature=None
+    ) -> ChatCompletion:
+
     for _ in range(retry_num):
         try: 
-            response = client.create(
-                messages=messages,
-            )
+            if "o1" in model:
+                messages[0]['role'] = 'user'
+                response = client.create(messages=messages, model=model)
+            elif "o3" in model:
+                response = client.create(messages=messages, model=model)
+            else:
+                response = client.create(messages=messages, model=model, temperature=temperature)
             break
         except TimeoutError as e:
             time.sleep(retry_wait_time)

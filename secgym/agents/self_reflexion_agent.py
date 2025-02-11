@@ -58,7 +58,8 @@ class ReflexionAgent:
                  retry_wait_time=5,
                  ):
         self.config_list = config_list
-        self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed, temperature=temperature)
+        self.temperature = temperature
+        self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
 
@@ -75,7 +76,14 @@ class ReflexionAgent:
         return "ReflexionAgent"
 
     def _call_llm(self, messages):
-        response = call_llm(self.client, messages, self.retry_num, self.retry_wait_time)
+        response = call_llm(
+            client=self.client, 
+            model=self.config_list[0]['model'],
+            messages=messages,
+            retry_num=self.retry_num,
+            retry_wait_time=self.retry_wait_time,
+            temperature=self.temperature
+        )
         return response.choices[0].message.content
     
     def reflect(self):
