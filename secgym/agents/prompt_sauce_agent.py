@@ -119,8 +119,11 @@ class PromptSauceAgent:
             summary_prompt = "You have reached maximum number of steps. Please summarize your findings of key information, and sumbit them."
             self._add_message(summary_prompt, role="system")
 
+        split_str = "\nAction:"
+        if "**Action:**" in response:
+            split_str = "\n**Action:**"
         try:
-            thought, action = response.strip().split(f"\nAction:")
+            thought, action = response.strip().split(split_str)
             self._add_message(response.strip(), role="assistant")
         except:
             print("\nRetry Split Action:")
