@@ -50,6 +50,7 @@ Action can be one of the following:
 
 You should only give one thought-action per response. The action from your response will be executed and the result will be shown to you.
 Follow the format "Thought: ....\nAction: ...." exactly.
+In action, put your SQL query in [] brackets directly. For example, "execute[SELECT ...]" or "execute[SHOW ...]"
 """
 
 class BaselineAgent:
