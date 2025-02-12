@@ -34,6 +34,24 @@ Action can be one of the following:
 When submitting an answer, please summarize key information from intermediate steps that lead to your answer.
 """
 
+O1_PROMPT = """You are a security analyst. 
+You need to answer a given security question by querying the database.
+The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
+Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
+
+Your response should always be a thought-action pair:
+Thought: <your reasoning>
+Action: <your action>
+
+In Thought, you can analyse and reason about the current situation, 
+Action can be one of the following: 
+(1) execute[<your sql query>], which executes the SQL query
+(2) submit[<your answer>], which is the final answer to the question
+
+You should only give one thought-action per response. The action from your response will be executed and the result will be shown to you.
+Follow the format "Thought: ....\nAction: ...." exactly.
+"""
+
 class BaselineAgent:
     def __init__(self,
                  config_list,
@@ -48,6 +66,8 @@ class BaselineAgent:
         self.temperature = temperature
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
+        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model']:
+            sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
 
         self.max_steps = max_steps
@@ -116,5 +136,3 @@ class BaselineAgent:
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
         self.client.clear_usage_summary()
-
-
