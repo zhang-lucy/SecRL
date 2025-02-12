@@ -161,6 +161,32 @@ CONFIG_LIST = [
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
+  {
+    "model": "o3-mini",
+    "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-12-01-preview",
+    "tags": ["o3-mini"],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "o1-mini-2024-09-12-global",
+    "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["o1-mini"],
+    "price" : [1.1/1000, 4.4/1000],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "o1-mini-2024-09-12-standard",
+    "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2024-08-01-preview",
+    "tags": ["o1-mini"],
+    "price" : [1.1/1000, 4.4/1000],
+    "azure_ad_token_provider": token_provider
+  },
 ]
 
 config_list_o1 = [
