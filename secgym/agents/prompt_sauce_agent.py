@@ -63,12 +63,11 @@ Action: <your SQL query>
 
 In Thought, you can analyse and reason about the current situation, 
 Action can be one of the following: 
-(1) execute[<your query>], which executes the SQL query
+(1) execute[<your sql query>], which executes the SQL query. For example, execute[DESCRIBE table_name].
 (2) submit[<your answer>], which is the final answer to the question
 
 You should only give one thought-action per response. The action from your response will be executed and the result will be shown to you.
 Follow the format "Thought: ....\nAction: ...." exactly.
-In action, put your SQL query in [] brackets directly. For example, "execute[SELECT ...]" or "execute[SHOW ...]"
 """
 
 

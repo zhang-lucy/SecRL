@@ -12,6 +12,8 @@ def msging(msg: str, role: str="user"):
 
 
 def sql_parser(action: str, code_block=False):
+    # remove ` in the str
+    action = action.replace("`", "")
     if "submit[" in action:
         pattern = r'submit\[(.*)\]'
         submit = True
