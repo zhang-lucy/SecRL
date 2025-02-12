@@ -25,7 +25,7 @@ Action can be one of the following:
 
 BASE_SUMMARY_PROMPT = """You are a security analyst working on investigating a security incident. 
 You need to answer a given question about the security incident by querying the database of security logs provided to you.
-The logs are stored in a MySQL database, yodatabaseu can use SQL queries to retrieve entries as needed.
+The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
 Note there are more than 20 tables in the , so you may need to explore the schema or check example entries to understand the database structure.
 
 A security incident is composed of a group of related alerts connected by data elements or entities that are shared between the alerts such as User accounts, Hosts, Mailboxes, IP addresses, Files, Cloud applications, Processes, URLs etc. Alerts are signals that result from various threat detection activities. These signals indicate the occurrence of malicious or suspicious events in your environment. Besides the security alert signals, you can also find additional information in the raw logs like device events, user activities, network traffic, etc. 
