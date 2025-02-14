@@ -50,6 +50,7 @@ Action can be one of the following:
 
 You should only give one thought-action per response. The action from your response will be executed and the result will be shown to you.
 Follow the format "Thought: ....\nAction: ...." exactly.
+Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
 """
 
 class BaselineAgent:
@@ -137,5 +138,7 @@ class BaselineAgent:
     def reset(self):
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
+        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
+            sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
         self.client.clear_usage_summary()
