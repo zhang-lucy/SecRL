@@ -6,7 +6,7 @@ from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
-from secgym.agents import BaselineAgent, CheatingAgent, PromptSauceAgent, ReflexionAgent
+from secgym.agents import BaselineAgent, CheatingAgent, PromptSauceAgent, ReflexionAgent, MultiModelBaselineAgent
 
 #config_list_4_turbo, config_list_35
 
@@ -124,14 +124,14 @@ def run_experiment(
 #TODO: fix eval step default value
 def get_args():
     parser = argparse.ArgumentParser(description="Run Experienments")
-    parser.add_argument("--model", "-m", type=str, default="o1-mini", help="Model to use for experiment")
+    parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for experiment")
     parser.add_argument("--eval_model", "-e", type=str, default="gpt-4o", help="Model to use for evaluation")
-    parser.add_argument("--cache_seed", type=int, default=92, help="Seed for the cache")
+    parser.add_argument("--cache_seed", type=int, default=96, help="Seed for the cache")
     parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
     parser.add_argument("--max_steps", type=int, default=25, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
     #parser.add_argument("--eval_step", action="store_true", help="Evaluate each step")
-    parser.add_argument("--agent", type=str, default="baseline", help="Agent to use for the experiment")
+    parser.add_argument("--agent", type=str, default="multi_model_baseline", help="Agent to use for the experiment")
     parser.add_argument("--num_trials", type=int, default=1, help="Number of trials to run for each question if not solved")
     args = parser.parse_args()
     return args
@@ -177,6 +177,15 @@ if __name__ == "__main__":
     elif args.agent == "reflexion":
         test_agent = ReflexionAgent(
             config_list=agent_config_list,
+            cache_seed=cache_seed, 
+            temperature=temperature,
+            max_steps=max_steps,
+        )
+    elif args.agent == "multi_model_baseline":
+        agent_config_list_master = filter_config_list(CONFIG_LIST, "o1-mini")
+        test_agent = MultiModelBaselineAgent(
+            config_list_master=agent_config_list_master,
+            config_list_slave=agent_config_list,
             cache_seed=cache_seed, 
             temperature=temperature,
             max_steps=max_steps,
