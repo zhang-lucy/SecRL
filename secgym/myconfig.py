@@ -78,6 +78,7 @@ CONFIG_LIST = [
       "api_type": "azure",
       "api_version": "2024-12-01-preview",
       "tags": ["o1-ga"],
+      "price": [15.0/1000, 60.0/1000],
       "azure_ad_token_provider": token_provider
   },
 
@@ -166,6 +167,7 @@ CONFIG_LIST = [
     "base_url": "https://devpythiaaoaieus2.openai.azure.com",
     "api_type": "azure",
     "api_version": "2024-12-01-preview",
+    "price": [1.1/1000, 4.4/1000],
     "tags": ["o3-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -175,7 +177,7 @@ CONFIG_LIST = [
     "api_type": "azure",
     "api_version": "2024-08-01-preview",
     "tags": ["o1-mini"],
-    "price" : [1.1/1000, 4.4/1000],
+    "price" : [1.1/1000, 4.4/1000], #TODO: This is wrong price, it should be [3.0/1000, 12.0/1000]
     "azure_ad_token_provider": token_provider
   },
   {
@@ -184,7 +186,7 @@ CONFIG_LIST = [
     "api_type": "azure",
     "api_version": "2024-08-01-preview",
     "tags": ["o1-mini"],
-    "price" : [1.1/1000, 4.4/1000],
+    "price" : [1.1/1000, 4.4/1000], #TODO: This is wrong price, it should be [3.0/1000, 12.0/1000]
     "azure_ad_token_provider": token_provider
   },
 ]

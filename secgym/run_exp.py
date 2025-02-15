@@ -126,7 +126,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Run Experienments")
     parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for experiment")
     parser.add_argument("--eval_model", "-e", type=str, default="gpt-4o", help="Model to use for evaluation")
-    parser.add_argument("--cache_seed", type=int, default=96, help="Seed for the cache")
+    parser.add_argument("--cache_seed", type=int, default=98, help="Seed for the cache")
     parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
     parser.add_argument("--max_steps", type=int, default=25, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
@@ -182,7 +182,7 @@ if __name__ == "__main__":
             max_steps=max_steps,
         )
     elif args.agent == "multi_model_baseline":
-        agent_config_list_master = filter_config_list(CONFIG_LIST, "o1-mini")
+        agent_config_list_master = filter_config_list(CONFIG_LIST, "o1-ga")
         test_agent = MultiModelBaselineAgent(
             config_list_master=agent_config_list_master,
             config_list_slave=agent_config_list,
