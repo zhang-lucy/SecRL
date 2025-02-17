@@ -256,6 +256,35 @@
         ]
     },
     {
+        "context": "",
+        "question": "Can you identify the command line associated with the suspicious PowerShell activity observed on the machine?",
+        "answer": "1348__2024-06-26t12:00:40.0878355z__\"schtasks.exe\" /create /sc once /tn yrei /tr \"c:\\users\\samuelf\\onedrive - (new) alpineskihouse\\desktop\\winatp-intro-backdoor.exe\" /st 11:58 /f",
+        "solution": [
+            "The account with SID `S-1-5-21-1870156660-7534030218-135086563-1193` was involved in dropping a suspicious file via PowerShell on the machine.",
+            "A suspicious PowerShell command was executed with Process ID `1348` at `2024-06-26t12:00:40.0878355z`, instructing the creation of a scheduled task using `schtasks.exe` to run the executable `winatp-intro-backdoor.exe` from the path `c:\\users\\samuelf\\onedrive - (new) alpineskihouse\\desktop`."
+        ],
+        "start_alert": 25,
+        "end_alert": 10,
+        "start_entities": [
+            1,
+            2,
+            5,
+            6,
+            7,
+            8,
+            9,
+            16
+        ],
+        "end_entities": [
+            13
+        ],
+        "shortest_alert_path": [
+            25,
+            5,
+            10
+        ]
+    },
+    {
         "context": "A security incident involving an anomalous scheduled task was created on a device using `schtasks.exe`. This incident could be used by an attacker to obtain persistence on the device. The command involved in this alert was: `schtasks.exe /create /sc once /tn yrei /tr \"c:\\users\\samuelf\\onedrive - (new) alpineskihouse\\desktop\\winatp-intro-backdoor.exe\" /st 11:58 /f`. This suggests that the attacker may be trying to gain persistence by scheduling the execution of a potentially malicious executable.",
         "question": "A related alert indicates suspicious activity involving PowerShell to download a file or run an encoded command. Can you identify the process that was used in this suspicious activity?",
         "answer": "winword.exe",
@@ -959,6 +988,58 @@
         ]
     },
     {
+        "context": {
+            "Security Incident": "Automated investigation started manually involving an uncommon file being created and added to a Run Key.",
+            "Start Alert": {
+                "Time": "2024-07-04 22:35:00.400749+00:00",
+                "Name": "Automated investigation started manually",
+                "Description": "User u141 (u141@ash.alpineskihouse.co) initiated an automated investigation on host `vnevado-win10e.vnevado.alpineskihouse.co`."
+            },
+            "Connected Entities": [
+                {
+                    "Type": "host",
+                    "Field": "HostName",
+                    "Value": "vnevado-win10e"
+                },
+                {
+                    "Type": "host",
+                    "Field": "AadDeviceId",
+                    "Value": "02b8f519-1123-4228-b32a-ccb78af3449f"
+                }
+            ],
+            "End Alert": {
+                "Time": "2024-07-04 22:35:02.252731+00:00",
+                "Name": "An uncommon file was created and added to a Run Key",
+                "Description": "An uncommon file was observed being created on this machine and was added to a Registry Key to ensure it runs after reboot."
+            },
+            "End Entity": {
+                "Type": "account",
+                "Field": "AadUserId",
+                "Value": "16320fec-8d90-403b-b7fe-78f715d4728d"
+            }
+        },
+        "question": "Can you obtain the AadUserId of the user associated with the alert where an uncommon file was created and added to a Run Key?",
+        "answer": "16320fec-8d90-403b-b7fe-78f715d4728d",
+        "solution": [
+            "User with email `u141@ash.alpineskihouse.co` initiated an Automated investigation on the device with AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`.",
+            "An uncommon file was created and added to a Run Key by the user with AadUserId `16320fec-8d90-403b-b7fe-78f715d4728d`."
+        ],
+        "start_alert": 0,
+        "end_alert": 23,
+        "start_entities": [
+            1,
+            2
+        ],
+        "end_entities": [
+            6
+        ],
+        "shortest_alert_path": [
+            0,
+            2,
+            23
+        ]
+    },
+    {
         "context": "An uncommon file was created and added to a Run Key on a machine, which is a tactic an attacker might use to maintain persistence. For more information, refer to the Simulated threat Threat Analytics report available online. The associated IP address for this activity is `72.5.72.208`.",
         "question": "What is the name of the suspicious file dropped and executed by Powershell on the machine?",
         "answer": "winatp-intro-backdoor.exe",
@@ -1200,6 +1281,41 @@
             26,
             5,
             23
+        ]
+    },
+    {
+        "context": {
+            "incidentTime": "2024-07-04 22:35:00.698474+00:00",
+            "alertName": "Suspicious process executed PowerShell command",
+            "processDetails": "A command in PowerShell was executed by a suspicious process. The command was executed by the process `powershell.exe`.",
+            "extractedFiles": [
+                "powershell.exe",
+                "winatp-intro-backdoor.exe"
+            ]
+        },
+        "question": "What is the hostname on which u141 initiated an Automated investigation?",
+        "answer": "vnevado-win10e",
+        "solution": [
+            "A suspicious process executed a PowerShell command on the host with AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`.",
+            "An automated investigation was started manually by u141 (u141@ash.alpineskihouse.co) on the host `vnevado-win10e`."
+        ],
+        "start_alert": 3,
+        "end_alert": 0,
+        "start_entities": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+        ],
+        "end_entities": [
+            1
+        ],
+        "shortest_alert_path": [
+            3,
+            2,
+            0
         ]
     },
     {
