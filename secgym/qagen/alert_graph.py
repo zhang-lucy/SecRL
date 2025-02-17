@@ -459,10 +459,10 @@ class AlertGraph:
         # allocated_counts = [int(r * m) for r in ratios]
         allocated_counts = [min(int(r * m), len(difficulty_groups[d])) for r, d in zip(ratios, difficulties)]
 
-        print(f"Difficulty : Ratios")
-        for i, difficulty in enumerate(difficulties):
-            print(f"{difficulty} : {ratios[i]}")
-        print(len(alert_paths), f"Allocated counts: {allocated_counts}", f"Leftover: {m - sum(allocated_counts)}")
+        # print(f"Difficulty : Ratios")
+        # for i, difficulty in enumerate(difficulties):
+        #     print(f"{difficulty} : {ratios[i]}")
+        # print(len(alert_paths), f"Allocated counts: {allocated_counts}", f"Leftover: {m - sum(allocated_counts)}")
 
         # Handle leftover counts
         leftover = m - sum(allocated_counts)

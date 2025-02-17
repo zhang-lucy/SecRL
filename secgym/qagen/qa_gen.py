@@ -10,7 +10,7 @@ import autogen
 class QAGen:
     def __init__(self,
                  config_list: list,
-                 graph_path: str,
+                 graph_path: str = None,
                  qa_path: str = None,
                  cache_seed: int = None,
                  trial: int = 5,
@@ -42,7 +42,7 @@ class QAGen:
             self.alert_graph = AlertGraph()
             self.alert_graph.load_graph_from_graphml(self.graph_path)
             print("Alert graph loaded.")
-            self.all_paths = self.alert_graph.get_alert_paths(num_select=self.max_question_count)
+            self.all_paths = self.alert_graph.get_alert_paths(num_select=self.max_question_count, verbose=False)
             
         self.all_questions = []
         self.trial = trial  
@@ -53,7 +53,7 @@ class QAGen:
         self.alert_graph = AlertGraph()
         self.alert_graph.load_graph_from_graphml(self.graph_path)
         print("Alert graph loaded.")
-        self.all_paths = self.alert_graph.get_alert_paths(num_select=self.max_question_count)
+        self.all_paths = self.alert_graph.get_alert_paths(num_select=self.max_question_count, verbose=False)
 
     def format_alert_entity_str(self, alert_node: int, entities:list):
         entity_str = ""

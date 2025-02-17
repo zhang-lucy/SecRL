@@ -3,6 +3,7 @@ from secgym.qagen.qa_gen import QAGen
 import os
 import argparse
 import json
+import random
 
 def get_args():
     parser = argparse.ArgumentParser(description="Run Alert QA Generation")
@@ -13,7 +14,9 @@ def get_args():
     parser.add_argument("--model", "-m", type=str, default="o1-ga", help="Model to use for QA generation")
     parser.add_argument("--solution_model", "-s", type=str, default="o1-ga", help="Model to use for solution generation")
     parser.add_argument("--include_incident", action="store_false", help="Include incident context in the question prompt")
-    parser.add_argument("--split", type=str, default="test", help="Split to generate QA for")
+    parser.add_argument("--split", type=str, default="train", help="Split to generate QA for")
+    parser.add_argument("--relevant_type", type=str, default="low", help="Relevance type for the QA")
+    parser.add_argument("--train_cap", type=int, default=100, help="Cap for the number of training questions")
     args = parser.parse_args()
     return args
 
@@ -56,11 +59,10 @@ if args.solution_model is not None and args.solution_model != args.model:
     qa_file_suffix += f"_{args.solution_model}"
 qa_file_suffix += f"_c{args.cache_seed}.json"
 
-
 set_split = args.split
+relevance_type = args.relevant_type
+train_cap = args.train_cap
 original_qa_path = "../env/questions/legacy/old_high_score/test"
-
-relevance_type = "low"
 
 if relevance_type == "low":
     saved_paths_path = "./low_split"
@@ -78,40 +80,42 @@ os.makedirs(new_qa_path, exist_ok=True)
 
 
 t = 0
-print(f"Generating QA for the {set_split} set...")
+print(f"Generating QA for the {set_split} set with relevance type {relevance_type}")
 for file in graph_files:
     skip_count = 0
     qagenena = QAGen(
         config_list=CONFIG_LIST, 
-        graph_path=os.path.join("graph_files", file),
+        # graph_path=os.path.join("graph_files", file),
         cache_seed=41
     )
 
     # 1. load the original question file if it exists
     qas = []
+    existing_qa_map = {}
     origin_qa_file = f"{original_qa_path}/{file.split('.')[0]}_{qa_file_suffix}"
     if os.path.exists(origin_qa_file):
         with open(origin_qa_file, "r") as f:
             qas = json.load(f)    
-    # construct (start_alert, end_alert) : question dict
-    existing_qa_map = {}
     for qa in qas:
         existing_qa_map[(qa["start_alert"], qa["end_alert"])] = qa
-    
-    # open graph paths file json
-    with open(os.path.join(saved_paths_path, file.split('.')[0] + ".json"), "r") as f:
-        question_paths = json.load(f)
 
-    # resume from new qa file if it exists
+    # 1.2 resume from new qa file if it exists
     current_qa_path = f"{new_qa_path}/{file.split('.')[0]}_{qa_file_suffix}"
     if os.path.exists(current_qa_path):
         with open(current_qa_path, "r") as f:
             new_qas = json.load(f)
             for qa in new_qas:
                 existing_qa_map[(qa["start_alert"], qa["end_alert"])] = qa
-                        
-    all_questions = []
+
+    # 2. open graph paths file json
+    with open(os.path.join(saved_paths_path, file.split('.')[0] + ".json"), "r") as f:
+        question_paths = json.load(f)
     path_from_split = question_paths[set_split]
+    if set_split == 'train' and train_cap > 0:
+        path_from_split = random.sample(path_from_split, min(train_cap, len(path_from_split)))
+    print(f"Generating QA for {file}... for {len(path_from_split)} questions")
+
+    all_questions = []
     for path_dict in path_from_split:
         start_alert = path_dict["start_alert"]
         end_alert = path_dict["end_alert"]
