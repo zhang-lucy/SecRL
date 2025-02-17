@@ -133,6 +133,7 @@ def get_args():
     #parser.add_argument("--eval_step", action="store_true", help="Evaluate each step")
     parser.add_argument("--agent", type=str, default="multi_model_baseline", help="Agent to use for the experiment")
     parser.add_argument("--num_trials", type=int, default=1, help="Number of trials to run for each question if not solved")
+    parser.add_argument("--split", type=str, default="test", help="Split to use for the experiment")
     args = parser.parse_args()
     return args
 
@@ -207,14 +208,15 @@ if __name__ == "__main__":
     os.makedirs(base_dir, exist_ok=True)
     agent_name = test_agent.name
 
+    sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}_s{max_steps}_trial{num_trials}"
+    if args.split != "test":
+        sub_dir += f"_{args.split}"
+    os.makedirs(f"{base_dir}/{sub_dir}", exist_ok=True)
+
     for attack in ATTACKS:
         print(f"Running attack: {attack}")
-        sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}_s{max_steps}_trial{num_trials}"
-        os.makedirs(f"{base_dir}/{sub_dir}", exist_ok=True)
         save_agent_file = f"{base_dir}/{sub_dir}/agent_{attack}.json" 
         save_env_file = f"{base_dir}/{sub_dir}/env_{attack}.json"
-
-        # break
 
         thug_env = ThuGEnv(
             attack=attack,
