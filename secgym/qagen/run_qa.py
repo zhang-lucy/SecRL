@@ -85,7 +85,7 @@ for file in graph_files:
     skip_count = 0
     qagenena = QAGen(
         config_list=CONFIG_LIST, 
-        # graph_path=os.path.join("graph_files", file),
+        graph_path=os.path.join("graph_files", file),
         cache_seed=41
     )
 
