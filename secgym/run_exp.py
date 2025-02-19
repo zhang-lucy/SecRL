@@ -226,6 +226,7 @@ if __name__ == "__main__":
             eval_step=eval_step, # boolean: whether to evaluate each step
             ans_check_reflection=True, # boolean: whether to check reflection in the answer
             sol_check_reflection=True, # boolean: whether to check reflection in the solution
+            split=args.split,
         )
         thug_env.check_layer(layer) # check if revelant tables is in the database for the layer
         

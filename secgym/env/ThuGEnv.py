@@ -95,7 +95,8 @@ class ThuGEnv(gym.Env):
             add_hint: bool = False,
             eval_step: bool = False,
             ans_check_reflection: bool = False,
-            sol_check_reflection: bool = False
+            sol_check_reflection: bool = False,
+            split: str = "test"
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
@@ -127,7 +128,11 @@ class ThuGEnv(gym.Env):
         attack_info = ATTACKS[self.attack]
 
         curr_path = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(curr_path, f'questions/{attack_info["qafile"]}'), "r") as f:
+        if split == "test":
+            qafile = attack_info["qafile"]
+        else:
+            qafile = attack_info["qafile"].replace("test", split)
+        with open(os.path.join(curr_path, f'questions/{qafile}'), "r") as f:
             self._all_questions = json.load(f)
             self.num_questions = len(self._all_questions)
 
