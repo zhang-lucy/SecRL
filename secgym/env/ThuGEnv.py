@@ -20,42 +20,42 @@ from secgym.env.evaluator import Evaluator
 
 ATTACKS = {
     "incident_5": {
-        "qafile": "incident_5_qa.json",
+        "qafile": "min_overlap/test/incident_5_qa_incident_o1-ga_c42.json",
         "port": "3306",
         "container_name": "incident_5"
     },
     "incident_38": {
-        "qafile": "incident_38_qa.json",
+        "qafile": "min_overlap/test/incident_38_qa_incident_o1-ga_c42.json",
         "port": "3307",
         "container_name": "incident_38"
     },
     "incident_34": {
-        "qafile": "incident_34_qa.json",
+        "qafile": "min_overlap/test/incident_34_qa_incident_o1-ga_c42.json",
         "port": "3308",
         "container_name": "incident_34"
     },
     "incident_39": {
-        "qafile": "incident_39_qa.json",
+        "qafile": "min_overlap/test/incident_39_qa_incident_o1-ga_c42.json",
         "port": "3309",
         "container_name": "incident_39"
     },
     "incident_55": {
-        "qafile": "incident_55_qa.json",
+        "qafile": "min_overlap/test/incident_55_qa_incident_o1-ga_c42.json",
         "port": "3310",
         "container_name": "incident_55"
     },
     "incident_134": {
-        "qafile": "incident_134_qa.json",
+        "qafile": "min_overlap/test/incident_134_qa_incident_o1-ga_c42.json",
         "port": "3311",
         "container_name": "incident_134"
     },
     "incident_166": {
-        "qafile": "incident_166_qa.json",
+        "qafile": "min_overlap/test/incident_166_qa_incident_o1-ga_c42.json",
         "port": "3312",
         "container_name": "incident_166"
     },
     "incident_322": {
-        "qafile": "incident_322_qa.json",
+        "qafile": "min_overlap/test/incident_322_qa_incident_o1-ga_c42.json",
         "port": "3313",
         "container_name": "incident_322"
     },
@@ -83,7 +83,7 @@ class ThuGEnv(gym.Env):
     def __init__(
             self,
             attack: Union[str, int],
-            config_list: List[Dict] = None,
+            eval_config_list: List[Dict] = None,
             noise_level: int = 0,
             save_file: Union[str, bool] = True,
             max_steps: int = 15,
@@ -93,7 +93,10 @@ class ThuGEnv(gym.Env):
             database_name: str = "env_monitor_db", # sql database name
             # port: str = "3306",
             add_hint: bool = False,
-            eval_step: bool = False
+            eval_step: bool = False,
+            ans_check_reflection: bool = False,
+            sol_check_reflection: bool = False,
+            split: str = "test"
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
@@ -125,7 +128,11 @@ class ThuGEnv(gym.Env):
         attack_info = ATTACKS[self.attack]
 
         curr_path = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(curr_path, f'questions/{attack_info["qafile"]}'), "r") as f:
+        if split == "test":
+            qafile = attack_info["qafile"]
+        else:
+            qafile = attack_info["qafile"].replace("test", split)
+        with open(os.path.join(curr_path, f'questions/{qafile}'), "r") as f:
             self._all_questions = json.load(f)
             self.num_questions = len(self._all_questions)
 
@@ -140,6 +147,7 @@ class ThuGEnv(gym.Env):
         )
         if self.connection.is_connected():
             self.cursor = self.connection.cursor()
+            self.cursor.execute("SET SESSION MAX_EXECUTION_TIME=30000")
             self.cursor.execute(f"USE {database_name};")
         else:
             raise ValueError("Could not connect to the database.")
@@ -149,9 +157,13 @@ class ThuGEnv(gym.Env):
         self.curr_question: Union[dict, None] = None
         self.curr_trajectory = []
         self.all_logs = []
+        if os.path.exists(self.save_file):
+            print(f"Warning: Save file {self.save_file} already exists, by default will append to the file.")
+            with open(self.save_file, "r") as f:
+                self.all_logs = json.load(f)
 
         # evaluator
-        self.evaluator = Evaluator(config_list=config_list)
+        self.evaluator = Evaluator(config_list=eval_config_list, ans_check_reflection=ans_check_reflection, sol_check_reflection=sol_check_reflection)
 
     def get_attack_list(self):
         """Get the list of attacks.
@@ -189,7 +201,6 @@ class ThuGEnv(gym.Env):
             "total_query_count": total_query_count,
             "question": self.curr_question,
             "trajectory": self.curr_trajectory,
-
         }
     
     def save_logging(self):
@@ -251,18 +262,20 @@ class ThuGEnv(gym.Env):
 
             reward = 0
             done = False
+            info = {}
         else:
             print("Warning: Maximum steps reached. Ending the episode.")
             observation = ""
             reward = 0
             done = True
+            info = {}
         
         self.step_count += 1
         
-        info = {
-            "query_success": query_success, 
-            "submit": submit,
-        }
+        info.update({
+            "query_success": query_success,
+            "submit": submit
+        })
 
         self.curr_trajectory.append(
             {
@@ -331,13 +344,39 @@ class ThuGEnv(gym.Env):
         Returns:
             Tuple[np.ndarray, float, bool, Dict]: The observation, reward, done, and info.
         """
+        eval_dict = self._eval(answer)
+        reward = eval_dict["reward"]
+        return "", reward, True, eval_dict
 
-        return "", self._eval(answer), True, {}
-
-    def _eval(self, answer: str) -> float:
+    def _eval(self, answer: str) -> dict:
         """Evaluate the answer and return the score.
         """
-        return self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
+        try:
+            eval_dict = self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
+        except Exception as e:
+            eval_dict = {
+                "reward": 0,
+                "error": str(e)
+            }
+        return eval_dict
+    
+    def check_layer(self, layer: str) -> None:
+        assert layer in ["alert", 'log'], "Layer should be either 'alert' or 'log'."
+
+        tables, _ = self.execute_query(f"SHOW TABLES;")
+        # print(tables)
+        # print(type(tables))
+        tables = str(tables)
+
+        if layer == "log":
+            assert "AlertEvidence" not in tables, "With 'log' level, the table 'AlertEvidence' should not be present."
+            assert "AlertInfo" not in tables, "With 'log' level, the table 'AlertInfo' should not be present."
+            assert "SecurityAlert" not in tables, "With 'log' level, the table 'SecurityAlert' should not be present."
+        elif layer == "alert":
+            assert "AlertEvidence" in tables, "With 'alert' level, the table 'AlertEvidence' should be present."
+            assert "AlertInfo" in tables, "With 'alert' level, the table 'AlertInfo' should be present."
+            assert "SecurityAlert" in tables, "With 'alert' level, the table 'SecurityAlert' should be present."
+            
 
 
 if __name__ == "__main__":

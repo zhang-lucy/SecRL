@@ -141,15 +141,20 @@ def create_sql_file_from_csv_folder(
     ]
     for file_name in os.listdir(csv_folder):
 
+        #skipping apple metadata stuff
+        if file_name.startswith("._"):
+            continue    
+            
         if file_name.replace(".csv", "").strip() in skip_tables: 
             if verbose:
                 print(f"Skipping table {file_name}")
             continue
         if file_name.endswith(".csv"):
             table_name = file_name.replace(".csv", "")
+            
             # check meta file exists
             if os.path.exists(os.path.join(csv_folder, f"{table_name}.meta")):
-                with open(os.path.join(csv_folder, f"{table_name}.meta"), 'r') as meta_file:
+                with open(os.path.join(csv_folder, f"{table_name}.meta"),  'r') as meta_file:
                     type_map = json.load(meta_file)
             else:
                 print(f"Meta file not found for {table_name}. Inferring types from the CSV file...")
@@ -311,6 +316,7 @@ if __name__ == "__main__":
     parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
     parser.add_argument('--respawn', action='store_true', help='Delete and recreate the container')
     parser.add_argument('--debug', action='store_true', help='Debug mode')
+    parser.add_argument('--layer', type=str, default="alert", help='Layer to use for the agent')
     args = parser.parse_args()
     # make sure the data is downloaded and stored in the 'large_data' folder
 
@@ -324,8 +330,20 @@ if __name__ == "__main__":
         debug_tables(args)
         exit(0)
 
+    # - Log level: minimum info, everything should be excluded
+    if args.layer == "log":
+        skip_tables = ["AzureDiagnostics", "LAQueryLogs", "SecurityIncident", "SecurityAlert", "AlertEvidence", "AlertInfo"]
+    # - Incident level: Have access to security incidents, but not the alerts
+    elif args.layer == "incident":
+        skip_tables = ["AzureDiagnostics", "LAQueryLogs", "SecurityAlert", "AlertEvidence", "AlertInfo"]
+    elif args.layer == "alert":
+        # - Alert level: Have access to all:
+        skip_tables = ["AzureDiagnostics", "LAQueryLogs"]
+    else:
+        raise ValueError(f"Invalid layer: {args.layer}")
+
     # 1. create a .sql file from the CSV  filesin the 'large_data' folder
-    skip_tables = ["SecurityAlert", "SecurityIncident", "AzureDiagnostics", "LAQueryLogs"]
+    #skip_tables = ["AzureDiagnostics", "LAQueryLogs", "SecurityIncident"] #TODO: add "AlertEvidence", "AlertInfo","SecurityAlert"
     # skip_tables += ["DeviceFileEvents"]
     create_sql_file_from_csv_folder(
         csv_folder=csv_folder,
