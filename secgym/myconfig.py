@@ -189,6 +189,15 @@ CONFIG_LIST = [
     "price" : [1.1/1000, 4.4/1000], #TODO: This is wrong price, it should be [3.0/1000, 12.0/1000]
     "azure_ad_token_provider": token_provider
   },
+  #fine-tuned models
+  {
+    "model": "gpt-4o-2024-08-06-secrl_cv1",
+    "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2025-01-01-preview",
+    "tags": ["gpt-4o-ft-cv1"],
+    "azure_ad_token_provider": token_provider
+  }
 ]
 
 config_list_o1 = [
