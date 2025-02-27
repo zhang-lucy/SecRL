@@ -127,7 +127,8 @@ class Evaluator:
                  ans_check_reflection: bool = False,
                  sol_check_reflection: bool = False,
                  step_checking: bool = False,
-                 strict_check: bool = False
+                 strict_check: bool = False,
+                 verbose: bool = False
                  ) -> None:
         #print(config_list)
         self.llm_config = {
@@ -141,6 +142,7 @@ class Evaluator:
         self.sol_check_reflection = sol_check_reflection
         self.step_checking = step_checking
         self.strict_check = strict_check
+        self.verbose = verbose
 
         if strict_check:
             self.ans_check_prompt = STRICT_ANSWER_CHECK_PROMPT
@@ -234,15 +236,17 @@ class Evaluator:
             if not is_json_success:
                 return eval_dict
             
-            print("Ground Truth Solution:")
-            for k in question["solution"]:
-                print(k)
-            print(f"-----> Solution Evaluation Result:\n {str(response)}\n--------------------")
+            if self.verbose:
+                print("Ground Truth Solution:")
+                for k in question["solution"]:
+                    print(k)
+                print(f"-----> Solution Evaluation Result:\n {str(response)}\n--------------------")
 
             if self.sol_check_reflection:
                 reflection_str = solution_str + "\n" + json.dumps(response)
                 reflect_reponse, is_reflect_success = self._get_json_response(STEP_CHECK_REFLECTION_PROMPT, reflection_str)
-                print(f"-----> Solution Evaluation Reflection: \n{str(response)}\n--------------------")
+                if self.verbose:
+                    print(f"-----> Solution Evaluation Reflection: \n{str(response)}\n--------------------")
                 eval_dict["is_reflect_success"] = is_reflect_success
                 eval_dict["check_sol_reflection"] = reflect_reponse
                 if not is_reflect_success:
@@ -291,8 +295,9 @@ class Evaluator:
         response = response.choices[0].message.content
         decision = re.search(r"Is_Answer_Correct: (True|False)", response)
         decision = decision.group(1)
-        print("Ground Truth Answer:", question["answer"])
-        print(f"-----> Answer Evaluation Result: {response}")
+        if self.verbose:
+            print("Ground Truth Answer:", question["answer"])
+            print(f"-----> Answer Evaluation Result: {response}")
         return_dict = {"check_ans_response": response, "reward": int(decision == "True")}
 
         # Reflection
@@ -307,7 +312,8 @@ class Evaluator:
             decision = decision.group(1)
             return_dict["check_ans_reflection"] = reflect_response
             return_dict['reward'] = int(decision == "True")
-            print(f"-----> Answer Evaluation Reflection: {reflect_response}")
+            if self.verbose:
+                print(f"-----> Answer Evaluation Reflection: {reflect_response}")
         return return_dict
         
         
