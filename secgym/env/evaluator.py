@@ -16,6 +16,8 @@ You are given:
 - The question
 - The golden answer
 - The submitted answer
+                                   
+If the submitted answer is a large enumeration of information containing the golden answer, it should be considered as false. For example, if the question ask about compromised IP addresses and the submitted answer enumerates all the IP addresses in the database, then it is false. However, if the submitted answer contains the golden answer along with some additional context useful for the investigation, it should be considered as true. For example, if the question asks about compromised IP addresses and the submitted answer contains the golden answer along with 2 other compromised IP addresses, then it is true. Use your best judgement to decide whether the enumeration is too large or if the additional context is useful for the investigation. 
 
 First give a brief analysis using 1-2 short sentences, then give your decision.
 Follow this format:
@@ -28,7 +30,9 @@ You are given:
 - The question
 - The golden answer
 - The submitted answer
-You are also give a previous evaluation of this submitted answer. Based on the given information, serve as a second reviewer to double-check whether the answer is correct.
+You are also give a previous evaluation of this submitted answer. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. To this end, please serve as a second reviewer to double-check whether the submitted answer is correct.
+
+If the submitted answer is a large enumeration of information containing the golden answer, it should be considered as false. For example, if the question ask about compromised IP addresses and the submitted answer enumerates all the IP addresses in the database, then it is false. However, if the submitted answer contains the golden answer along with some additional context useful for the investigation, it should be considered as true. For example, if the question asks about compromised IP addresses and the submitted answer contains the golden answer along with 2 other compromised IP addresses, then it is true. Use your best judgement to decide whether the enumeration is too large or if the additional context is useful for the investigation. 
 
 Follow this format:
 Reflection: <your reflection on previous evaluation>
@@ -51,13 +55,13 @@ Is_Answer_Correct: <"True" or "False">
 """ )
 
 STRICT_ANSWER_CHECK_REFLECTION_PROMPT = """Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
-- if the submitted answer gives several possible answers, you should mark it as False no matter if the golden answer is one of the answers.
+- if the submitted answer gives several possible answers, you should mark it as False even if the golden answer is one of the answers.
 
 You are given:
 - The question
 - The golden answer
 - The submitted answer
-You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
+You are also give a previous evaluation of this submitted answer. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. To this end, please serve as a second reviewer to double-check whether the submitted answer is correct.
 
 Follow this format:
 Reflection: <your reflection on previous evaluation>

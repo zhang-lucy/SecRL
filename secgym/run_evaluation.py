@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
-from secgym.env.evaluation.evaluator import Evaluator
+from secgym.env.evaluator import Evaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
@@ -152,8 +152,8 @@ def run_evaluation(
             info = agent_log_entry["info"]
             last_message = agent_log_entry["messages"][-1]['content']
         else:
-            info = agent_log_entry["0"]["info"] # assume only one trial
-            last_message = agent_log_entry["0"]["messages"][-1]['content']
+            info = agent_log_entry['trials']["0"]["info"] # assume only one trial
+            last_message = agent_log_entry['trials']["0"]["messages"][-1]['content']
 
         if "submit" not in info:
             print(agent_log_entry['nodes'], save_agent_file, info)
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     )
 
     base_files = [
-        # "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
+        "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
         "BaselineAgent_gpt-4o_c70_alert_level_t0_s25_trial1",
         "BaselineAgent_gpt-4o_c102_alert_level_t0_s25_trial1_train",
         "BaselineAgent_gpt-4o-ft-cv1_c102_alert_level_t0_s25_trial1",
@@ -250,10 +250,10 @@ if __name__ == "__main__":
     ]
 
     consider_rerun = [
-         "PromptSauceAgent_4o-mini_c73_alert_level_t0_s25_trial1",
-         "PromptSauceAgent_gpt-4o_c72_alert_level_t0_s25_trial1",
-         "PromptSauceAgent_4o-mini_c79_alert_level_t0_s15_trial2",
-         "PromptSauceAgent_gpt-4o_c83_alert_level_t0_s15_trial2",
+         "PromptSauceAgent_4o-mini_c73_alert_level_t0_s25_trial1",# rerun 3 trials
+         "PromptSauceAgent_gpt-4o_c72_alert_level_t0_s25_trial1", # rerun 3 trials
+         "PromptSauceAgent_4o-mini_c79_alert_level_t0_s15_trial2", # no need to run
+         "PromptSauceAgent_gpt-4o_c83_alert_level_t0_s15_trial2", # no need to run
     ] # On Hold
     reflections = [
         "ReflexionAgent_gpt-4o_c101_alert_level_t0_s15_trial3_train",
@@ -270,7 +270,6 @@ if __name__ == "__main__":
                 evaluator=evaluator,
                 save_agent_file=f"./final_results/{base_file}/agent_{attack}.json",
                 save_env_file=f"./final_results/{base_file}/env_{attack}.json",
-                base_file=base_file,
+                #base_file=base_file,
                 is_update_file=True,
             )
-        break
