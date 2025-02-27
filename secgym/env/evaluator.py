@@ -11,28 +11,76 @@ Golden Answer: {golden_answer}
                               
 Submitted Answer: {submitted_answer}""")
 
-FUZZY_ANSWER_CHECK_PROMPT = dedent("""Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
+FUZZY_ANSWER_CHECK_PROMPT = dedent("""Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer.
 You are given:
 - The question
 - The golden answer
 - The submitted answer
                                    
-If the submitted answer is a large enumeration of information containing the golden answer, it should be considered as false. For example, if the question ask about compromised IP addresses and the submitted answer enumerates all the IP addresses in the database, then it is false. However, if the submitted answer contains the golden answer along with some additional context useful for the investigation, it should be considered as true. For example, if the question asks about compromised IP addresses and the submitted answer contains the golden answer along with 2 other compromised IP addresses, then it is true. Use your best judgement to decide whether the enumeration is too large or if the additional context is useful for the investigation. 
+Note:
+The submitted answer does not need to match the golden answer exactly unless its a unique identifier. But the key content should be present.
+If the submitted answer presents the golden answer along with additional context, it should be considered correct.
+If the submitted answer is an extensive enumeration that includes the golden answer but lacks relevance, it should be considered false.
+If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true.
+For time-based questions, the submitted answer should be within a reasonable time frame of the golden answer and the format of the timestamps is not required to match exactly.
 
+Examples:
+Example 1
+Golden Answer: notepad.exe
+Submitted Answer: notepad is running
+Analysis: Although the submitted answer is lacking the ".exe" extension, it is correct because the file name is correct, which is the key information.
+Is_Answer_Correct: True
+
+Example 2
+Golden Answer: vnevado-win11u
+Submitted Answer: The hostnames of the target devices involved in the 'CommandAndControl' malware attempts are: 'vnevado-win10s', 'vnevado-win10r', 'vnevado-win11t', and 'vnevado-win11u'. 
+Analysis: The submitted answer is correct because it contains the golden answer along with additional context that is useful for the investigation since it provides the hostnames of all the target devices that were targetted by the command and control malware.
+Is_Answer_Correct: True
+
+Example 3
+Golden Answer: 72.153.24.3
+Submitted Answer: These are the IP addresses are related to this incident: [72.153.24.3, 43.22.123.45, 293.56.765.54, 99.24.34.28, ....]
+Analysis: The submitted answer is incorrect because it contains too many IP addresses, potentially all that are in the database. It will be hard to conduct further investigation with this information.
+Is_Answer_Correct: False                                   
+                                   
 First give a brief analysis using 1-2 short sentences, then give your decision.
 Follow this format:
 Analysis: <your analysis>
 Is_Answer_Correct: <"True" or "False">       
 """ )
 
-FUZZY_ANSWER_CHECK_REFLECTION_PROMPT = """Given a golden answer and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
+FUZZY_ANSWER_CHECK_REFLECTION_PROMPT = """Given a golden answer and a submitted answer, please evaluate whether the submitted answer matches the golden answer.
 You are given:
 - The question
 - The golden answer
 - The submitted answer
 You are also give a previous evaluation of this submitted answer. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. To this end, please serve as a second reviewer to double-check whether the submitted answer is correct.
 
-If the submitted answer is a large enumeration of information containing the golden answer, it should be considered as false. For example, if the question ask about compromised IP addresses and the submitted answer enumerates all the IP addresses in the database, then it is false. However, if the submitted answer contains the golden answer along with some additional context useful for the investigation, it should be considered as true. For example, if the question asks about compromised IP addresses and the submitted answer contains the golden answer along with 2 other compromised IP addresses, then it is true. Use your best judgement to decide whether the enumeration is too large or if the additional context is useful for the investigation. 
+Note:
+The submitted answer does not need to match the golden answer exactly unless its a unique identifier. But the key content should be present.
+If the submitted answer presents the golden answer along with additional context, it should be considered correct.
+If the submitted answer is an extensive enumeration that includes the golden answer but lacks relevance, it should be considered false.
+If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true.
+For time-based questions, the submitted answer should be within a reasonable time frame of the golden answer and the format of the timestamps is not required to match exactly.
+
+Examples:
+Example 1
+Golden Answer: notepad.exe
+Submitted Answer: notepad is running
+Analysis: Although the submitted answer is lacking the ".exe" extension, it is correct because the file name is correct, which is the key information.
+Is_Answer_Correct: True
+
+Example 2
+Golden Answer: vnevado-win11u
+Submitted Answer: The hostnames of the target devices involved in the 'CommandAndControl' malware attempts are: 'vnevado-win10s', 'vnevado-win10r', 'vnevado-win11t', and 'vnevado-win11u'. 
+Analysis: The submitted answer is correct because it contains the golden answer along with additional context that is useful for the investigation since it provides the hostnames of all the target devices that were targetted by the command and control malware.
+Is_Answer_Correct: True
+
+Example 3
+Golden Answer: 72.153.24.3
+Submitted Answer: These are the IP addresses are related to this incident: [72.153.24.3, 43.22.123.45, 293.56.765.54, 99.24.34.28, ....]
+Analysis: The submitted answer is incorrect because it contains too many IP addresses, potentially all that are in the database. It will be hard to conduct further investigation with this information.
+Is_Answer_Correct: False  
 
 Follow this format:
 Reflection: <your reflection on previous evaluation>

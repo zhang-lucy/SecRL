@@ -12,6 +12,7 @@ from secgym.utils import get_full_question
 #config_list_4_turbo, config_list_35
 import autogen
 from secgym.agents.agent_utils import sql_parser
+import sys
 
 
 
@@ -197,11 +198,12 @@ def run_evaluation(
         
         if eval_dict['reward'] != old_reward:
             changed_reward += 1
-            print(f"question {agent_log_entry['nodes']} | reward: {old_reward} -> {eval_dict['reward']}")
-            print("Submitted Answer", submitted_answer)
-            print("Correct Answer", agent_log_entry["question_dict"]['answer'])
-            print("Evaluation", eval_dict['check_ans_response'])
-            print("Reflection on Explanation", eval_dict['check_ans_reflection'])
+            with open('test.txt', 'a') as sys.stdout:
+                print(f"question {agent_log_entry['nodes']} | reward: {old_reward} -> {eval_dict['reward']}")
+                print("Submitted Answer", submitted_answer)
+                print("Correct Answer", agent_log_entry["question_dict"]['answer'])
+                print("Evaluation", eval_dict['check_ans_response'])
+                print("Reflection on Explanation", eval_dict['check_ans_reflection'])
 
     print(f"Re-evaluated {reevaluated_count} questions | Changed reward: {changed_reward}")
 
