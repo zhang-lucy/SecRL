@@ -187,7 +187,6 @@ class Evaluator:
             "cache_seed": cache_seed,
         }
         self.cache_seed = cache_seed
-        self.client = OpenAIWrapper(**self.llm_config)
         self.use_llm = True
         self.ans_check_reflection = ans_check_reflection
         self.sol_check_reflection = sol_check_reflection
@@ -204,16 +203,18 @@ class Evaluator:
     
     def _retry_create(self, messages, **kwargs):
         """Retry at None response"""
-        response = self.client.create(messages=messages, **kwargs)
+        tmp_config = self.llm_config.copy()
+        tmp_config.update(kwargs)
+        client = OpenAIWrapper(**tmp_config)
+        
+        response = client.create(messages=messages, **kwargs)
         for i in range(10):
             if response.choices[0].message.content is not None:
                 break
-            self.llm_config["cache_seed"] = self.cache_seed+1+i
-            self.client = OpenAIWrapper(**self.llm_config)
-            response = self.client.create(messages=messages, **kwargs)
-        
-        self.llm_config["cache_seed"] = self.cache_seed
-        self.client = OpenAIWrapper(**self.llm_config)
+            tmp_config["cache_seed"] = self.cache_seed+1+i
+            client = OpenAIWrapper(**tmp_config)
+            response = client.create(messages=messages, **kwargs)
+
         return response
     
     def _get_json_response(
@@ -236,10 +237,8 @@ class Evaluator:
             except Exception as e:
                 print(f"Error: {e}: {response}, retry {i+1} time.")
                 self.llm_config["cache_seed"] = self.cache_seed+10+i
-                self.client = OpenAIWrapper(**self.llm_config)
         
         self.llm_config["cache_seed"] = self.cache_seed
-        self.client = OpenAIWrapper(**self.llm_config)
         if not isinstance(response, dict):
             print("Failed to get response")
             return response, False
