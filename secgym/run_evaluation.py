@@ -198,6 +198,10 @@ def run_evaluation(
         if eval_dict['reward'] != old_reward:
             changed_reward += 1
             print(f"question {agent_log_entry['nodes']} | reward: {old_reward} -> {eval_dict['reward']}")
+            print("Submitted Answer", submitted_answer)
+            print("Correct Answer", agent_log_entry["question_dict"]['answer'])
+            print("Evaluation", eval_dict['check_ans_response'])
+            print("Reflection on Explanation", eval_dict['check_ans_reflection'])
 
     print(f"Re-evaluated {reevaluated_count} questions | Changed reward: {changed_reward}")
 
