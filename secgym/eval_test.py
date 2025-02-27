@@ -1,5 +1,5 @@
 import json
-from secgym.env.evaluator import Evaluator
+from secgym.env.evaluation.evaluator import Evaluator
 from secgym.myconfig import CONFIG_LIST
 
 import autogen

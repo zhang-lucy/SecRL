@@ -1,5 +1,5 @@
 import json
-from secgym.env.evaluator import Evaluator
+from secgym.env.evaluation.evaluator import Evaluator
 
 with open("/Users/kevin/Downloads/SecRL/secgym/agent_experiment_logs/base_agent_experiments_4o/alert_level/incident_5_agent_log_gpt-4o_46_alert.json", "r") as f:
     agent_log = json.load(f)
