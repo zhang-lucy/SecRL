@@ -8,8 +8,12 @@ from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
 from secgym.agents import BaselineAgent, CheatingAgent, PromptSauceAgent, ReflexionAgent, MultiModelBaselineAgent
-
+from secgym.utils import get_full_question
 #config_list_4_turbo, config_list_35
+import autogen
+from secgym.agents.agent_utils import sql_parser
+
+
 
 def run_experiment(
         agent,
@@ -92,7 +96,7 @@ def run_experiment(
             print("*"*50, "\n", "*"*50)
 
             trials[trial] = {
-                "reward": reward,
+                reward: reward,
                 "info": info,
             }
             trials[trial].update(agent.get_logging())
@@ -122,23 +126,96 @@ def run_experiment(
     
     return accum_success, tested_num, accum_reward
 
-#TODO: fix eval step default value
-def get_args():
-    parser = argparse.ArgumentParser(description="Run Experienments")
-    parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for experiment")
-    parser.add_argument("--eval_model", "-e", type=str, default="gpt-4o", help="Model to use for evaluation")
-    parser.add_argument("--cache_seed", type=int, default=103, help="Seed for the cache")
-    parser.add_argument("--temperature", type=int, default=0, help="Temperature for the model")
-    parser.add_argument("--max_steps", type=int, default=25, help="Maximum number of steps for the agent")
-    parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
-    #parser.add_argument("--step_checking", action="store_true", help="Evaluate each step")
-    parser.add_argument("--agent", type=str, default="baseline", help="Agent to use for the experiment")
-    parser.add_argument("--num_trials", type=int, default=1, help="Number of trials to run for each question if not solved")
-    parser.add_argument("--split", type=str, default="test", help="Split to use for the experiment")
-    args = parser.parse_args()
-    return args
 
-import autogen
+def run_evaluation(
+    evaluator: Evaluator,
+    save_agent_file: str,
+    save_env_file: str,
+    # base_file: str,
+    is_update_file: bool = False,
+):
+    """
+    Run evaluation on the agent logs"
+    """
+    with open(save_agent_file, "r") as f:
+        agent_log = json.load(f)
+    
+    with open(save_env_file, "r") as f:
+        env_log = json.load(f)
+
+    # print(f"len agent log: {len(agent_log)} | len env log: {len(env_log)}")
+    reevaluated_count = 0
+    changed_reward = 0
+
+    for i, agent_log_entry in enumerate(agent_log):
+        if "info" in agent_log_entry:
+            info = agent_log_entry["info"]
+            last_message = agent_log_entry["messages"][-1]['content']
+        else:
+            info = agent_log_entry["0"]["info"] # assume only one trial
+            last_message = agent_log_entry["0"]["messages"][-1]['content']
+
+        if "submit" not in info:
+            print(agent_log_entry['nodes'], save_agent_file, info)
+            continue
+        
+        if i < len(env_log):
+            assert agent_log_entry['question_dict']['start_alert'] == env_log[i]['question']['start_alert']
+            assert agent_log_entry['question_dict']['end_alert'] == env_log[i]['question']['end_alert']
+        
+        if not info['submit']:
+            continue # skip if not submitted
+        
+        # get env log entry
+        # if submit, last action is the submitted answer
+        if i < len(env_log):
+            submitted_answer = env_log[i]['trajectory'][-1]['action']
+        else:
+            submitted_answer, _, is_submit = sql_parser(last_message)
+
+        old_reward = agent_log_entry["reward"]
+
+        # re-evaluate
+        eval_dict = evaluator.checking(question=agent_log_entry["question_dict"], submitted_answer=submitted_answer)
+        reevaluated_count += 1
+
+        # ------------------------------------
+        info.update(eval_dict) # update info with eval results
+
+        # update agent log entry
+        agent_log_entry['reward'] = eval_dict["reward"]
+        if "info" in agent_log_entry:
+            agent_log_entry["info"] = info
+        else:
+            agent_log_entry["0"]["info"] = info
+        
+        # update env log entry
+        if i < len(env_log):
+            env_log[i]['reward'] = eval_dict["reward"]
+            env_log[i]['trajectory'][-1]['reward'] = eval_dict["reward"]
+            env_log[i]['trajectory'][-1]['info'] = info
+        
+        if eval_dict['reward'] != old_reward:
+            changed_reward += 1
+            print(f"question {agent_log_entry['nodes']} | reward: {old_reward} -> {eval_dict['reward']}")
+
+    print(f"Re-evaluated {reevaluated_count} questions | Changed reward: {changed_reward}")
+
+    if is_update_file:
+        with open(save_agent_file, "w") as f:
+            json.dump(agent_log, f, indent=4)
+        with open(save_env_file, "w") as f:
+            json.dump(env_log, f, indent=4)
+
+
+# check if submit
+# no submit -> 0
+
+# data
+# data['reward']
+# if data['info'] doesn't exist -> data['info']['1'] or data['info']['0'] find info 
+# 
+
 def filter_config_list(config_list, model_name):
     config_list = autogen.filter_config(config_list, {'tags': [model_name]})
     if len(config_list) == 0:
@@ -146,21 +223,10 @@ def filter_config_list(config_list, model_name):
     return config_list
 
 if __name__ == "__main__":
-    # curr_time = datetime.now().strftime("%Y%m%d-%H%M%S")
-    args = get_args()
-
-    model = args.model
-    eval_model = args.eval_model
-    cache_seed = args.cache_seed
-    temperature = args.temperature
-    max_steps = args.max_steps
-    assert args.layer in ["log", "alert"], "Layer must be either 'log' or 'alert'"
-    layer = args.layer
-    num_trials = args.num_trials
-
-    agent_config_list = filter_config_list(CONFIG_LIST, model)
+    eval_model = "gpt-4o"
+    cache_seed = 102
+    temperature = 0
     eval_config_list = filter_config_list(CONFIG_LIST, eval_model)
-
     evaluator = Evaluator(
         config_list=eval_config_list, 
         ans_check_reflection=True, 
@@ -169,81 +235,42 @@ if __name__ == "__main__":
         strict_check=False,
     )
 
-    if args.agent == "baseline":
-        test_agent = BaselineAgent(
-            config_list=agent_config_list,
-            cache_seed=cache_seed, 
-            temperature=temperature,
-            max_steps=max_steps,
-        )
-    elif args.agent == "prompt_sauce":
-        test_agent = PromptSauceAgent(
-            config_list=agent_config_list,
-            cache_seed=cache_seed, 
-            temperature=temperature,
-            max_steps=max_steps,
-        )
-    elif args.agent == "reflexion":
-        test_agent = ReflexionAgent(
-            config_list=agent_config_list,
-            cache_seed=cache_seed, 
-            temperature=temperature,
-            max_steps=max_steps,
-        )
-    elif args.agent == "multi_model_baseline":
-        agent_config_list_master = filter_config_list(CONFIG_LIST, "o3-mini")
-        test_agent = MultiModelBaselineAgent(
-            config_list_master=agent_config_list_master,
-            config_list_slave=agent_config_list,
-            cache_seed=cache_seed, 
-            temperature=temperature,
-            max_steps=max_steps,
-        )
-    elif args.agent == "cheating":
-        pass
-        # # For cheating agent
-        # graph_path = f"qagen/graph_files/{attack}.graphml"
-        # alert_graph = AlertGraph()
-        # alert_graph.load_graph_from_graphml(graph_path)
-        # incident = alert_graph.incident
-        # agent.incident = incident
-        # # print(incident)
-        # # exit()
-    else:
-        raise ValueError(f"Invalid agent name: {args.agent}, please modify run_exp.py to include the agent")
+    base_files = [
+        # "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
+        "BaselineAgent_gpt-4o_c70_alert_level_t0_s25_trial1",
+        "BaselineAgent_gpt-4o_c102_alert_level_t0_s25_trial1_train",
+        "BaselineAgent_gpt-4o-ft-cv1_c102_alert_level_t0_s25_trial1",
+        "BaselineAgent_o1-mini_c92_alert_level_t0_s25_trial1",
+        "BaselineAgent_o3-mini_c99_alert_level_t0_s25_trial1",
 
-    base_dir = "final_results"
-    os.makedirs(base_dir, exist_ok=True)
-    agent_name = test_agent.name
+        # new ones: info only in trias['i']['info']
+        "MultiModelBaselineAgent_master_o1_mini_slave_gpt-4o_c96_alert_level_t0_s25_trial1",
+        "MultiModelBaselineAgent_master_o1_slave_gpt-4o_c98_alert_level_t0_s25_trial1",
+        "MultiModelBaselineAgent_master_o3_mini_slave_gpt-4o_c100_alert_level_t0_s25_trial1",
+    ]
 
-    sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}_s{max_steps}_trial{num_trials}"
-    if args.split != "test":
-        sub_dir += f"_{args.split}"
-    os.makedirs(f"{base_dir}/{sub_dir}", exist_ok=True)
+    consider_rerun = [
+         "PromptSauceAgent_4o-mini_c73_alert_level_t0_s25_trial1",
+         "PromptSauceAgent_gpt-4o_c72_alert_level_t0_s25_trial1",
+         "PromptSauceAgent_4o-mini_c79_alert_level_t0_s15_trial2",
+         "PromptSauceAgent_gpt-4o_c83_alert_level_t0_s15_trial2",
+    ] # On Hold
+    reflections = [
+        "ReflexionAgent_gpt-4o_c101_alert_level_t0_s15_trial3_train",
+        "ReflexionAgent_gpt-4o_c82_alert_level_t0_s15_trial3",
+        "ReflexionAgent_4o-mini_c80_alert_level_t0_s15_trial3",
+    ] # On Hold
 
-    for attack in ATTACKS:
-        print(f"Running attack: {attack}")
-        save_agent_file = f"{base_dir}/{sub_dir}/agent_{attack}.json" 
-        save_env_file = f"{base_dir}/{sub_dir}/env_{attack}.json"
-
-        thug_env = ThuGEnv(
-            attack=attack,
-            evaluator=evaluator,
-            save_file=save_env_file,
-            max_steps=max_steps,
-            split=args.split,
-        )
-        thug_env.check_layer(layer) # check if revelant tables is in the database for the layer
-        
-        avg_success, tested_num, avg_reward = run_experiment(
-            agent=test_agent,
-            thug_env=thug_env,
-            save_agent_file=save_agent_file,
-            num_test=-1, # set to -1 to run all questions
-            num_trials=num_trials,
-        )
-        test_agent.reset()
-
-        with open(f'{base_dir}/{sub_dir}/results.txt', 'a') as f:
-            f.write(f"Model: {model}, Attack: {attack}, Agent: {agent_name}, Cache Seed: {cache_seed}, Temperature: {temperature}, Layer: {layer}, Max Steps: {max_steps}, Eval Model: {eval_model}, Num Trials: {num_trials}\n")
-            f.write(f"Success: {avg_success}/{tested_num}={avg_success/tested_num:.3f}, Avg Reward: {avg_reward/tested_num:.3f}\n")
+    for base_file in base_files:
+        print(f"Running evaluation for {base_file}")
+        for attack in ATTACKS:
+            print(f"Running evaluation for {attack}")
+            # avg_success, tested_num, avg_reward = 
+            run_evaluation(
+                evaluator=evaluator,
+                save_agent_file=f"./final_results/{base_file}/agent_{attack}.json",
+                save_env_file=f"./final_results/{base_file}/env_{attack}.json",
+                base_file=base_file,
+                is_update_file=True,
+            )
+        break

@@ -9,8 +9,6 @@ from datetime import datetime
 from time import sleep
 
 from secgym.utils import get_full_question
-from secgym.env.evaluator import Evaluator
-
 
 # ATTACKS = {
 #     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
@@ -83,27 +81,23 @@ class ThuGEnv(gym.Env):
     def __init__(
             self,
             attack: Union[str, int],
-            eval_config_list: List[Dict] = None,
+            evaluator,
             noise_level: int = 0,
             save_file: Union[str, bool] = True,
             max_steps: int = 15,
-            max_entry_return: int = 15,
-            max_str_len: int = 100000,
+            max_entry_return: int = 15, # database entry return limit
+            max_str_len: int = 100000, # maximum string length to return
             # container_name: str = "mysql-container",
             database_name: str = "env_monitor_db", # sql database name
             # port: str = "3306",
-            add_hint: bool = False,
-            eval_step: bool = False,
-            ans_check_reflection: bool = False,
-            sol_check_reflection: bool = False,
-            split: str = "test"
+            split: str = "test",
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
         self.max_entry_return = max_entry_return
         self.max_str_len = max_str_len
-        self.add_hint = add_hint
-        self.eval_step = eval_step
+        # evaluator
+        self.evaluator = evaluator
 
         if save_file is False:
             print("Warning: No save file provided. Logging will not be saved.")
@@ -162,8 +156,6 @@ class ThuGEnv(gym.Env):
             with open(self.save_file, "r") as f:
                 self.all_logs = json.load(f)
 
-        # evaluator
-        self.evaluator = Evaluator(config_list=eval_config_list, ans_check_reflection=ans_check_reflection, sol_check_reflection=sol_check_reflection)
 
     def get_attack_list(self):
         """Get the list of attacks.
@@ -321,7 +313,7 @@ class ThuGEnv(gym.Env):
             "qid": idx
         }
     
-        return get_full_question(observation, self.add_hint), info
+        return get_full_question(observation), info
     
     def render(self):
         """Render the environment.
@@ -352,7 +344,7 @@ class ThuGEnv(gym.Env):
         """Evaluate the answer and return the score.
         """
         try:
-            eval_dict = self.evaluator.checking(self.curr_question, answer, eval_step=self.eval_step)
+            eval_dict = self.evaluator.checking(self.curr_question, answer)
         except Exception as e:
             eval_dict = {
                 "reward": 0,

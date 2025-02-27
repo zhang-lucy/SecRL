@@ -1,37 +1,9 @@
 from autogen import OpenAIWrapper
 import json
-import os
 import re
 from secgym.myconfig import config_list_4o
 from secgym.utils import msging, get_full_question
-
 from textwrap import dedent
-CHECK_ANSWER_PROMPT = dedent("""Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
-
-If the submitted answer is an enumeration of information containing the golden answer, it should be considered as false. For example, if the question ask about an IP address and the submitted answer enumerates all the IP addresses in the database.
-
-You are given:
-- A question
-- The golden answer
-- The submitted answer
-
-First give a brief analysis using 1-2 short sentences, then give your decision.
-Follow this format:
-Analysis: <your analysis>
-Decision: <"True" or "False">       
-""" 
-)
-
-ANSWER_CHECKING_REFLECTION_PROMPT = """Given a golden answer and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
-You are given:
-- A question
-- The golden answer
-- The submitted answer
-You are also give a previous evaluation of this submitted answer. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. To this end, please serve as a second reviewer to double-check whether the answer is correct.
-
-Reflection: <your reflection>
-Decision: <"True" or "False", whether the submitted answer is correct>
-"""
 
 EVAL_ANSWER_TEMPLATE = dedent("""Question: {question}
                               
@@ -39,6 +11,62 @@ Golden Answer: {golden_answer}
                               
 Submitted Answer: {submitted_answer}""")
 
+FUZZY_ANSWER_CHECK_PROMPT = dedent("""Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
+You are given:
+- The question
+- The golden answer
+- The submitted answer
+
+First give a brief analysis using 1-2 short sentences, then give your decision.
+Follow this format:
+Analysis: <your analysis>
+Is_Answer_Correct: <"True" or "False">       
+""" )
+
+FUZZY_ANSWER_CHECK_REFLECTION_PROMPT = """Given a golden answer and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
+You are given:
+- The question
+- The golden answer
+- The submitted answer
+You are also give a previous evaluation of this submitted answer. Based on the given information, serve as a second reviewer to double-check whether the answer is correct.
+
+Follow this format:
+Reflection: <your reflection on previous evaluation>
+Analysis: <your analysis>
+Is_Answer_Correct: <"True" or "False", whether the submitted answer is correct>       
+"""
+
+STRICT_ANSWER_CHECK_PROMPT = dedent("""Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
+- if the submitted answer gives several possible answers, you should mark it as False no matter if the golden answer is one of the answers.
+                                    
+You are given:
+- The question
+- The golden answer
+- The submitted answer
+
+First give a brief analysis using 1-2 short sentences, then give your decision.
+Follow this format:
+Analysis: <your analysis>
+Is_Answer_Correct: <"True" or "False">       
+""" )
+
+STRICT_ANSWER_CHECK_REFLECTION_PROMPT = """Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer without ambiguity.
+- if the submitted answer gives several possible answers, you should mark it as False no matter if the golden answer is one of the answers.
+
+You are given:
+- The question
+- The golden answer
+- The submitted answer
+You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
+
+Follow this format:
+Reflection: <your reflection on previous evaluation>
+Analysis: <your analysis>
+Is_Answer_Correct: <"True" or "False", whether the submitted answer is correct>       
+"""
+
+
+# -----------------------------------
 # ---- Solution Evaluation ----
 
 EVAL_SOLUTION_TEMPLATE = dedent("""Question: {question}
@@ -49,8 +77,8 @@ Golden Solution:
 Submitted Answer: 
 {submitted_answer}""")
 
-CHECK_SOLUTION_PROMPT = """Given a security question, a submitted answer, and a ground truth solution, please evaluate the correctness of the submitted answer.
-The ground truth solution may contain several steps. Please go through each step of the ground truth solution and evaluate whether the given answer correctly contains the key information (Indicator of Comprise) of that step.
+STEP_CHECK_PROMPT = """Given a security question, a submitted answer, and a ground truth solution, please evaluate the correctness of the submitted answer.
+The ground truth solution may contain several steps. Please go through each step of the ground truth solution and evaluate whether the given answer correctly contains key info (the Indicator of Comprise) of that step, which is usually enclosed in `< >`.
 Note that the key information should not be the ones that is already present in the question.
          
 Your response should be in JSON format:
@@ -64,36 +92,38 @@ Your response should be in JSON format:
 step_i is the step number from the ground truth solution, starting from 0. 
 For each step, you must have two fields:
 - `analysis`: a quick analysis of whether this step is correct.
-- `is_step_correct`: whether the answer contains key info from this step and is correct.
+- `is_step_correct`: whether the answer matches the key info from this step.
 """
 
-SOLUTION_CHECKING_REFLECTION_PROMPT = """Given a security question, a submitted answer, and a ground truth solution, please evaluate the correctness of the submitted answer.
-The ground truth solution may contain several steps. Please go through each step of the ground truth solution and evaluate whether the given answer correctly contains the key information (Indicator of Comprise) of that step.
-Note that the key information should not be the ones that is already present in the question.
+STEP_CHECK_REFLECTION_PROMPT = """Given a security question, a submitted answer, and a ground truth solution, please evaluate the correctness of the submitted answer.
+The ground truth solution may contain several steps. Please go through each step of the ground truth solution and evaluate whether the given answer correctly contains key info (the Indicator of Comprise) of that step, which is usually enclosed in `< >`. Note that the key information should not be the ones that is already present in the question.
 
-You will also be given a previous evaluation of this solution. Based the collected info and this previous evaluation, please serve as a second reviewer to make the final decision on whether the submitted answer is correct. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. 
+You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
 
 Your response should be in JSON format:
 {
     "<step_i>" : {
+            "reflection": "<your reflection on previous evaluation>",
             "analysis": "<your analysis>",
             "is_step_correct": "<"True" or "False">,
         },
     ...
 }
 step_i is the step number from the ground truth solution, starting from 0. 
-For each step, you must have two fields:
-- `analysis`: a quick analysis of whether this step is correct based on the given information and the previous evaluation.
-- `is_step_correct`: whether the answer contains key info from this step and is correct.
+For each step, you must have three fields:
+- `reflection`: your reflection on the previous evaluation.
+- `analysis`: a quick analysis of whether this step is correct.
+- `is_step_correct`: whether the answer matches the key info from this step.
 """
 
 class Evaluator:
-
     def __init__(self,
                  config_list,
                  cache_seed: int = 41,
                  ans_check_reflection: bool = False,
-                 sol_check_reflection: bool = False
+                 sol_check_reflection: bool = False,
+                 step_checking: bool = False,
+                 strict_check: bool = False
                  ) -> None:
         #print(config_list)
         self.llm_config = {
@@ -105,6 +135,15 @@ class Evaluator:
         self.use_llm = True
         self.ans_check_reflection = ans_check_reflection
         self.sol_check_reflection = sol_check_reflection
+        self.step_checking = step_checking
+        self.strict_check = strict_check
+
+        if strict_check:
+            self.ans_check_prompt = STRICT_ANSWER_CHECK_PROMPT
+            self.ans_check_reflection_prompt = STRICT_ANSWER_CHECK_REFLECTION_PROMPT
+        else:
+            self.ans_check_prompt = FUZZY_ANSWER_CHECK_PROMPT
+            self.ans_check_reflection_prompt = FUZZY_ANSWER_CHECK_REFLECTION_PROMPT
     
     def _retry_create(self, messages, **kwargs):
         """Retry at None response"""
@@ -114,7 +153,7 @@ class Evaluator:
                 break
             self.llm_config["cache_seed"] = self.cache_seed+1+i
             self.client = OpenAIWrapper(**self.llm_config)
-            response = self.client.create(messages=messages, stop=stop)
+            response = self.client.create(messages=messages, **kwargs)
         
         self.llm_config["cache_seed"] = self.cache_seed
         self.client = OpenAIWrapper(**self.llm_config)
@@ -152,21 +191,21 @@ class Evaluator:
     def checking(self, 
                  question: dict, 
                  submitted_answer: str, 
-                 eval_step: bool = False
+                 step_checking: bool = None
                  ) -> dict:
-            
-            # 1. Check if the answer is correct
-            eval_dict = self.check_single_response(question, submitted_answer)
-            if eval_dict["reward"] == 1:
-                return eval_dict
-            if "solution" not in question or not eval_step:
-                if "solution" not in question:
-                    print("Warning: No solution in the question. Skipping solution checking...")
-                return eval_dict
-            
-            # 2. Check if the solution is correct
-            eval_dict.update(self.check_solution(question, submitted_answer))
+        step_checking = step_checking if step_checking is not None else self.step_checking
+        # 1. Check if the answer is correct
+        eval_dict = self.check_single_response(question, submitted_answer)
+        if eval_dict["reward"] == 1:
             return eval_dict
+        if "solution" not in question or not step_checking:
+            if "solution" not in question:
+                print("Warning: No solution in the question. Skipping solution checking...")
+            return eval_dict
+        
+        # 2. Check if the solution is correct
+        eval_dict.update(self.check_solution(question, submitted_answer))
+        return eval_dict
 
     def check_solution(self,
                        question: dict,
@@ -183,7 +222,7 @@ class Evaluator:
                 golden_solution = question["solution"]
 
             solution_str = EVAL_SOLUTION_TEMPLATE.format(question=get_full_question(question), golden_solution=golden_solution, submitted_answer=submitted_answer) 
-            response, is_json_success = self._get_json_response(CHECK_SOLUTION_PROMPT, solution_str)
+            response, is_json_success = self._get_json_response(STEP_CHECK_PROMPT, solution_str)
             eval_dict["is_json_success"] = is_json_success
             eval_dict["check_sol_response"] = response
 
@@ -198,7 +237,7 @@ class Evaluator:
 
             if self.sol_check_reflection:
                 reflection_str = solution_str + "\n" + json.dumps(response)
-                reflect_reponse, is_reflect_success = self._get_json_response(SOLUTION_CHECKING_REFLECTION_PROMPT, reflection_str)
+                reflect_reponse, is_reflect_success = self._get_json_response(STEP_CHECK_REFLECTION_PROMPT, reflection_str)
                 print(f"-----> Solution Evaluation Reflection: \n{str(response)}\n--------------------")
                 eval_dict["is_reflect_success"] = is_reflect_success
                 eval_dict["check_sol_reflection"] = reflect_reponse
@@ -210,17 +249,21 @@ class Evaluator:
             # calculate the reward based on the response
             discount_factor = 0.4
             # reverse the response
-            current_reward = 1
+
             total_reward = 0
             step_eval = []
             for _, v in response.items():
                 step_eval.append(v["is_step_correct"])
             # step_eval = list(response.values())
             step_eval.reverse()
-            for b in step_eval:
+
+            # starting from the last second step
+            current_reward = discount_factor
+            for b in step_eval[1:]:  # skip the last step as it is the final answer
                 if b == "True":
                     total_reward += current_reward
-                if total_reward == 1:
+                if total_reward >= 1: # cap the reward to 1 if discount_factor is too large
+                    total_reward = 1
                     break
                 current_reward *= discount_factor
 
@@ -236,13 +279,13 @@ class Evaluator:
         # Call LLM to evaluate the answer
         input_str = EVAL_ANSWER_TEMPLATE.format(question=get_full_question(question), golden_answer=question["answer"], submitted_answer=submitted_answer)
         response = self._retry_create(messages=[
-            msging(CHECK_ANSWER_PROMPT, role="system"), 
+            msging(self.ans_check_prompt, role="system"), 
             msging(input_str, role="user")
         ])
 
         # Parse the response
         response = response.choices[0].message.content
-        decision = re.search(r"Decision: (True|False)", response)
+        decision = re.search(r"Is_Answer_Correct: (True|False)", response)
         decision = decision.group(1)
         print("Ground Truth Answer:", question["answer"])
         print(f"-----> Answer Evaluation Result: {response}")
@@ -251,12 +294,12 @@ class Evaluator:
         # Reflection
         if self.ans_check_reflection:
             messages=[
-                msging(ANSWER_CHECKING_REFLECTION_PROMPT, role="system"), 
+                msging(self.ans_check_reflection_prompt, role="system"), 
                 msging(input_str+"\n"+response, role="user")
             ]
             reflect_response = self._retry_create(messages=messages).choices[0].message.content
 
-            decision = re.search(r"Decision: (True|False)", reflect_response)
+            decision = re.search(r"Is_Answer_Correct: (True|False)", reflect_response)
             decision = decision.group(1)
             return_dict["check_ans_reflection"] = reflect_response
             return_dict['reward'] = int(decision == "True")
