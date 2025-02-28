@@ -138,15 +138,6 @@ Note:
 - If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true.
 - The key information should not be the ones that is already present in the question.
          
-Your response should be in JSON format:
-{
-    "<step_i>" : {
-            "analysis": "<your analysis>",
-            "is_step_correct": "<"True" or "False">,
-        },
-    ...
-}
-step_i is the step number from the ground truth solution, starting from 0. 
 For each step, you must have two fields:
 - `analysis`: a quick analysis of whether this step is correct.
 - `is_step_correct`: whether the answer matches the key info from this step.
@@ -160,19 +151,45 @@ Note:
 
 You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
 
-Your response should be in JSON format:
-{
-    "<step_i>" : {
-            "analysis": "<your analysis>",
-            "is_step_correct": "<"True" or "False">,
-        },
-    ...
-}
-step_i is the step number from the ground truth solution, starting from 0. 
-For each step, you must have three fields:
+For each step, you must have two fields:
 - `analysis`: your reflection on the previous evaluation, and a quick analysis of whether this step is correct.
 - `is_step_correct`: whether the answer matches the key info from this step.
 """
+
+RESPONSE_FORMAT = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "step_analysis_response",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "steps": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "analysis": {
+                                    "type": "string",
+                                    "description": "A quick analysis of whether this step is correct."
+                                },
+                                "is_step_correct": {
+                                    "type": "boolean",
+                                    "description": "Indicates whether the answer matches the key info from this step."
+                                }
+                            },
+                            "required": ["analysis", "is_step_correct"],
+                            "additionalProperties": False
+                        },
+                        "description": "A list of step-wise evaluations."
+                    }
+                },
+                "required": ["steps"],
+                "additionalProperties": False
+            },
+            "strict": True
+        },
+        
+    }
 
 class Evaluator:
     def __init__(self,
@@ -210,14 +227,13 @@ class Evaluator:
         tmp_config.update(kwargs)
         client = OpenAIWrapper(**tmp_config)
         
-        response = client.create(messages=messages, **kwargs)
+        response = client.create(messages=messages)
         for i in range(10):
             if response.choices[0].message.content is not None:
                 break
             tmp_config["cache_seed"] = self.cache_seed+1+i
             client = OpenAIWrapper(**tmp_config)
-            response = client.create(messages=messages, **kwargs)
-
+            response = client.create(messages=messages)
         return response
     
     def _get_json_response(
@@ -231,11 +247,12 @@ class Evaluator:
         ]
         for i in range(10):
             try:
-                response = self._retry_create(messages=messages, response_format= { "type": "json_object" }).choices[0].message.content
+                response = self._retry_create(messages=messages, response_format=RESPONSE_FORMAT).choices[0].message.content
                 if "```json" in response:
                     print("Spearating ```json placeholder")
                     response = response.split("```json")[1].split("```")[0]
                 response = json.loads(response)
+                response = response["steps"]
                 break
             except Exception as e:
                 print(f"Error: {e}: {response}, retry {i+1} time.")
@@ -276,7 +293,7 @@ class Evaluator:
             if isinstance(question["solution"], list):
                 golden_solution = ""
                 for i, s in enumerate(question["solution"]):
-                    golden_solution += f"Step {i}: {s}\n"
+                    golden_solution += f"Step {i+1}: {s}\n"
             else:
                 golden_solution = question["solution"]
 
