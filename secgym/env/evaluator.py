@@ -135,15 +135,6 @@ Note:
 - If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true.
 - The key information should not be the ones that is already present in the question.
          
-Your response should be in JSON format:
-{
-    "<step_i>" : {
-            "analysis": "<your analysis>",
-            "is_step_correct": "<"True" or "False">,
-        },
-    ...
-}
-step_i is the step number from the ground truth solution, starting from 0. 
 For each step, you must have two fields:
 - `analysis`: a quick analysis of whether this step is correct.
 - `is_step_correct`: whether the answer matches the key info from this step.
@@ -157,16 +148,7 @@ Note:
 
 You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
 
-Your response should be in JSON format:
-{
-    "<step_i>" : {
-            "analysis": "<your analysis>",
-            "is_step_correct": "<"True" or "False">,
-        },
-    ...
-}
-step_i is the step number from the ground truth solution, starting from 0. 
-For each step, you must have three fields:
+For each step, you must have two fields:
 - `analysis`: your reflection on the previous evaluation, and a quick analysis of whether this step is correct.
 - `is_step_correct`: whether the answer matches the key info from this step.
 """
