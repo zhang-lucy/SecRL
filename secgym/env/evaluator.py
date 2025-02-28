@@ -11,6 +11,7 @@ Golden Answer: {golden_answer}
                               
 Submitted Answer: {submitted_answer}""")
 
+#We allow enumerations of up to 15 items in the submitted answer. This is to accomodate for the noise in our testing environment. This number can be adjusted based on the specific use case.
 FUZZY_ANSWER_CHECK_PROMPT = dedent("""Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer.
 You are given:
 - The question
@@ -18,11 +19,12 @@ You are given:
 - The submitted answer
                                    
 Note:
-The submitted answer does not need to match the golden answer exactly unless its a unique identifier. But the key content should be present.
+The submitted answer does not need to match the golden answer exactly. But the key content should be present.
 If the submitted answer presents the golden answer along with additional context, it should be considered correct.
-If the submitted answer is an extensive enumeration that includes the golden answer but lacks relevance, it should be considered false.
-If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true.
+If the submitted answer is an overly large enumeration (>15 is the strict limit) that includes the golden answer and lacks relevance, it should be considered false. Anything under 10 is an acceptable enumeration.
+If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true. Ignore the case of the text.
 For time-based questions, the submitted answer should be within a reasonable time frame of the golden answer and the format of the timestamps is not required to match exactly.
+In case you find discrepancies between the question and the golden answer, please consider the golden answer as the ground truth as you do not have full context of the question.
 
 Examples:
 Example 1
@@ -34,7 +36,7 @@ Is_Answer_Correct: True
 Example 2
 Golden Answer: vnevado-win11u
 Submitted Answer: The hostnames of the target devices involved in the 'CommandAndControl' malware attempts are: 'vnevado-win10s', 'vnevado-win10r', 'vnevado-win11t', and 'vnevado-win11u'. 
-Analysis: The submitted answer is correct because it contains the golden answer along with additional context that is useful for the investigation since it provides the hostnames of all the target devices that were targetted by the command and control malware.
+Analysis: The submitted answer is correct because it contains the golden answer along with additional context that is useful for the investigation since it provides the hostnames of all the target devices in the network that were targetted by the command and control malware.
 Is_Answer_Correct: True
 
 Example 3
@@ -54,14 +56,15 @@ You are given:
 - The question
 - The golden answer
 - The submitted answer
-You are also give a previous evaluation of this submitted answer. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. To this end, please serve as a second reviewer to double-check whether the submitted answer is correct.
+You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
 
 Note:
-The submitted answer does not need to match the golden answer exactly unless its a unique identifier. But the key content should be present.
+The submitted answer does not need to match the golden answer exactly. But the key content should be present.
 If the submitted answer presents the golden answer along with additional context, it should be considered correct.
-If the submitted answer is an extensive enumeration that includes the golden answer but lacks relevance, it should be considered false.
-If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true.
+If the submitted answer is an overly large enumeration (>15 is the strict limit) that includes the golden answer and lacks relevance, it should be considered false. Anything under 10 is an acceptable enumeration.
+If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true. Ignore the case of the text.
 For time-based questions, the submitted answer should be within a reasonable time frame of the golden answer and the format of the timestamps is not required to match exactly.
+In case you find discrepancies between the question and the golden answer, please consider the golden answer as the ground truth as you do not have full context of the question.
 
 Examples:
 Example 1
@@ -73,7 +76,7 @@ Is_Answer_Correct: True
 Example 2
 Golden Answer: vnevado-win11u
 Submitted Answer: The hostnames of the target devices involved in the 'CommandAndControl' malware attempts are: 'vnevado-win10s', 'vnevado-win10r', 'vnevado-win11t', and 'vnevado-win11u'. 
-Analysis: The submitted answer is correct because it contains the golden answer along with additional context that is useful for the investigation since it provides the hostnames of all the target devices that were targetted by the command and control malware.
+Analysis: The submitted answer is correct because it contains the golden answer along with additional context that is useful for the investigation since it provides the hostnames of all the target devices in the network that were targetted by the command and control malware.
 Is_Answer_Correct: True
 
 Example 3
@@ -109,7 +112,7 @@ You are given:
 - The question
 - The golden answer
 - The submitted answer
-You are also give a previous evaluation of this submitted answer. Learn from any mistakes made in the previous evaluation and provide a more accurate evaluation. To this end, please serve as a second reviewer to double-check whether the submitted answer is correct.
+You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
 
 Follow this format:
 Reflection: <your reflection on previous evaluation>

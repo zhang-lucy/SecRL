@@ -188,7 +188,7 @@ def run_evaluation(
         if "info" in agent_log_entry:
             agent_log_entry["info"] = info
         else:
-            agent_log_entry["0"]["info"] = info
+            agent_log_entry['trials']["0"]["info"] = info
         
         # update env log entry
         if i < len(env_log):
@@ -198,12 +198,13 @@ def run_evaluation(
         
         if eval_dict['reward'] != old_reward:
             changed_reward += 1
-            with open('test.txt', 'a') as sys.stdout:
-                print(f"question {agent_log_entry['nodes']} | reward: {old_reward} -> {eval_dict['reward']}")
-                print("Submitted Answer", submitted_answer)
-                print("Correct Answer", agent_log_entry["question_dict"]['answer'])
-                print("Evaluation", eval_dict['check_ans_response'])
-                print("Reflection on Explanation", eval_dict['check_ans_reflection'])
+            #with open('test.txt', 'a') as sys.stdout:
+            print(f"question {agent_log_entry['nodes']} | reward: {old_reward} -> {eval_dict['reward']}")
+            print("Submitted Answer", submitted_answer)
+            print("Correct Answer", agent_log_entry["question_dict"]['answer'])
+            print("Evaluation", eval_dict['check_ans_response'])
+            print("Reflection on Explanation", eval_dict['check_ans_reflection'])
+            print("---"*50)
 
     print(f"Re-evaluated {reevaluated_count} questions | Changed reward: {changed_reward}")
 
@@ -242,8 +243,8 @@ if __name__ == "__main__":
     )
 
     base_files = [
-        "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
-        "BaselineAgent_gpt-4o_c70_alert_level_t0_s25_trial1",
+        # "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
+        # "BaselineAgent_gpt-4o_c70_alert_level_t0_s25_trial1",
         "BaselineAgent_gpt-4o_c102_alert_level_t0_s25_trial1_train",
         "BaselineAgent_gpt-4o-ft-cv1_c102_alert_level_t0_s25_trial1",
         "BaselineAgent_o1-mini_c92_alert_level_t0_s25_trial1",
