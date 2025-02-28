@@ -154,39 +154,38 @@ For each step, you must have two fields:
 """
 
 RESPONSE_FORMAT = {
-        "type": "json_schema",
-        "json_schema": {
-            "name": "step_analysis_response",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "steps": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "analysis": {
-                                    "type": "string",
-                                    "description": "A quick analysis of whether this step is correct."
-                                },
-                                "is_step_correct": {
-                                    "type": "boolean",
-                                    "description": "Indicates whether the answer matches the key info from this step."
-                                }
+    "type": "json_schema",
+    "json_schema": {
+        "name": "step_analysis_response",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "analysis": {
+                                "type": "string",
+                                "description": "A quick analysis of whether this step is correct."
                             },
-                            "required": ["analysis", "is_step_correct"],
-                            "additionalProperties": False
+                            "is_step_correct": {
+                                "type": "boolean",
+                                "description": "Indicates whether the answer matches the key info from this step."
+                            }
                         },
-                        "description": "A list of step-wise evaluations."
-                    }
-                },
-                "required": ["steps"],
-                "additionalProperties": False
+                        "required": ["analysis", "is_step_correct"],
+                        "additionalProperties": False
+                    },
+                    "description": "A list of step-wise evaluations."
+                }
             },
-            "strict": True
+            "required": ["steps"],
+            "additionalProperties": False
         },
-        
-    }
+        "strict": True
+    },
+}
 
 class Evaluator:
     def __init__(self,
@@ -256,9 +255,6 @@ class Evaluator:
                 self.llm_config["cache_seed"] = self.cache_seed+10+i
         
         self.llm_config["cache_seed"] = self.cache_seed
-        if not isinstance(response, dict):
-            print("Failed to get response")
-            return response, False
         return response, True
     
     def checking(self, 
@@ -327,7 +323,7 @@ class Evaluator:
 
             total_reward = 0
             step_eval = []
-            for _, v in response.items():
+            for v in response:
                 step_eval.append(v["is_step_correct"])
             # step_eval = list(response.values())
             step_eval.reverse()
