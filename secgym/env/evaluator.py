@@ -11,7 +11,6 @@ Golden Answer: {golden_answer}
                               
 Submitted Answer: {submitted_answer}""")
 
-#We allow enumerations of up to 15 items in the submitted answer. This is to accomodate for the noise in our testing environment. This number can be adjusted based on the specific use case.
 FUZZY_ANSWER_CHECK_PROMPT = dedent("""Given a golden answer to a security question and a submitted answer, please evaluate whether the submitted answer matches the golden answer.
 You are given:
 - The question
@@ -138,6 +137,15 @@ Note:
 - If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true.
 - The key information should not be the ones that is already present in the question.
          
+Your response should be in JSON format:
+{
+    "<step_i>" : {
+            "analysis": "<your analysis>",
+            "is_step_correct": "<"True" or "False">,
+        },
+    ...
+}
+step_i is the step number from the ground truth solution, starting from 0. 
 For each step, you must have two fields:
 - `analysis`: a quick analysis of whether this step is correct.
 - `is_step_correct`: whether the answer matches the key info from this step.
@@ -151,44 +159,19 @@ Note:
 
 You are also given a previous evaluation of this submitted answer. Reflect on it and serve as a second reviewer to double-check whether the answer is correct.
 
-For each step, you must have two fields:
+Your response should be in JSON format:
+{
+    "<step_i>" : {
+            "analysis": "<your analysis>",
+            "is_step_correct": "<"True" or "False">,
+        },
+    ...
+}
+step_i is the step number from the ground truth solution, starting from 0. 
+For each step, you must have three fields:
 - `analysis`: your reflection on the previous evaluation, and a quick analysis of whether this step is correct.
 - `is_step_correct`: whether the answer matches the key info from this step.
 """
-
-RESPONSE_FORMAT = {
-    "type": "json_schema",
-    "json_schema": {
-        "name": "step_analysis_response",
-        "schema": {
-            "type": "object",
-            "properties": {
-                "steps": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "analysis": {
-                                "type": "string",
-                                "description": "A quick analysis of whether this step is correct."
-                            },
-                            "is_step_correct": {
-                                "type": "boolean",
-                                "description": "Indicates whether the answer matches the key info from this step."
-                            }
-                        },
-                        "required": ["analysis", "is_step_correct"],
-                        "additionalProperties": False
-                    },
-                    "description": "A list of step-wise evaluations."
-                }
-            },
-            "required": ["steps"],
-            "additionalProperties": False
-        },
-        "strict": True
-    },
-}
 
 class Evaluator:
     def __init__(self,
@@ -246,18 +229,22 @@ class Evaluator:
         ]
         for i in range(10):
             try:
-                response = self._retry_create(messages=messages, response_format=RESPONSE_FORMAT).choices[0].message.content
+                response = self._retry_create(messages=messages, response_format= { "type": "json_object" }).choices[0].message.content
                 if "```json" in response:
                     print("Spearating ```json placeholder")
                     response = response.split("```json")[1].split("```")[0]
                 response = json.loads(response)
-                response = response["steps"]
+                for _, v in response.items():
+                    v["is_step_correct"]
                 break
             except Exception as e:
                 print(f"Error: {e}: {response}, retry {i+1} time.")
                 self.llm_config["cache_seed"] = self.cache_seed+10+i
         
         self.llm_config["cache_seed"] = self.cache_seed
+        if not isinstance(response, dict):
+            print("Failed to get response")
+            return response, False
         return response, True
     
     def checking(self, 
@@ -289,7 +276,7 @@ class Evaluator:
             if isinstance(question["solution"], list):
                 golden_solution = ""
                 for i, s in enumerate(question["solution"]):
-                    golden_solution += f"Step {i+1}: {s}\n"
+                    golden_solution += f"Step {i}: {s}\n"
             else:
                 golden_solution = question["solution"]
 
@@ -326,7 +313,7 @@ class Evaluator:
 
             total_reward = 0
             step_eval = []
-            for v in response:
+            for _, v in response.items():
                 step_eval.append(v["is_step_correct"])
             # step_eval = list(response.values())
             step_eval.reverse()

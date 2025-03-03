@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
-from secgym.env.evaluation.evaluator import Evaluator
+from secgym.env.evaluator import Evaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
