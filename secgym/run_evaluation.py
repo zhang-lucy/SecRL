@@ -144,9 +144,11 @@ def run_evaluation(
     with open(save_env_file, "r") as f:
         env_log = json.load(f)
 
-    # print(f"len agent log: {len(agent_log)} | len env log: {len(env_log)}")
     reevaluated_count = 0
     changed_reward = 0
+
+    env_log_dict = {f"{env['question']['start_alert']}-{env['question']['end_alert']}": env for env in env_log} 
+    new_env_log = []
 
     for i, agent_log_entry in enumerate(agent_log):
         if "info" in agent_log_entry:
@@ -160,10 +162,10 @@ def run_evaluation(
             print(agent_log_entry['nodes'], save_agent_file, info)
             continue
         
-        if i < len(env_log):
-            assert agent_log_entry['question_dict']['start_alert'] == env_log[i]['question']['start_alert']
-            assert agent_log_entry['question_dict']['end_alert'] == env_log[i]['question']['end_alert']
-        
+        env_entry = None
+        if agent_log_entry['nodes'] in env_log_dict:
+            env_entry = env_log_dict[agent_log_entry['nodes']]
+
         if not info['submit']:
             continue # skip if not submitted
         
@@ -191,10 +193,11 @@ def run_evaluation(
             agent_log_entry['trials']["0"]["info"] = info
         
         # update env log entry
-        if i < len(env_log):
-            env_log[i]['reward'] = eval_dict["reward"]
-            env_log[i]['trajectory'][-1]['reward'] = eval_dict["reward"]
-            env_log[i]['trajectory'][-1]['info'] = info
+        if env_entry:
+            env_entry['reward'] = eval_dict["reward"]
+            env_entry['trajectory'][-1]['reward'] = eval_dict["reward"]
+            env_entry['trajectory'][-1]['info'] = info
+            new_env_log.append(env_entry)
         
         if eval_dict['reward'] != old_reward:
             changed_reward += 1
@@ -212,7 +215,7 @@ def run_evaluation(
         with open(save_agent_file, "w") as f:
             json.dump(agent_log, f, indent=4)
         with open(save_env_file, "w") as f:
-            json.dump(env_log, f, indent=4)
+            json.dump(new_env_log, f, indent=4)
 
 
 # check if submit
