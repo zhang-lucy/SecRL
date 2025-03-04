@@ -7,7 +7,7 @@ from secgym.env.evaluator import Evaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
-from secgym.agents import BaselineAgent, CheatingAgent, PromptSauceAgent, ReflexionAgent, MultiModelBaselineAgent
+from secgym.agents import BaselineAgent, PromptSauceAgent, ReflexionAgent, MultiModelBaselineAgent, ReActAgent
 
 #config_list_4_turbo, config_list_35
 
@@ -171,6 +171,13 @@ if __name__ == "__main__":
 
     if args.agent == "baseline":
         test_agent = BaselineAgent(
+            config_list=agent_config_list,
+            cache_seed=cache_seed, 
+            temperature=temperature,
+            max_steps=max_steps,
+        )
+    elif args.agent == "react":
+        test_agent = ReActAgent(
             config_list=agent_config_list,
             cache_seed=cache_seed, 
             temperature=temperature,
