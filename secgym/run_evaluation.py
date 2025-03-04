@@ -234,7 +234,7 @@ def filter_config_list(config_list, model_name):
 
 if __name__ == "__main__":
     eval_model = "gpt-4o"
-    cache_seed = 102
+    cache_seed = 110
     temperature = 0
     eval_config_list = filter_config_list(CONFIG_LIST, eval_model)
     evaluator = Evaluator(
@@ -247,9 +247,9 @@ if __name__ == "__main__":
     )
 
     base_files = [
-        # "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
-        # "BaselineAgent_gpt-4o_c70_alert_level_t0_s25_trial1",
-        #"BaselineAgent_gpt-4o_c102_alert_level_t0_s25_trial1_train",
+        "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
+        "BaselineAgent_gpt-4o_c70_alert_level_t0_s25_trial1",
+        "BaselineAgent_gpt-4o_c102_alert_level_t0_s25_trial1_train",
         "BaselineAgent_gpt-4o-ft-cv1_c102_alert_level_t0_s25_trial1",
         "BaselineAgent_o1-mini_c92_alert_level_t0_s25_trial1",
         "BaselineAgent_o3-mini_c99_alert_level_t0_s25_trial1",

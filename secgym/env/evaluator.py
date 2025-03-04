@@ -20,9 +20,10 @@ You are given:
 Note:
 The submitted answer does not need to match the golden answer exactly. But the key content should be present.
 If the submitted answer presents the golden answer along with additional context, it should be considered correct.
-If the submitted answer is an overly large enumeration (>15 is the strict limit) that includes the golden answer and lacks relevance, it should be considered false. Anything under 10 is an acceptable enumeration.
+If the submitted answer is an overly large enumeration (>15 is the strict limit) that includes the golden answer and lacks relevance, it should be considered false. All enumerations less than 10 and containing the golden answer should be considered correct. Between 10 and 15, use your discretion to determine if the answer is relevant enough to be considered correct.
 If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true. Ignore the case of the text.
 For time-based questions, the submitted answer should be within a reasonable time frame of the golden answer and the format of the timestamps is not required to match exactly.
+For domain-specific questions, the submitted answer should contain the key information mentioned in the golden answer. Ignore differences in http/https, www, and trailing slashes in URLs. 
 In case you find discrepancies between the question and the golden answer, please consider the golden answer as the ground truth as you do not have full context of the question.
 
 Examples:
@@ -60,9 +61,10 @@ You are also given a previous evaluation of this submitted answer. Reflect on it
 Note:
 The submitted answer does not need to match the golden answer exactly. But the key content should be present.
 If the submitted answer presents the golden answer along with additional context, it should be considered correct.
-If the submitted answer is an overly large enumeration (>15 is the strict limit) that includes the golden answer and lacks relevance, it should be considered false. Anything under 10 is an acceptable enumeration.
+If the submitted answer is an overly large enumeration (>15 is the strict limit) that includes the golden answer and lacks relevance, it should be considered false. All enumerations less than 10 and containing the golden answer should be considered correct. Between 10 and 15, use your discretion to determine if the answer is relevant enough to be considered correct.
 If the format of the submitted answer is different from the golden answer but the meaning is the same, it should be considered as true. Ignore the case of the text.
 For time-based questions, the submitted answer should be within a reasonable time frame of the golden answer and the format of the timestamps is not required to match exactly.
+For domain-specific questions, the submitted answer should contain the key information mentioned in the golden answer. Ignore differences in http/https, www, and trailing slashes in URLs.
 In case you find discrepancies between the question and the golden answer, please consider the golden answer as the ground truth as you do not have full context of the question.
 
 Examples:

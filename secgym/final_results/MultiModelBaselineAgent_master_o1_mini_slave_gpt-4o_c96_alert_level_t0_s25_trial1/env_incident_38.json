@@ -1,291 +1,6 @@
 [
     {
         "success": false,
-        "steps": 25,
-        "reward": 0,
-        "success_query_count": 24,
-        "total_query_count": 25,
-        "question": {
-            "context": "A security incident involving a suspicious process injection was observed on host `vnevado-win11a`. A file `notepad.exe` was executed with process ID 8932 on this host. It was reported that a process injected code into another process, which might be an attempt to hide malicious code execution within a trusted process.",
-            "question": "Can you identify the name of the account associated with this suspicious activity?",
-            "answer": "nathans",
-            "solution": [
-                "The user account `nathans` was involved in an incident where suspicious process injection was observed."
-            ],
-            "start_alert": 10,
-            "end_alert": 10,
-            "start_entities": [
-                4,
-                8,
-                9,
-                13,
-                3,
-                12,
-                2,
-                11
-            ],
-            "end_entities": [
-                1
-            ],
-            "shortest_alert_path": [
-                10
-            ]
-        },
-        "trajectory": [
-            {
-                "action": "SHOW TABLES",
-                "observation": "[('AADManagedIdentitySignInLogs',), ('AADNonInteractiveUserSignInLogs',), ('AADServicePrincipalSignInLogs',), ('AZFWApplicationRule',), ('AZFWApplicationRuleAggregation',), ('AZFWDnsQuery',), ('AZFWIdpsSignature',), ('AZFWNetworkRule',), ('AZFWNetworkRuleAggregation',), ('AlertEvidence',), ('AlertInfo',), ('AuditLogs',), ('AzureMetrics',), ('CloudAppEvents',), ('DeviceEvents',), ('DeviceFileCertificateInfo',), ('DeviceFileEvents',), ('DeviceImageLoadEvents',), ('DeviceInfo',), ('DeviceLogonEvents',), ('DeviceNetworkEvents',), ('DeviceNetworkInfo',), ('DeviceProcessEvents',), ('DeviceRegistryEvents',), ('EmailAttachmentInfo',), ('EmailEvents',), ('EmailUrlInfo',), ('Heartbeat',), ('IdentityDirectoryEvents',), ('IdentityLogonEvents',), ('IdentityQueryEvents',), ('MicrosoftAzureBastionAuditLogs',), ('MicrosoftGraphActivityLogs',), ('SecurityAlert',), ('SecurityIncident',), ('SigninLogs',), ('ThreatIntelligenceIndicator',), ('Usage',)]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' AND ProcessName = 'notepad.exe' AND ProcessId = 8932",
-                "observation": "ProgrammingError: Unknown column 'ProcessName' in 'where clause'",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": false,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceProcessEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('ProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessSignerType', 'text', 'YES', '', None, ''), ('InitiatingProcessSignatureStatus', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT AccountName FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' AND FileName = 'notepad.exe' AND ProcessId = 8932",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT AccountName FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' AND InitiatingProcessFileName = 'notepad.exe' AND InitiatingProcessId = 8932",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AuditLogs",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('OperationName', 'text', 'YES', '', None, ''), ('OperationVersion', 'text', 'YES', '', None, ''), ('Category', 'text', 'YES', '', None, ''), ('ResultType', 'text', 'YES', '', None, ''), ('ResultSignature', 'text', 'YES', '', None, ''), ('ResultDescription', 'text', 'YES', '', None, ''), ('DurationMs', 'text', 'YES', '', None, ''), ('CorrelationId', 'text', 'YES', '', None, ''), ('Resource', 'text', 'YES', '', None, ''), ('ResourceGroup', 'text', 'YES', '', None, ''), ('ResourceProvider', 'text', 'YES', '', None, ''), ('Identity', 'text', 'YES', '', None, ''), ('Level', 'text', 'YES', '', None, ''), ('Location', 'text', 'YES', '', None, ''), ('AdditionalDetails', 'text', 'YES', '', None, ''), ('Id', 'text', 'YES', '', None, ''), ('InitiatedBy', 'text', 'YES', '', None, ''), ('LoggedByService', 'text', 'YES', '', None, ''), ('Result', 'text', 'YES', '', None, ''), ('ResultReason', 'text', 'YES', '', None, ''), ('TargetResources', 'text', 'YES', '', None, ''), ('AADTenantId', 'text', 'YES', '', None, ''), ('ActivityDisplayName', 'text', 'YES', '', None, ''), ('ActivityDateTime', 'text', 'YES', '', None, ''), ('AADOperationType', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT InitiatedBy FROM AuditLogs WHERE ActivityDisplayName LIKE '%notepad.exe%' AND ResourceId = 'vnevado-win11a'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceLogonEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FailureReason', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsLocalAdmin', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('LogonType', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('Protocol', 'text', 'YES', '', None, ''), ('RemoteDeviceName', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteIPType', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT AccountName FROM DeviceLogonEvents WHERE DeviceName = 'vnevado-win11a' AND InitiatingProcessFileName = 'notepad.exe' AND InitiatingProcessId = 8932",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' AND (FileName = 'notepad.exe' OR InitiatingProcessFileName = 'notepad.exe')",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SecurityAlert",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('DisplayName', 'text', 'YES', '', None, ''), ('AlertName', 'text', 'YES', '', None, ''), ('AlertSeverity', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('VendorName', 'text', 'YES', '', None, ''), ('VendorOriginalId', 'text', 'YES', '', None, ''), ('SystemAlertId', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('SourceComputerId', 'text', 'YES', '', None, ''), ('AlertType', 'text', 'YES', '', None, ''), ('ConfidenceLevel', 'text', 'YES', '', None, ''), ('ConfidenceScore', 'text', 'YES', '', None, ''), ('IsIncident', 'text', 'YES', '', None, ''), ('StartTime', 'text', 'YES', '', None, ''), ('EndTime', 'text', 'YES', '', None, ''), ('ProcessingEndTime', 'text', 'YES', '', None, ''), ('RemediationSteps', 'text', 'YES', '', None, ''), ('ExtendedProperties', 'text', 'YES', '', None, ''), ('Entities', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('WorkspaceSubscriptionId', 'text', 'YES', '', None, ''), ('WorkspaceResourceGroup', 'text', 'YES', '', None, ''), ('ExtendedLinks', 'text', 'YES', '', None, ''), ('ProductName', 'text', 'YES', '', None, ''), ('ProductComponentName', 'text', 'YES', '', None, ''), ('AlertLink', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('CompromisedEntity', 'text', 'YES', '', None, ''), ('Tactics', 'text', 'YES', '', None, ''), ('Techniques', 'text', 'YES', '', None, ''), ('SubTechniques', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM SecurityAlert WHERE CompromisedEntity = 'vnevado-win11a' AND (Description LIKE '%process injection%' OR AlertName LIKE '%process injection%')",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AlertEvidence",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Categories', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('EntityType', 'text', 'YES', '', None, ''), ('EvidenceRole', 'text', 'YES', '', None, ''), ('EvidenceDirection', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('ThreatFamily', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('NetworkMessageId', 'text', 'YES', '', None, ''), ('EmailSubject', 'text', 'YES', '', None, ''), ('ApplicationId', 'text', 'YES', '', None, ''), ('Application', 'text', 'YES', '', None, ''), ('OAuthApplicationId', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT AccountName FROM AlertEvidence WHERE DeviceName = 'vnevado-win11a' AND FileName = 'notepad.exe'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SecurityIncident",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('IncidentName', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('Severity', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('Classification', 'text', 'YES', '', None, ''), ('ClassificationComment', 'text', 'YES', '', None, ''), ('ClassificationReason', 'text', 'YES', '', None, ''), ('Owner', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('ProviderIncidentId', 'text', 'YES', '', None, ''), ('FirstActivityTime', 'text', 'YES', '', None, ''), ('LastActivityTime', 'text', 'YES', '', None, ''), ('FirstModifiedTime', 'text', 'YES', '', None, ''), ('LastModifiedTime', 'text', 'YES', '', None, ''), ('CreatedTime', 'text', 'YES', '', None, ''), ('ClosedTime', 'text', 'YES', '', None, ''), ('IncidentNumber', 'text', 'YES', '', None, ''), ('RelatedAnalyticRuleIds', 'text', 'YES', '', None, ''), ('AlertIds', 'text', 'YES', '', None, ''), ('BookmarkIds', 'text', 'YES', '', None, ''), ('Comments', 'text', 'YES', '', None, ''), ('Tasks', 'text', 'YES', '', None, ''), ('Labels', 'text', 'YES', '', None, ''), ('IncidentUrl', 'text', 'YES', '', None, ''), ('AdditionalData', 'text', 'YES', '', None, ''), ('ModifiedBy', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM SecurityIncident WHERE Description LIKE '%process injection%' AND IncidentName LIKE '%vnevado-win11a%'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' LIMIT 100",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('LocalPort', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RemoteDeviceName', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT AccountName FROM DeviceEvents WHERE DeviceName = 'vnevado-win11a' AND FileName = 'notepad.exe' AND ProcessId = 8932",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SigninLogs",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('OperationName', 'text', 'YES', '', None, ''), ('OperationVersion', 'text', 'YES', '', None, ''), ('Category', 'text', 'YES', '', None, ''), ('ResultType', 'text', 'YES', '', None, ''), ('ResultSignature', 'text', 'YES', '', None, ''), ('ResultDescription', 'text', 'YES', '', None, ''), ('DurationMs', 'text', 'YES', '', None, ''), ('CorrelationId', 'text', 'YES', '', None, ''), ('Resource', 'text', 'YES', '', None, ''), ('ResourceGroup', 'text', 'YES', '', None, ''), ('ResourceProvider', 'text', 'YES', '', None, ''), ('Identity', 'text', 'YES', '', None, ''), ('Level', 'text', 'YES', '', None, ''), ('Location', 'text', 'YES', '', None, ''), ('AlternateSignInName', 'text', 'YES', '', None, ''), ('AppDisplayName', 'text', 'YES', '', None, ''), ('AppId', 'text', 'YES', '', None, ''), ('AuthenticationContextClassReferences', 'text', 'YES', '', None, ''), ('AuthenticationDetails', 'text', 'YES', '', None, ''), ('AppliedEventListeners', 'text', 'YES', '', None, ''), ('AuthenticationMethodsUsed', 'text', 'YES', '', None, ''), ('AuthenticationProcessingDetails', 'text', 'YES', '', None, ''), ('AuthenticationRequirement', 'text', 'YES', '', None, ''), ('AuthenticationRequirementPolicies', 'text', 'YES', '', None, ''), ('ClientAppUsed', 'text', 'YES', '', None, ''), ('ConditionalAccessPolicies', 'text', 'YES', '', None, ''), ('ConditionalAccessStatus', 'text', 'YES', '', None, ''), ('CreatedDateTime', 'text', 'YES', '', None, ''), ('DeviceDetail', 'text', 'YES', '', None, ''), ('IsInteractive', 'text', 'YES', '', None, ''), ('Id', 'text', 'YES', '', None, ''), ('IPAddress', 'text', 'YES', '', None, ''), ('IsRisky', 'text', 'YES', '', None, ''), ('LocationDetails', 'text', 'YES', '', None, ''), ('MfaDetail', 'text', 'YES', '', None, ''), ('NetworkLocationDetails', 'text', 'YES', '', None, ''), ('OriginalRequestId', 'text', 'YES', '', None, ''), ('ProcessingTimeInMilliseconds', 'text', 'YES', '', None, ''), ('RiskDetail', 'text', 'YES', '', None, ''), ('RiskEventTypes', 'text', 'YES', '', None, ''), ('RiskEventTypes_V2', 'text', 'YES', '', None, ''), ('RiskLevelAggregated', 'text', 'YES', '', None, ''), ('RiskLevelDuringSignIn', 'text', 'YES', '', None, ''), ('RiskState', 'text', 'YES', '', None, ''), ('ResourceDisplayName', 'text', 'YES', '', None, ''), ('ResourceIdentity', 'text', 'YES', '', None, ''), ('ResourceServicePrincipalId', 'text', 'YES', '', None, ''), ('ServicePrincipalId', 'text', 'YES', '', None, ''), ('ServicePrincipalName', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('TokenIssuerName', 'text', 'YES', '', None, ''), ('TokenIssuerType', 'text', 'YES', '', None, ''), ('UserAgent', 'text', 'YES', '', None, ''), ('UserDisplayName', 'text', 'YES', '', None, ''), ('UserId', 'text', 'YES', '', None, ''), ('UserPrincipalName', 'text', 'YES', '', None, ''), ('AADTenantId', 'text', 'YES', '', None, ''), ('UserType', 'text', 'YES', '', None, ''), ('FlaggedForReview', 'text', 'YES', '', None, ''), ('IPAddressFromResourceProvider', 'text', 'YES', '', None, ''), ('SignInIdentifier', 'text', 'YES', '', None, ''), ('SignInIdentifierType', 'text', 'YES', '', None, ''), ('ResourceTenantId', 'text', 'YES', '', None, ''), ('HomeTenantId', 'text', 'YES', '', None, ''), ('UniqueTokenIdentifier', 'text', 'YES', '', None, ''), ('SessionLifetimePolicies', 'text', 'YES', '', None, ''), ('AutonomousSystemNumber', 'text', 'YES', '', None, ''), ('AuthenticationProtocol', 'text', 'YES', '', None, ''), ('CrossTenantAccessType', 'text', 'YES', '', None, ''), ('AppliedConditionalAccessPolicies', 'text', 'YES', '', None, ''), ('RiskLevel', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT UserDisplayName FROM SigninLogs WHERE ResourceDisplayName = 'vnevado-win11a'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceFileEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginReferrerUrl', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsAzureInfoProtectionApplied', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('PreviousFileName', 'text', 'YES', '', None, ''), ('PreviousFolderPath', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('RequestAccountDomain', 'text', 'YES', '', None, ''), ('RequestAccountName', 'text', 'YES', '', None, ''), ('RequestAccountSid', 'text', 'YES', '', None, ''), ('RequestProtocol', 'text', 'YES', '', None, ''), ('RequestSourceIP', 'text', 'YES', '', None, ''), ('RequestSourcePort', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('SensitivityLabel', 'text', 'YES', '', None, ''), ('SensitivitySubLabel', 'text', 'YES', '', None, ''), ('ShareName', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT InitiatingProcessAccountName FROM DeviceFileEvents WHERE DeviceName = 'vnevado-win11a' AND (FileName = 'notepad.exe' OR InitiatingProcessFileName = 'notepad.exe') AND InitiatingProcessId = 8932",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' LIMIT 100",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            }
-        ]
-    },
-    {
-        "success": false,
         "steps": 4,
         "reward": 0,
         "success_query_count": 3,
@@ -351,28 +66,28 @@
                 "reward": 0,
                 "done": true,
                 "info": {
-                    "check_ans_response": "Analysis: The submitted answer provides multiple command lines instead of the specific one given in the golden answer.\nDecision: False",
+                    "check_ans_response": "Analysis: The submitted answer mentions command lines different from the golden answer and does not include it. Therefore, the key content in the golden answer is missing.\nIs_Answer_Correct: False",
                     "reward": 0,
-                    "check_ans_reflection": "Reflection: The previously submitted answer listed multiple command lines, whereas the golden answer specifies a single, specific command line. The task was to identify the exact command line of the process involved in information gathering, and the submitted answer did not align exactly with the golden answer.\n\nDecision: False",
+                    "check_ans_reflection": "Reflection: The previous evaluation is accurate in pointing out that the submitted answer lacks the key content of the golden answer.\n\nAnalysis: The golden answer specifies that the command line of the process associated with the information gathering activity is \"7472__2024-06-26t15:49:15.7860486z__powershell.exe\". On the other hand, the submitted answer lists command lines for \"ipconfig.exe\" and \"netstat.exe\". These are different tools and do not include the required \"powershell.exe\" command line specified in the golden answer. Thus, the submitted answer does not match the golden answer and misses the key content.\n\nIs_Answer_Correct: False",
                     "is_json_success": true,
                     "check_sol_response": {
                         "0": {
-                            "analysis": "The submitted answer mentions command lines 'ipconfig.exe' and 'netstat.exe' associated with information gathering, but it does not indicate any abnormal code injection or the use of 'powershell.exe' as described in Step 0 of the Golden Solution.",
+                            "analysis": "The submitted answer does not mention the process `powershell.exe` or the action of injecting code into another process.",
                             "is_step_correct": "False"
                         },
                         "1": {
-                            "analysis": "The submitted answer does not mention 'powershell.exe' with the specific details provided in Step 1. Instead, it lists different processes ('ipconfig.exe' and 'netstat.exe') that are unrelated to the specific command line details associated with 'powershell.exe' as mentioned in the Golden Solution.",
+                            "analysis": "The submitted answer provides command lines of different processes `ipconfig.exe` and `netstat.exe` but does not mention `powershell.exe` with the provided process ID and timestamp.",
                             "is_step_correct": "False"
                         }
                     },
                     "is_reflect_success": true,
                     "check_sol_reflection": {
                         "0": {
-                            "analysis": "The submitted answer does not mention or describe any abnormal code injection activities or the use of 'powershell.exe'. It instead lists command lines 'ipconfig.exe' and 'netstat.exe', which are unrelated to the described process in Step 0.",
+                            "analysis": "The previous evaluation correctly noted that the submitted answer does not mention `powershell.exe` or the action of injecting code into another process. The essential action here is the code injection by `powershell.exe`, which is missing in the provided answer.",
                             "is_step_correct": "False"
                         },
                         "1": {
-                            "analysis": "The submitted answer does not mention any use of 'powershell.exe' with the associated details (Process ID, creation time) provided in Step 1. It instead mentions 'ipconfig.exe' and 'netstat.exe', which do not match the information gathering process specified.",
+                            "analysis": "The previous evaluation correctly identified that the submitted answer talks about `ipconfig.exe` and `netstat.exe`, which are different from the process `powershell.exe` with the given process ID and creation time given in the question. The key information about `powershell.exe` is missing in the submitted answer.",
                             "is_step_correct": "False"
                         }
                     },
@@ -385,7 +100,7 @@
     {
         "success": true,
         "steps": 9,
-        "reward": 1,
+        "reward": 0,
         "success_query_count": 7,
         "total_query_count": 8,
         "question": {
@@ -494,869 +209,36 @@
             {
                 "action": "The URL associated with the suspicious process injection is https://security.microsoft.com/alerts/da5518f9d2-f91e-4ed2-9dbd-6a71db0114b6_1?tid=a59fc703-72db-43e0-8a21-0494303b7220.",
                 "observation": "",
-                "reward": 1,
+                "reward": 0,
                 "done": true,
                 "info": {
-                    "check_ans_response": "Analysis: The submitted answer provides a different URL that does not match the golden answer URL exactly.\nDecision: False",
-                    "reward": 1,
-                    "check_ans_reflection": "Reflection: Upon reviewing the submitted answer, it was noted that the URL mentioned in the answer does not match the golden answer\u2019s URL. The task was specifically to identify the URL associated with the suspicious process injection, and the golden answer provided is clear and specific in its detail. The URL given in the submitted answer does not correspond to the expected answer and provides an entirely different URL not relevant to the golden answer provided.\n\nDecision: True",
-                    "query_success": true,
-                    "submit": true
-                }
-            }
-        ]
-    },
-    {
-        "success": false,
-        "steps": 25,
-        "reward": 0,
-        "success_query_count": 25,
-        "total_query_count": 25,
-        "question": {
-            "context": "A security incident involving suspicious activities was reported on 2024-07-04. During this incident, two Powershell processes were identified on the device, potentially indicating an attacker gathering information about the target device or network for later attacks. The activity was flagged as Suspicious Application Window Discovery. In addition, there were abnormal process injection activities observed, which could lead to unexpected code running within a trusted process.",
-            "question": "In relation to the suspicious process injection observed on 2024-07-04, can you provide the URL associated with this suspicious activity?",
-            "answer": "https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt",
-            "solution": [
-                "Suspicious activity was observed from the IP address `72.5.72.208`, which may indicate an attacker gathering information about the device or network.",
-                "There was a suspicious process injection event where code was abnormally injected into a process, as evidenced by the URL `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt`."
-            ],
-            "start_alert": 0,
-            "end_alert": 10,
-            "start_entities": [
-                5,
-                6,
-                7
-            ],
-            "end_entities": [
-                13
-            ],
-            "shortest_alert_path": [
-                0,
-                4,
-                10
-            ]
-        },
-        "trajectory": [
-            {
-                "action": "SHOW TABLES",
-                "observation": "[('AADManagedIdentitySignInLogs',), ('AADNonInteractiveUserSignInLogs',), ('AADServicePrincipalSignInLogs',), ('AZFWApplicationRule',), ('AZFWApplicationRuleAggregation',), ('AZFWDnsQuery',), ('AZFWIdpsSignature',), ('AZFWNetworkRule',), ('AZFWNetworkRuleAggregation',), ('AlertEvidence',), ('AlertInfo',), ('AuditLogs',), ('AzureMetrics',), ('CloudAppEvents',), ('DeviceEvents',), ('DeviceFileCertificateInfo',), ('DeviceFileEvents',), ('DeviceImageLoadEvents',), ('DeviceInfo',), ('DeviceLogonEvents',), ('DeviceNetworkEvents',), ('DeviceNetworkInfo',), ('DeviceProcessEvents',), ('DeviceRegistryEvents',), ('EmailAttachmentInfo',), ('EmailEvents',), ('EmailUrlInfo',), ('Heartbeat',), ('IdentityDirectoryEvents',), ('IdentityLogonEvents',), ('IdentityQueryEvents',), ('MicrosoftAzureBastionAuditLogs',), ('MicrosoftGraphActivityLogs',), ('SecurityAlert',), ('SecurityIncident',), ('SigninLogs',), ('ThreatIntelligenceIndicator',), ('Usage',)]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceProcessEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('ProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessSignerType', 'text', 'YES', '', None, ''), ('InitiatingProcessSignatureStatus', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ActionType LIKE '%injection%' AND ProcessCreationTime BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SecurityIncident",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('IncidentName', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('Severity', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('Classification', 'text', 'YES', '', None, ''), ('ClassificationComment', 'text', 'YES', '', None, ''), ('ClassificationReason', 'text', 'YES', '', None, ''), ('Owner', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('ProviderIncidentId', 'text', 'YES', '', None, ''), ('FirstActivityTime', 'text', 'YES', '', None, ''), ('LastActivityTime', 'text', 'YES', '', None, ''), ('FirstModifiedTime', 'text', 'YES', '', None, ''), ('LastModifiedTime', 'text', 'YES', '', None, ''), ('CreatedTime', 'text', 'YES', '', None, ''), ('ClosedTime', 'text', 'YES', '', None, ''), ('IncidentNumber', 'text', 'YES', '', None, ''), ('RelatedAnalyticRuleIds', 'text', 'YES', '', None, ''), ('AlertIds', 'text', 'YES', '', None, ''), ('BookmarkIds', 'text', 'YES', '', None, ''), ('Comments', 'text', 'YES', '', None, ''), ('Tasks', 'text', 'YES', '', None, ''), ('Labels', 'text', 'YES', '', None, ''), ('IncidentUrl', 'text', 'YES', '', None, ''), ('AdditionalData', 'text', 'YES', '', None, ''), ('ModifiedBy', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT IncidentUrl FROM SecurityIncident WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SecurityAlert",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('DisplayName', 'text', 'YES', '', None, ''), ('AlertName', 'text', 'YES', '', None, ''), ('AlertSeverity', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('VendorName', 'text', 'YES', '', None, ''), ('VendorOriginalId', 'text', 'YES', '', None, ''), ('SystemAlertId', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('SourceComputerId', 'text', 'YES', '', None, ''), ('AlertType', 'text', 'YES', '', None, ''), ('ConfidenceLevel', 'text', 'YES', '', None, ''), ('ConfidenceScore', 'text', 'YES', '', None, ''), ('IsIncident', 'text', 'YES', '', None, ''), ('StartTime', 'text', 'YES', '', None, ''), ('EndTime', 'text', 'YES', '', None, ''), ('ProcessingEndTime', 'text', 'YES', '', None, ''), ('RemediationSteps', 'text', 'YES', '', None, ''), ('ExtendedProperties', 'text', 'YES', '', None, ''), ('Entities', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('WorkspaceSubscriptionId', 'text', 'YES', '', None, ''), ('WorkspaceResourceGroup', 'text', 'YES', '', None, ''), ('ExtendedLinks', 'text', 'YES', '', None, ''), ('ProductName', 'text', 'YES', '', None, ''), ('ProductComponentName', 'text', 'YES', '', None, ''), ('AlertLink', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('CompromisedEntity', 'text', 'YES', '', None, ''), ('Tactics', 'text', 'YES', '', None, ''), ('Techniques', 'text', 'YES', '', None, ''), ('SubTechniques', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT AlertLink FROM SecurityAlert WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59' AND AlertName LIKE '%process injection%'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AlertEvidence",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Categories', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('EntityType', 'text', 'YES', '', None, ''), ('EvidenceRole', 'text', 'YES', '', None, ''), ('EvidenceDirection', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('ThreatFamily', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('NetworkMessageId', 'text', 'YES', '', None, ''), ('EmailSubject', 'text', 'YES', '', None, ''), ('ApplicationId', 'text', 'YES', '', None, ''), ('Application', 'text', 'YES', '', None, ''), ('OAuthApplicationId', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT RemoteUrl FROM AlertEvidence WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59' AND Title LIKE '%process injection%'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceNetworkEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('LocalIPType', 'text', 'YES', '', None, ''), ('LocalPort', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('Protocol', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteIPType', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE EmailUrlInfo",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('NetworkMessageId', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('Url', 'text', 'YES', '', None, ''), ('UrlLocation', 'text', 'YES', '', None, ''), ('UrlDomain', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT Url FROM EmailUrlInfo WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT RemoteUrl FROM DeviceNetworkEvents WHERE ActionType LIKE '%injection%' AND TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('LocalPort', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RemoteDeviceName', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT RemoteUrl FROM DeviceEvents WHERE ActionType LIKE '%injection%' AND TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AuditLogs",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('OperationName', 'text', 'YES', '', None, ''), ('OperationVersion', 'text', 'YES', '', None, ''), ('Category', 'text', 'YES', '', None, ''), ('ResultType', 'text', 'YES', '', None, ''), ('ResultSignature', 'text', 'YES', '', None, ''), ('ResultDescription', 'text', 'YES', '', None, ''), ('DurationMs', 'text', 'YES', '', None, ''), ('CorrelationId', 'text', 'YES', '', None, ''), ('Resource', 'text', 'YES', '', None, ''), ('ResourceGroup', 'text', 'YES', '', None, ''), ('ResourceProvider', 'text', 'YES', '', None, ''), ('Identity', 'text', 'YES', '', None, ''), ('Level', 'text', 'YES', '', None, ''), ('Location', 'text', 'YES', '', None, ''), ('AdditionalDetails', 'text', 'YES', '', None, ''), ('Id', 'text', 'YES', '', None, ''), ('InitiatedBy', 'text', 'YES', '', None, ''), ('LoggedByService', 'text', 'YES', '', None, ''), ('Result', 'text', 'YES', '', None, ''), ('ResultReason', 'text', 'YES', '', None, ''), ('TargetResources', 'text', 'YES', '', None, ''), ('AADTenantId', 'text', 'YES', '', None, ''), ('ActivityDisplayName', 'text', 'YES', '', None, ''), ('ActivityDateTime', 'text', 'YES', '', None, ''), ('AADOperationType', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE InitiatingProcessFileName LIKE '%powershell%' AND ProcessCreationTime BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM SecurityIncident WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AlertInfo",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Category', 'text', 'YES', '', None, ''), ('Severity', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM AlertInfo WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59' AND (Title LIKE '%process injection%' OR Category LIKE '%process injection%')",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT Url FROM ThreatIntelligenceIndicator WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceFileEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginReferrerUrl', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsAzureInfoProtectionApplied', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('PreviousFileName', 'text', 'YES', '', None, ''), ('PreviousFolderPath', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('RequestAccountDomain', 'text', 'YES', '', None, ''), ('RequestAccountName', 'text', 'YES', '', None, ''), ('RequestAccountSid', 'text', 'YES', '', None, ''), ('RequestProtocol', 'text', 'YES', '', None, ''), ('RequestSourceIP', 'text', 'YES', '', None, ''), ('RequestSourcePort', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('SensitivityLabel', 'text', 'YES', '', None, ''), ('SensitivitySubLabel', 'text', 'YES', '', None, ''), ('ShareName', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT FileOriginUrl FROM DeviceFileEvents WHERE ActionType LIKE '%injection%' AND TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT RemoteUrl FROM DeviceNetworkEvents WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT RemoteUrl FROM AlertEvidence WHERE TimeGenerated BETWEEN '2024-07-04 00:00:00' AND '2024-07-04 23:59:59'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            }
-        ]
-    },
-    {
-        "success": false,
-        "steps": 25,
-        "reward": 0,
-        "success_query_count": 25,
-        "total_query_count": 25,
-        "question": {
-            "context": "As part of a recent security incident on 2024-07-04, a suspicious application window discovery was detected at 22:35:00.593840+00:00. This incident involved a known tool or technique being used to gather information on a device. Specifically, a command line process `powershell.exe` was executed. This might be an indication of attackers attempting to gather information about the target device or network for later attacks.",
-            "question": "Related to this alert, there was also an observation of unexpected behavior by a process ran with no command line arguments the next second. Can you identify the IP address associated with this unexpected behavior?",
-            "answer": "202.183.149.174",
-            "solution": [
-                "A suspicious application window discovery was detected from IP address `72.5.72.208`.",
-                "Unexpected behavior was observed by a process ran with no command line arguments from IP address `202.183.149.174`."
-            ],
-            "start_alert": 0,
-            "end_alert": 15,
-            "start_entities": [
-                5,
-                6,
-                7
-            ],
-            "end_entities": [
-                16
-            ],
-            "shortest_alert_path": [
-                0,
-                4,
-                15
-            ]
-        },
-        "trajectory": [
-            {
-                "action": "SHOW TABLES",
-                "observation": "[('AADManagedIdentitySignInLogs',), ('AADNonInteractiveUserSignInLogs',), ('AADServicePrincipalSignInLogs',), ('AZFWApplicationRule',), ('AZFWApplicationRuleAggregation',), ('AZFWDnsQuery',), ('AZFWIdpsSignature',), ('AZFWNetworkRule',), ('AZFWNetworkRuleAggregation',), ('AlertEvidence',), ('AlertInfo',), ('AuditLogs',), ('AzureMetrics',), ('CloudAppEvents',), ('DeviceEvents',), ('DeviceFileCertificateInfo',), ('DeviceFileEvents',), ('DeviceImageLoadEvents',), ('DeviceInfo',), ('DeviceLogonEvents',), ('DeviceNetworkEvents',), ('DeviceNetworkInfo',), ('DeviceProcessEvents',), ('DeviceRegistryEvents',), ('EmailAttachmentInfo',), ('EmailEvents',), ('EmailUrlInfo',), ('Heartbeat',), ('IdentityDirectoryEvents',), ('IdentityLogonEvents',), ('IdentityQueryEvents',), ('MicrosoftAzureBastionAuditLogs',), ('MicrosoftGraphActivityLogs',), ('SecurityAlert',), ('SecurityIncident',), ('SigninLogs',), ('ThreatIntelligenceIndicator',), ('Usage',)]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceProcessEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('ProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessSignerType', 'text', 'YES', '', None, ''), ('InitiatingProcessSignatureStatus', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCommandLine IS NULL AND ProcessCreationTime = '2024-07-04 22:35:01.593840+00:00'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCommandLine IS NULL AND ProcessCreationTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCommandLine = '' AND ProcessCreationTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceNetworkEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('LocalIPType', 'text', 'YES', '', None, ''), ('LocalPort', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('Protocol', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteIPType', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceNetworkEvents WHERE Timestamp BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('LocalPort', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RemoteDeviceName', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceEvents WHERE ProcessCommandLine IS NULL AND ProcessCreationTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCreationTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCommandLine IS NULL AND ProcessCreationTime LIKE '2024-07-04 22:35:01%'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCreationTime LIKE '2024-07-04 22:35:01%'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCreationTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCreationTime LIKE '2024-07-04 22:35:01%'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCreationTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SecurityAlert",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('DisplayName', 'text', 'YES', '', None, ''), ('AlertName', 'text', 'YES', '', None, ''), ('AlertSeverity', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('VendorName', 'text', 'YES', '', None, ''), ('VendorOriginalId', 'text', 'YES', '', None, ''), ('SystemAlertId', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('SourceComputerId', 'text', 'YES', '', None, ''), ('AlertType', 'text', 'YES', '', None, ''), ('ConfidenceLevel', 'text', 'YES', '', None, ''), ('ConfidenceScore', 'text', 'YES', '', None, ''), ('IsIncident', 'text', 'YES', '', None, ''), ('StartTime', 'text', 'YES', '', None, ''), ('EndTime', 'text', 'YES', '', None, ''), ('ProcessingEndTime', 'text', 'YES', '', None, ''), ('RemediationSteps', 'text', 'YES', '', None, ''), ('ExtendedProperties', 'text', 'YES', '', None, ''), ('Entities', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('WorkspaceSubscriptionId', 'text', 'YES', '', None, ''), ('WorkspaceResourceGroup', 'text', 'YES', '', None, ''), ('ExtendedLinks', 'text', 'YES', '', None, ''), ('ProductName', 'text', 'YES', '', None, ''), ('ProductComponentName', 'text', 'YES', '', None, ''), ('AlertLink', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('CompromisedEntity', 'text', 'YES', '', None, ''), ('Tactics', 'text', 'YES', '', None, ''), ('Techniques', 'text', 'YES', '', None, ''), ('SubTechniques', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM SecurityAlert WHERE TimeGenerated BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AlertEvidence",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Categories', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('EntityType', 'text', 'YES', '', None, ''), ('EvidenceRole', 'text', 'YES', '', None, ''), ('EvidenceDirection', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('ThreatFamily', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('NetworkMessageId', 'text', 'YES', '', None, ''), ('EmailSubject', 'text', 'YES', '', None, ''), ('ApplicationId', 'text', 'YES', '', None, ''), ('Application', 'text', 'YES', '', None, ''), ('OAuthApplicationId', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM AlertEvidence WHERE Timestamp BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCreationTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AuditLogs",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('OperationName', 'text', 'YES', '', None, ''), ('OperationVersion', 'text', 'YES', '', None, ''), ('Category', 'text', 'YES', '', None, ''), ('ResultType', 'text', 'YES', '', None, ''), ('ResultSignature', 'text', 'YES', '', None, ''), ('ResultDescription', 'text', 'YES', '', None, ''), ('DurationMs', 'text', 'YES', '', None, ''), ('CorrelationId', 'text', 'YES', '', None, ''), ('Resource', 'text', 'YES', '', None, ''), ('ResourceGroup', 'text', 'YES', '', None, ''), ('ResourceProvider', 'text', 'YES', '', None, ''), ('Identity', 'text', 'YES', '', None, ''), ('Level', 'text', 'YES', '', None, ''), ('Location', 'text', 'YES', '', None, ''), ('AdditionalDetails', 'text', 'YES', '', None, ''), ('Id', 'text', 'YES', '', None, ''), ('InitiatedBy', 'text', 'YES', '', None, ''), ('LoggedByService', 'text', 'YES', '', None, ''), ('Result', 'text', 'YES', '', None, ''), ('ResultReason', 'text', 'YES', '', None, ''), ('TargetResources', 'text', 'YES', '', None, ''), ('AADTenantId', 'text', 'YES', '', None, ''), ('ActivityDisplayName', 'text', 'YES', '', None, ''), ('ActivityDateTime', 'text', 'YES', '', None, ''), ('AADOperationType', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM AuditLogs WHERE ActivityDateTime BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE ProcessCreationTime LIKE '2024-07-04 22:35:01%'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceLogonEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FailureReason', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsLocalAdmin', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('LogonType', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('Protocol', 'text', 'YES', '', None, ''), ('RemoteDeviceName', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteIPType', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceLogonEvents WHERE Timestamp BETWEEN '2024-07-04 22:35:01' AND '2024-07-04 22:35:02'",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            }
-        ]
-    },
-    {
-        "success": false,
-        "steps": 25,
-        "reward": 0,
-        "success_query_count": 24,
-        "total_query_count": 25,
-        "question": {
-            "context": "A suspicious process injection was observed where a process abnormally injected code into another process. This may cause unexpected code to run in the target process memory, potentially leading to abnormal behaviors such as opening a listening port or connecting to a command and control server. During the investigation of the security incident, it was identified that the suspicious activity occurred on host with hostname `vnevado-win11a`.",
-            "question": "What is the Process Id and the exact command line of the process that injected code as recorded on the endpoint during the suspicious process injection?",
-            "answer": "Process Id: 4656, Command Line: \"powershell.exe\" -executionpolicy bypass -encodedcommand wwboaguadaauafmazqbyahyaaqbjaguauabvagkabgb0ae0ayqbuageazwblihiaxqa6adoauwblagmadqbyagkadab5afaacgbvahqabwbjag8abaagad0aiabbae4azqb0ac4auwblagmadqbyagkadab5afaacgbvahqabwbjag8ababuahkacablaf0aoga6afqababzadeamga7acqaeabvahiaiaa9acaawwbtahkacwb0aguabqauafqazqb4ahqalgbfag4aywbvagqaaqbuagcaxqa6adoavqbuaeyaoaauaecazqb0aeiaeqb0aguacwaoaccavwbpag4aqqbuafaalqbjag4adabyag8alqbjag4aaqblagmadabpag8abganackaowakagiayqbzaguanga0afmadabyagkabgbnacaapqagacgasqbuahyabwbragualqbxaguaygbsaguacqb1aguacwb0acaalqbvafiasqagaggadab0ahaacwa6ac8alwb3agmazabzahqayqb0agkaywbmagkabablahmacabyagqazqb1ahmalgbiagwabwbiac4aywbvahiazqauahcaaqbuagqabwb3ahmalgbuaguadaavahcaywbkahmadabhahqaaqbjagyaaqbsaguacwavafcaaqbuaeeavabqac0asqbuahqacgbvac0argbpagwazqbsaguacwbzac4adab4ahqaiaatafuacwblaeiayqbzagkaywbqageacgbzagkabgbnackalgbdag8abgb0aguabgb0adsavabyahkaewagacqaywbvag4adablag4adabcahkadablahmaiaa9acaawwbtahkacwb0aguabqauaemabwbuahyazqbyahqaxqa6adoargbyag8abqbcageacwbladyanabtahqacgbpag4azwaoacqaygbhahmazqa2adqauwb0ahiaaqbuagcakqagah0aiabdageadabjaggaiab7acaajabjag8abgb0aguabgb0aeiaeqb0aguacwagad0aiabbafmaeqbzahqazqbtac4aqwbvag4adgblahiadabdadoaogbgahiabwbtaeiayqbzaguanga0afmadabyagkabgbnacgajabiageacwbladyanabtahqacgbpag4azwauafmadqbiahmadabyagkabgbnacgamwapackaiab9adsajabpacaapqagadaaowagacqazablagmacgb5ahaadablagqaqgb5ahqazqbzacaapqagaeaakaapadsajabjag8abgb0aguabgb0aeiaeqb0aguacwauagyabwbyaguayqbjaggaewagacqazablagmacgb5ahaadablagqaqgb5ahqazqbzacaakwa9acaajabfacaalqbiahgabwbyacaajab4ag8acgbbacqaaqbdadsaiaakagkakwaradsaiabpagyaiaaoacqaaqagac0azqbxacaajab4ag8acgauaewazqbuagcadaboackaiab7acqaaqagad0aiaawah0aiab9adsasqbuahyabwbragualqbfahgacabyaguacwbzagkabwbuacaakabbafmaeqbzahqazqbtac4avablahgadaauaeuabgbjag8azabpag4azwbdadoaogbvafqarga4ac4arwblahqauwb0ahiaaqbuagcakaakagqazqbjahiaeqbwahqazqbkaeiaeqb0aguacwapacka -inputformat xml -outputformat text",
-            "solution": [
-                "There was a suspicious process injection using PowerShell on host `vnevado-win11a`.",
-                "The attacker used the command line `powershell.exe -executionpolicy bypass -encodedcommand wwboaguadaauafmazqbyahyaaqbjeguabvagkabgb0ae0ayqbuageazwblahiaxqa6adoauwblagmadqbyagkadab5afaacgbvahqabwbjag8abaagad0aiabbae4azqb0ac4auwblagmadqbyagkadab5afaacgbvahqabwbjag8ababuahkacablaf0aoga6afqababzadeamga7acqaeabvahiaiaa9acaawwbtahkacwb0aguabqauafqazqb4ahqalgbfag4aywbvagqaaqbuagcaxqa6adoavqbuaeyaoaauaecazqb0aeiaeqb0aguacwaoaccavwbpag4aqqbuafaalqbjag4adabyag8alqbjag4aagblagmadabpag8abganackaowakagiayqbzaguanga0afmadabyagkabgbnacaapqagacgasqbuahyabwbragualqbxaguaygbsaguacqb1aguacwb0acaalqbvafiasqagaggadab0ahaacwa6ac8alwb3agmazabzahqayqb0agkaywbmagkabablahmacabyagqazqb1ahmalgbiagwabwbiac4aywbvahiazqauahcaaqbuagqabwb3ahmalgbuaguadaavahcaywbkahmadabhahqaaqbjagyaaqbsaguacwavafcaaqbuaeeavabqac0asqbuahqacgbvac0argbpagwazqbsaguacwbzac4adab4ahqaiaatafuacwblaeiayqbzagkaywbqageacgbzagkabgbnackalgbdag8abgb0aguabgb0adsavabyahkaewagacqaywbvag4adablag4adabcahkadablahmaiaa9acaawwbtahkacwb0aguabqauaemabwbuahyazqbyahqaxqa6adoargbyag8abqbcageacwbladyanabtahqacgbpag4azwaoacqaygbhahmazqa2adqauwb0ahiaaqbuagcakqagah0aiabdageadabjaggaiab7acaajabjag8abgb0aguabgb0aeiaeqb0aguacwagad0aiabbafmaeqbzahqazqbtac4aqwbvag4adgblahiadabdadoaogbgahiabwbtaeiayqbzaguanga0afmadabyagkabgbnacgajabiageacwbladyanabtahqacgbpag4azwauafmadqbiahmadabyagkabgbnacgamwapackaiab9adsajabpacaapqagadaaowagacqazablagmacgb5ahaadablagqaqgb5ahqazqbzacaapqagaeaakaapadsajabjag8abgb0aguabgb0aeiaeqb0aguacwauagyabwbyaguayqbjaggaewagacqazablagmacgb5ahaadablagqaqgb5ahqazqbzacaakwa9acaajabfacaalqbiahgabwbyacaajab4ag8acgbbacqaaqbdadsaiaakagkakwaradsaiabpagyaiaaoacqaaqagac0azqbxacaajab4ag8acgauaewazqbuagcadaboackaiab7acqaaqagad0aiaawah0aiab9adsasqbuahyabwbragualqbfahgacabyaguacwbzagkabwbuacaakabbafmaeqbzahqazqbtac4avablahgadaauaeuabgbjag8azabpag4azwbdadoaogbvafqarga4ac4arwblahqauwb0ahiaaqbuagcakaakagqazqbjahiaeqbwahqazqbkaeiaeqb0aguacwapacka -inputformat xml -outputformat text` with Process ID `4656` at `2024-06-26t15:49:41.4025245z`."
-            ],
-            "start_alert": 10,
-            "end_alert": 14,
-            "start_entities": [
-                1,
-                2,
-                3,
-                4,
-                8,
-                9,
-                11,
-                12,
-                13
-            ],
-            "end_entities": [
-                7
-            ],
-            "shortest_alert_path": [
-                10,
-                8,
-                14
-            ]
-        },
-        "trajectory": [
-            {
-                "action": "SHOW TABLES",
-                "observation": "[('AADManagedIdentitySignInLogs',), ('AADNonInteractiveUserSignInLogs',), ('AADServicePrincipalSignInLogs',), ('AZFWApplicationRule',), ('AZFWApplicationRuleAggregation',), ('AZFWDnsQuery',), ('AZFWIdpsSignature',), ('AZFWNetworkRule',), ('AZFWNetworkRuleAggregation',), ('AlertEvidence',), ('AlertInfo',), ('AuditLogs',), ('AzureMetrics',), ('CloudAppEvents',), ('DeviceEvents',), ('DeviceFileCertificateInfo',), ('DeviceFileEvents',), ('DeviceImageLoadEvents',), ('DeviceInfo',), ('DeviceLogonEvents',), ('DeviceNetworkEvents',), ('DeviceNetworkInfo',), ('DeviceProcessEvents',), ('DeviceRegistryEvents',), ('EmailAttachmentInfo',), ('EmailEvents',), ('EmailUrlInfo',), ('Heartbeat',), ('IdentityDirectoryEvents',), ('IdentityLogonEvents',), ('IdentityQueryEvents',), ('MicrosoftAzureBastionAuditLogs',), ('MicrosoftGraphActivityLogs',), ('SecurityAlert',), ('SecurityIncident',), ('SigninLogs',), ('ThreatIntelligenceIndicator',), ('Usage',)]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceProcessEvents WHERE DeviceName = 'vnevado-win11a' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM DeviceEvents WHERE DeviceName = 'vnevado-win11a' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM AlertInfo WHERE DeviceName = 'vnevado-win11a' LIMIT 10",
-                "observation": "ProgrammingError: Unknown column 'DeviceName' in 'where clause'",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": false,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AlertInfo",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Category', 'text', 'YES', '', None, ''), ('Severity', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE AlertEvidence",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('AlertId', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Categories', 'text', 'YES', '', None, ''), ('AttackTechniques', 'text', 'YES', '', None, ''), ('ServiceSource', 'text', 'YES', '', None, ''), ('DetectionSource', 'text', 'YES', '', None, ''), ('EntityType', 'text', 'YES', '', None, ''), ('EvidenceRole', 'text', 'YES', '', None, ''), ('EvidenceDirection', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('ThreatFamily', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('NetworkMessageId', 'text', 'YES', '', None, ''), ('EmailSubject', 'text', 'YES', '', None, ''), ('ApplicationId', 'text', 'YES', '', None, ''), ('Application', 'text', 'YES', '', None, ''), ('OAuthApplicationId', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT DeviceId, ProcessCommandLine FROM AlertEvidence WHERE DeviceName = 'vnevado-win11a' AND ProcessCommandLine IS NOT NULL LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SecurityIncident",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('IncidentName', 'text', 'YES', '', None, ''), ('Title', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('Severity', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('Classification', 'text', 'YES', '', None, ''), ('ClassificationComment', 'text', 'YES', '', None, ''), ('ClassificationReason', 'text', 'YES', '', None, ''), ('Owner', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('ProviderIncidentId', 'text', 'YES', '', None, ''), ('FirstActivityTime', 'text', 'YES', '', None, ''), ('LastActivityTime', 'text', 'YES', '', None, ''), ('FirstModifiedTime', 'text', 'YES', '', None, ''), ('LastModifiedTime', 'text', 'YES', '', None, ''), ('CreatedTime', 'text', 'YES', '', None, ''), ('ClosedTime', 'text', 'YES', '', None, ''), ('IncidentNumber', 'text', 'YES', '', None, ''), ('RelatedAnalyticRuleIds', 'text', 'YES', '', None, ''), ('AlertIds', 'text', 'YES', '', None, ''), ('BookmarkIds', 'text', 'YES', '', None, ''), ('Comments', 'text', 'YES', '', None, ''), ('Tasks', 'text', 'YES', '', None, ''), ('Labels', 'text', 'YES', '', None, ''), ('IncidentUrl', 'text', 'YES', '', None, ''), ('AdditionalData', 'text', 'YES', '', None, ''), ('ModifiedBy', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM SecurityIncident WHERE Description LIKE '%vnevado-win11a%' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceProcessEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountObjectId', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('AccountUpn', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessLogonId', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ProcessCommandLine', 'text', 'YES', '', None, ''), ('ProcessCreationTime', 'text', 'YES', '', None, ''), ('ProcessId', 'text', 'YES', '', None, ''), ('ProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('ProcessTokenElevation', 'text', 'YES', '', None, ''), ('ProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('ProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('ProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessSignerType', 'text', 'YES', '', None, ''), ('InitiatingProcessSignatureStatus', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT DeviceId FROM DeviceInfo WHERE DeviceName = 'vnevado-win11a' LIMIT 1",
-                "observation": "[('fa37014e27eac3f926ae4540fe9bafdaa8d49550',)]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT ProcessId, ProcessCommandLine FROM DeviceProcessEvents WHERE DeviceId = 'fa37014e27eac3f926ae4540fe9bafdaa8d49550' AND ActionType = 'ProcessInjection' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT ProcessId, ProcessCommandLine, ActionType FROM DeviceProcessEvents WHERE DeviceId = 'fa37014e27eac3f926ae4540fe9bafdaa8d49550' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceFileEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FileOriginIP', 'text', 'YES', '', None, ''), ('FileOriginReferrerUrl', 'text', 'YES', '', None, ''), ('FileOriginUrl', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsAzureInfoProtectionApplied', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('PreviousFileName', 'text', 'YES', '', None, ''), ('PreviousFolderPath', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('RequestAccountDomain', 'text', 'YES', '', None, ''), ('RequestAccountName', 'text', 'YES', '', None, ''), ('RequestAccountSid', 'text', 'YES', '', None, ''), ('RequestProtocol', 'text', 'YES', '', None, ''), ('RequestSourceIP', 'text', 'YES', '', None, ''), ('RequestSourcePort', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('SensitivityLabel', 'text', 'YES', '', None, ''), ('SensitivitySubLabel', 'text', 'YES', '', None, ''), ('ShareName', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT InitiatingProcessId, InitiatingProcessCommandLine FROM DeviceFileEvents WHERE DeviceId = 'fa37014e27eac3f926ae4540fe9bafdaa8d49550' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceImageLoadEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FileName', 'text', 'YES', '', None, ''), ('FolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('MD5', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('SHA1', 'text', 'YES', '', None, ''), ('SHA256', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('FileSize', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT InitiatingProcessId, InitiatingProcessCommandLine FROM DeviceImageLoadEvents WHERE DeviceId = 'fa37014e27eac3f926ae4540fe9bafdaa8d49550' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceNetworkEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('LocalIP', 'text', 'YES', '', None, ''), ('LocalIPType', 'text', 'YES', '', None, ''), ('LocalPort', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('Protocol', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteIPType', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('RemoteUrl', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT InitiatingProcessId, InitiatingProcessCommandLine FROM DeviceNetworkEvents WHERE DeviceId = 'fa37014e27eac3f926ae4540fe9bafdaa8d49550' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceRegistryEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('PreviousRegistryKey', 'text', 'YES', '', None, ''), ('PreviousRegistryValueData', 'text', 'YES', '', None, ''), ('PreviousRegistryValueName', 'text', 'YES', '', None, ''), ('RegistryKey', 'text', 'YES', '', None, ''), ('RegistryValueData', 'text', 'YES', '', None, ''), ('RegistryValueName', 'text', 'YES', '', None, ''), ('RegistryValueType', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT InitiatingProcessId, InitiatingProcessCommandLine FROM DeviceRegistryEvents WHERE DeviceId = 'fa37014e27eac3f926ae4540fe9bafdaa8d49550' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE SecurityAlert",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('DisplayName', 'text', 'YES', '', None, ''), ('AlertName', 'text', 'YES', '', None, ''), ('AlertSeverity', 'text', 'YES', '', None, ''), ('Description', 'text', 'YES', '', None, ''), ('ProviderName', 'text', 'YES', '', None, ''), ('VendorName', 'text', 'YES', '', None, ''), ('VendorOriginalId', 'text', 'YES', '', None, ''), ('SystemAlertId', 'text', 'YES', '', None, ''), ('ResourceId', 'text', 'YES', '', None, ''), ('SourceComputerId', 'text', 'YES', '', None, ''), ('AlertType', 'text', 'YES', '', None, ''), ('ConfidenceLevel', 'text', 'YES', '', None, ''), ('ConfidenceScore', 'text', 'YES', '', None, ''), ('IsIncident', 'text', 'YES', '', None, ''), ('StartTime', 'text', 'YES', '', None, ''), ('EndTime', 'text', 'YES', '', None, ''), ('ProcessingEndTime', 'text', 'YES', '', None, ''), ('RemediationSteps', 'text', 'YES', '', None, ''), ('ExtendedProperties', 'text', 'YES', '', None, ''), ('Entities', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('WorkspaceSubscriptionId', 'text', 'YES', '', None, ''), ('WorkspaceResourceGroup', 'text', 'YES', '', None, ''), ('ExtendedLinks', 'text', 'YES', '', None, ''), ('ProductName', 'text', 'YES', '', None, ''), ('ProductComponentName', 'text', 'YES', '', None, ''), ('AlertLink', 'text', 'YES', '', None, ''), ('Status', 'text', 'YES', '', None, ''), ('CompromisedEntity', 'text', 'YES', '', None, ''), ('Tactics', 'text', 'YES', '', None, ''), ('Techniques', 'text', 'YES', '', None, ''), ('SubTechniques', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT * FROM SecurityAlert WHERE Description LIKE '%vnevado-win11a%' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "DESCRIBE DeviceLogonEvents",
-                "observation": "[('TenantId', 'text', 'YES', '', None, ''), ('AccountDomain', 'text', 'YES', '', None, ''), ('AccountName', 'text', 'YES', '', None, ''), ('AccountSid', 'text', 'YES', '', None, ''), ('ActionType', 'text', 'YES', '', None, ''), ('AdditionalFields', 'text', 'YES', '', None, ''), ('AppGuardContainerId', 'text', 'YES', '', None, ''), ('DeviceId', 'text', 'YES', '', None, ''), ('DeviceName', 'text', 'YES', '', None, ''), ('FailureReason', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountDomain', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountName', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountObjectId', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountSid', 'text', 'YES', '', None, ''), ('InitiatingProcessAccountUpn', 'text', 'YES', '', None, ''), ('InitiatingProcessCommandLine', 'text', 'YES', '', None, ''), ('InitiatingProcessFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessFolderPath', 'text', 'YES', '', None, ''), ('InitiatingProcessId', 'text', 'YES', '', None, ''), ('InitiatingProcessIntegrityLevel', 'text', 'YES', '', None, ''), ('InitiatingProcessMD5', 'text', 'YES', '', None, ''), ('InitiatingProcessParentFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessParentId', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA1', 'text', 'YES', '', None, ''), ('InitiatingProcessSHA256', 'text', 'YES', '', None, ''), ('InitiatingProcessTokenElevation', 'text', 'YES', '', None, ''), ('IsLocalAdmin', 'text', 'YES', '', None, ''), ('LogonId', 'text', 'YES', '', None, ''), ('LogonType', 'text', 'YES', '', None, ''), ('MachineGroup', 'text', 'YES', '', None, ''), ('Protocol', 'text', 'YES', '', None, ''), ('RemoteDeviceName', 'text', 'YES', '', None, ''), ('RemoteIP', 'text', 'YES', '', None, ''), ('RemoteIPType', 'text', 'YES', '', None, ''), ('RemotePort', 'text', 'YES', '', None, ''), ('ReportId', 'text', 'YES', '', None, ''), ('Timestamp', 'text', 'YES', '', None, ''), ('TimeGenerated', 'text', 'YES', '', None, ''), ('InitiatingProcessParentCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessCreationTime', 'text', 'YES', '', None, ''), ('InitiatingProcessFileSize', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoCompanyName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoFileDescription', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoInternalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoOriginalFileName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductName', 'text', 'YES', '', None, ''), ('InitiatingProcessVersionInfoProductVersion', 'text', 'YES', '', None, ''), ('SourceSystem', 'text', 'YES', '', None, ''), ('Type', 'text', 'YES', '', None, '')]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
-                }
-            },
-            {
-                "action": "SELECT InitiatingProcessId, InitiatingProcessCommandLine FROM DeviceLogonEvents WHERE DeviceId = 'fa37014e27eac3f926ae4540fe9bafdaa8d49550' LIMIT 10",
-                "observation": "[]",
-                "reward": 0,
-                "done": false,
-                "info": {
-                    "query_success": true,
-                    "submit": false
+                    "check_ans_response": "Analysis: The submitted answer does not match the golden answer and provides a completely different URL, which does not contain the key information mentioned in the golden answer.\nIs_Answer_Correct: False",
+                    "reward": 0,
+                    "check_ans_reflection": "Reflection: The previous evaluation correctly identifies that the URL in the submitted answer does not match the golden answer, which is crucial for determining the correctness of the submission in this context. URLs often serve as precise identifiers, and hence the exactness is important.\n\nAnalysis: The submitted answer provides a completely different URL from the golden answer, and the key information (the specific URL associated with the suspicious process injection) is not present. Thus, the submitted URL does not fulfill the requirement of the key content requested.\n\nIs_Answer_Correct: False",
+                    "query_success": true,
+                    "submit": true,
+                    "is_json_success": true,
+                    "check_sol_response": {
+                        "0": {
+                            "analysis": "The submitted answer does not discuss the process observing unexpected behavior on host 'vnevado-win11a', or the fact that it ran with no command line arguments.",
+                            "is_step_correct": "False"
+                        },
+                        "1": {
+                            "analysis": "The submitted answer provides a URL which is different from the one mentioned in the ground truth solution. The key URL `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt` is not present in the submitted answer.",
+                            "is_step_correct": "False"
+                        }
+                    },
+                    "is_reflect_success": true,
+                    "check_sol_reflection": {
+                        "0": {
+                            "analysis": "The previous evaluation correctly notes that the submitted answer does not discuss the process observing unexpected behavior on host 'vnevado-win11a', or the fact that it ran with no command line arguments. These details are critical to step 0.",
+                            "is_step_correct": "False"
+                        },
+                        "1": {
+                            "analysis": "The previous evaluation is accurate in stating that the submitted answer provides a different URL from the one mentioned in the ground truth solution. The key URL in the ground truth solution is `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt`, which is not present in the submitted answer.",
+                            "is_step_correct": "False"
+                        }
+                    }
                 }
             }
         ]
@@ -1450,9 +332,9 @@
                 "reward": 1,
                 "done": true,
                 "info": {
-                    "check_ans_response": "Analysis: The submitted answer exactly matches the golden answer for the user account's Security Identifier (SID).\nDecision: True",
+                    "check_ans_response": "Analysis: The submitted answer exactly matches the golden answer.\nIs_Answer_Correct: True",
                     "reward": 1,
-                    "check_ans_reflection": "Reflection: The analysis affirms that the submitted answer exactly matches the golden answer in both format and content. There is no ambiguity in the correctness of the submitted SID based on the given data. \n\nDecision: True",
+                    "check_ans_reflection": "Reflection: The previous evaluation is accurate in noting that the submitted answer exactly matches the golden answer. \n\nAnalysis: The submitted answer \"S-1-5-21-1240151660-3534038288-105586567-4122\" is an exact match to the golden answer. Both the format and the content are identical. There are no discrepancies or additional unnecessary information provided that could alter the correctness.\n\nIs_Answer_Correct: True",
                     "query_success": true,
                     "submit": true
                 }
@@ -1700,20 +582,20 @@
                 "reward": 0,
                 "done": true,
                 "info": {
-                    "check_ans_response": "Analysis: The submitted answer does not provide the required URL but instead states that no URL was found related to the suspicious activity.\nDecision: False",
+                    "check_ans_response": "Analysis: The submitted answer does not match the golden answer and is completely off, indicating no URL was found, which is contradictory as the golden answer provides a specific URL.\nIs_Answer_Correct: False",
                     "reward": 0,
-                    "check_ans_reflection": "Reflection: The submitted answer clearly states that no URL was found, which directly contradicts the requirement to provide a specific URL that indicates additional suspicious activity related to fileless attacks. The golden answer supplies a specific URL, demonstrating that there is indeed a URL that should be reported.\n\nDecision: False",
+                    "check_ans_reflection": "Reflection: The previous evaluation properly identifies that the submitted answer does not match the golden answer. The submitted answer denies the existence of any related URL, while the golden answer does provide a specific URL, making the evaluation coherent.\n\nAnalysis: Indeed, the submitted answer explicitly states \"No URL related to additional suspicious activity related to fileless attacks was found,\" which directly contradicts the golden answer, which provides a specific URL. Given this clear discrepancy, the submitted answer is incorrect as it fails to provide the correct URL.\n\nIs_Answer_Correct: False",
                     "is_json_success": true,
                     "check_sol_response": {
                         "0": {
-                            "analysis": "The submitted answer states that no URL related to additional suspicious activity was found, which contradicts the ground truth solution. The ground truth mentions a specific URL that was related to the suspicious process injection.",
+                            "analysis": "Rather than identifying the specific suspicious URL, the submitted answer incorrectly states that no related URL was found in the logs.",
                             "is_step_correct": "False"
                         }
                     },
                     "is_reflect_success": true,
                     "check_sol_reflection": {
                         "0": {
-                            "analysis": "The submitted answer states that there was no URL found related to additional suspicious activity, directly contradicting the ground truth solution which specifies the URL `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt` associated with the suspicious activity.",
+                            "analysis": "The previous evaluation is correct. The submitted answer denies finding related URLs while the ground truth explicitly provides a URL as key info for additional suspicious activity. Therefore, it does not satisfy the requirement of identifying the URL.",
                             "is_step_correct": "False"
                         }
                     },
@@ -1726,7 +608,7 @@
     {
         "success": false,
         "steps": 4,
-        "reward": 0,
+        "reward": 1,
         "success_query_count": 3,
         "total_query_count": 3,
         "question": {
@@ -1786,12 +668,12 @@
             {
                 "action": "The SIDs of the account associated with the suspicious activity are 'S-2-2-78' and 'S-1-5-21-1240151660-3534038288-105586567-4122'.",
                 "observation": "",
-                "reward": 0,
+                "reward": 1,
                 "done": true,
                 "info": {
-                    "check_ans_response": "Analysis: The submitted answer provides multiple SIDs including the golden answer, thereby not specifying it unambiguously.\nDecision: False",
-                    "reward": 0,
-                    "check_ans_reflection": "Reflection: Upon reviewing the analysis, I noticed that the submitted answer contains additional information beyond the golden answer and does not clearly denote a single SID as required. The golden answer specifies precisely one SID, whereas the submission includes two, making the response ambiguous and therefore incorrect.\n\nDecision: False",
+                    "check_ans_response": "Analysis: The submitted answer contains the golden answer SID 'S-1-5-21-1240151660-3534038288-105586567-4122' along with an additional SID, which does not exceed the enumeration limit.\nIs_Answer_Correct: True",
+                    "reward": 1,
+                    "check_ans_reflection": "Reflection: The initial review correctly stated that the submitted answer contained the golden answer along with one additional SID and did not exceed the enumeration limit. The determination of correctness is based on the presence of the golden answer within the provided SIDs.\n\nAnalysis: The submitted answer correctly includes the SID 'S-1-5-21-1240151660-3534038288-105586567-4122' which is the key information required. Although an additional SID 'S-2-2-78' is included, it does not exceed the enumeration limit and does not dilute the relevance of the key SID provided. Since it meets the criteria and the key information is present, the previous evaluation was accurate.\n\nIs_Answer_Correct: True",
                     "is_json_success": true,
                     "check_sol_response": {
                         "0": {
@@ -1961,9 +843,9 @@
                 "reward": 1,
                 "done": true,
                 "info": {
-                    "check_ans_response": "Analysis: The submitted answer precisely matches the golden answer for the AadUserId.\nDecision: True",
+                    "check_ans_response": "Analysis: The submitted answer matches the golden answer exactly, providing the correct AadUserId associated with the incident.\nIs_Answer_Correct: True",
                     "reward": 1,
-                    "check_ans_reflection": "Reflection: The analysis provided in the initial response is correct, as the AadUserId in the submitted answer matches the golden answer perfectly. The format and value are identical, indicating a match between the two.\n\nDecision: True",
+                    "check_ans_reflection": "Reflection: The previous evaluation accurately assessed that the submitted answer matched the golden answer exactly and provided the correct AadUserId associated with the incident.\n\nAnalysis: The submitted answer \"AadUserId is '12185914-91dd-4fb9-94f9-3252203b0426'\" contains the exact AadUserId provided in the golden answer. It also clearly identifies the AadUserId contextually, making it easy to understand.\n\nIs_Answer_Correct: True",
                     "query_success": true,
                     "submit": true
                 }
