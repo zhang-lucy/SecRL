@@ -1,5 +1,5 @@
 from autogen import OpenAIWrapper
-from .agent_utils import sql_parser, msging, call_llm
+from secgym.agents.agent_utils import sql_parser, msging, call_llm
 # from tenacity import retry, wait_fixed
 import random
 

@@ -1,6 +1,8 @@
 from autogen import OpenAIWrapper
 from secgym.agents.agent_utils import sql_parser, msging, call_llm
-# from tenacity import retry, wait_fixed
+import os
+
+curr_path = os.path.dirname(os.path.abspath(__file__))
 
 BASE_PROMPT = """You are a security analyst. 
 You need to answer a given security question by querying the database.
@@ -15,45 +17,19 @@ In Thought, you can analyse and reason about the current situation,
 Action can be one of the following: 
 (1) execute[<your query>], which executes the SQL query
 (2) submit[<your answer>], which is the final answer to the question
+
+Below are some demonstrations. Note that `Observation` denotes the returned logs from the database.
+Many of the returned logs are reduced for brevity (replaced with `...`).
 """
 
-BASE_SUMMARY_PROMPT = """You are a security analyst. 
-You need to answer a given security question by querying the database.
-The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
-Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
+for i, file in enumerate(os.listdir(os.path.join(curr_path, "react_examples"))):
+    with open(os.path.join(curr_path, "react_examples", file), "r") as f:
+        BASE_PROMPT +=  f"\nExample {i+1}: \n" + f.read() + "\n" + "-"*50
 
-Your response should always be a thought-action pair:
-Thought: <your reasoning>
-Action: <your SQL query>
+BASE_PROMPT = BASE_PROMPT[:-50].strip()
+print(BASE_PROMPT)
 
-In Thought, you can analyse and reason about the current situation, 
-Action can be one of the following: 
-(1) execute[<your query>], which executes the SQL query
-(2) submit[<your answer>], which is the final answer to the question
-
-When submitting an answer, please summarize key information from intermediate steps that lead to your answer.
-"""
-
-O1_PROMPT = """You are a security analyst. 
-You need to answer a given security question by querying the database.
-The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
-Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
-
-Your response should always be a thought-action pair:
-Thought: <your reasoning>
-Action: <your action>
-
-In Thought, you can analyse and reason about the current situation, 
-Action can be one of the following: 
-(1) execute[<your sql query>], which executes the SQL query. For example, execute[DESCRIBE table_name].
-(2) submit[<your answer>], which is the final answer to the question
-
-You should only give one thought-action per response. The action from your response will be executed and the result will be shown to you.
-Follow the format "Thought: ....\nAction: ...." exactly.
-Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
-"""
-
-class BaselineAgent:
+class ReActAgent:
     def __init__(self,
                  config_list,
                  cache_seed=41,
@@ -66,9 +42,9 @@ class BaselineAgent:
         self.config_list = config_list
         self.temperature = temperature
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
-        sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
+        sys_prompt = BASE_PROMPT
         if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model']:
-            sys_prompt = O1_PROMPT
+            raise ValueError("O1 and O3 models prompt is not set for ReactAgent")
         self.messages = [{"role": "system", "content": sys_prompt}]
 
         self.max_steps = max_steps
@@ -79,7 +55,7 @@ class BaselineAgent:
         
     @property
     def name(self):
-        return "BaselineAgent"
+        return "ReactAgent"
 
     def _call_llm(self, messages):
         response = call_llm(
@@ -137,8 +113,8 @@ class BaselineAgent:
 
     def reset(self):
         self.step_count = 0
-        sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
+        sys_prompt = BASE_PROMPT
         if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
-            sys_prompt = O1_PROMPT
+            raise ValueError("O1 and O3 models prompt is not set for ReactAgent")
         self.messages = [{"role": "system", "content": sys_prompt}]
         self.client.clear_usage_summary()
