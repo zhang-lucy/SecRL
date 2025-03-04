@@ -243,12 +243,13 @@ if __name__ == "__main__":
         sol_check_reflection=True,
         step_checking=True,
         strict_check=False,
+        verbose=False,
     )
 
     base_files = [
         # "BaselineAgent_4o-mini_c71_alert_level_t0_s25_trial1",
         # "BaselineAgent_gpt-4o_c70_alert_level_t0_s25_trial1",
-        "BaselineAgent_gpt-4o_c102_alert_level_t0_s25_trial1_train",
+        #"BaselineAgent_gpt-4o_c102_alert_level_t0_s25_trial1_train",
         "BaselineAgent_gpt-4o-ft-cv1_c102_alert_level_t0_s25_trial1",
         "BaselineAgent_o1-mini_c92_alert_level_t0_s25_trial1",
         "BaselineAgent_o3-mini_c99_alert_level_t0_s25_trial1",
