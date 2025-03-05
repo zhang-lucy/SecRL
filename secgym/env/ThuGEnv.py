@@ -9,6 +9,7 @@ from datetime import datetime
 from time import sleep
 
 from secgym.utils import get_full_question
+from secgym.env.evaluator import Evaluator
 
 # ATTACKS = {
 #     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
@@ -81,7 +82,7 @@ class ThuGEnv(gym.Env):
     def __init__(
             self,
             attack: Union[str, int],
-            evaluator,
+            evaluator: Evaluator,
             noise_level: int = 0,
             save_file: Union[str, bool] = True,
             max_steps: int = 15,
@@ -343,13 +344,14 @@ class ThuGEnv(gym.Env):
     def _eval(self, answer: str) -> dict:
         """Evaluate the answer and return the score.
         """
-        try:
-            eval_dict = self.evaluator.checking(self.curr_question, answer)
-        except Exception as e:
-            eval_dict = {
-                "reward": 0,
-                "error": str(e)
-            }
+        eval_dict = self.evaluator.checking(self.curr_question, answer)
+        # try:
+        #     eval_dict = self.evaluator.checking(self.curr_question, answer)
+        # except Exception as e:
+        #     eval_dict = {
+        #         "reward": 0,
+        #         "error": str(e)
+        #     }
         return eval_dict
     
     def check_layer(self, layer: str) -> None:

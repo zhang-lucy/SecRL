@@ -27,7 +27,6 @@ for i, file in enumerate(os.listdir(os.path.join(curr_path, "react_examples"))):
         BASE_PROMPT +=  f"\nExample {i+1}: \n" + f.read() + "\n" + "-"*50
 
 BASE_PROMPT = BASE_PROMPT[:-50].strip()
-print(BASE_PROMPT)
 
 class ReActAgent:
     def __init__(self,
