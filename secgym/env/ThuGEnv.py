@@ -343,13 +343,14 @@ class ThuGEnv(gym.Env):
     def _eval(self, answer: str) -> dict:
         """Evaluate the answer and return the score.
         """
-        try:
-            eval_dict = self.evaluator.checking(self.curr_question, answer)
-        except Exception as e:
-            eval_dict = {
-                "reward": 0,
-                "error": str(e)
-            }
+        eval_dict = self.evaluator.checking(self.curr_question, answer)
+        # try:
+        #     eval_dict = self.evaluator.checking(self.curr_question, answer)
+        # except Exception as e:
+        #     eval_dict = {
+        #         "reward": 0,
+        #         "error": str(e)
+        #     }
         return eval_dict
     
     def check_layer(self, layer: str) -> None:
