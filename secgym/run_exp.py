@@ -40,7 +40,7 @@ def run_experiment(
         
     for i in range(thug_env.num_questions):
         #emptying the replay buffer for each question
-        if agent.name == "ReflexionAgent":
+        if agent.name == "ReactReflexionAgent" or agent.name == "PromptSauceReflexionAgent":
             agent.replay_buffer = []
         tested_num += 1 # increment tested number of questions
 
@@ -76,7 +76,7 @@ def run_experiment(
                     break
             
             # for Reflexion Agent
-            if agent.name == "ReflexionAgent":
+            if agent.name == "ReactReflexionAgent" or agent.name == "PromptSauceReflexionAgent":
                 # saving replay in agent memory
                 replay = {
                     "messages": agent.messages,
