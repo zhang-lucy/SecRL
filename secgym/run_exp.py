@@ -7,7 +7,7 @@ from secgym.env.evaluator import Evaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
-from secgym.agents import BaselineAgent, PromptSauceAgent, ReflexionAgent, MultiModelBaselineAgent, ReActAgent
+from secgym.agents import BaselineAgent, PromptSauceAgent, MultiModelBaselineAgent, ReActAgent, PromptSauceReflexionAgent, ReActReflexionAgent
 
 #config_list_4_turbo, config_list_35
 
@@ -163,6 +163,7 @@ if __name__ == "__main__":
 
     evaluator = Evaluator(
         config_list=eval_config_list, 
+        cache_seed=cache_seed,
         ans_check_reflection=True, 
         sol_check_reflection=True,
         step_checking=True,
@@ -170,29 +171,16 @@ if __name__ == "__main__":
         cache_seed=cache_seed,
     )
 
-    if args.agent == "baseline":
-        test_agent = BaselineAgent(
-            config_list=agent_config_list,
-            cache_seed=cache_seed, 
-            temperature=temperature,
-            max_steps=max_steps,
-        )
-    elif args.agent == "react":
-        test_agent = ReActAgent(
-            config_list=agent_config_list,
-            cache_seed=cache_seed, 
-            temperature=temperature,
-            max_steps=max_steps,
-        )
-    elif args.agent == "prompt_sauce":
-        test_agent = PromptSauceAgent(
-            config_list=agent_config_list,
-            cache_seed=cache_seed, 
-            temperature=temperature,
-            max_steps=max_steps,
-        )
-    elif args.agent == "reflexion":
-        test_agent = ReflexionAgent(
+    agent_map = {
+        "baseline": BaselineAgent,
+        "react": ReActAgent,
+        "prompt_sauce": PromptSauceAgent,
+        "ps_reflexion": PromptSauceReflexionAgent,
+        "react_reflexion": ReActReflexionAgent,
+    }
+
+    if args.agent in agent_map:
+        test_agent = agent_map[args.agent](
             config_list=agent_config_list,
             cache_seed=cache_seed, 
             temperature=temperature,
@@ -207,16 +195,6 @@ if __name__ == "__main__":
             temperature=temperature,
             max_steps=max_steps,
         )
-    elif args.agent == "cheating":
-        pass
-        # # For cheating agent
-        # graph_path = f"qagen/graph_files/{attack}.graphml"
-        # alert_graph = AlertGraph()
-        # alert_graph.load_graph_from_graphml(graph_path)
-        # incident = alert_graph.incident
-        # agent.incident = incident
-        # # print(incident)
-        # # exit()
     else:
         raise ValueError(f"Invalid agent name: {args.agent}, please modify run_exp.py to include the agent")
 
