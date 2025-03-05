@@ -64,7 +64,8 @@ class ReActAgent:
             messages=messages,
             retry_num=self.retry_num,
             retry_wait_time=self.retry_wait_time,
-            temperature=self.temperature
+            temperature=self.temperature,
+            stop=["Observation:", "observation:"]
         )
         return response.choices[0].message.content
         

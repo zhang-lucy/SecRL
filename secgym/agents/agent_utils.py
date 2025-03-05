@@ -37,7 +37,8 @@ def call_llm(
         messages:List[str], 
         retry_num=10, 
         retry_wait_time=5,
-        temperature=None
+        temperature=None,
+        stop=None
     ) -> ChatCompletion:
 
     for _ in range(retry_num):
@@ -48,7 +49,7 @@ def call_llm(
             elif "o3" in model:
                 response = client.create(messages=messages, model=model)
             else:
-                response = client.create(messages=messages, model=model, temperature=temperature)
+                response = client.create(messages=messages, model=model, temperature=temperature, stop=stop)
             break
         except TimeoutError as e:
             time.sleep(retry_wait_time)
