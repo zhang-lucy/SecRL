@@ -167,7 +167,11 @@ class PromptSauceReflexionAgent:
     def _add_message(self, msg: str, role: str="user"):
         self.messages.append(msging(msg, role))
 
-    def reset(self):
+    def reset(self, change_seed=True):
+        if change_seed:
+            self.cache_seed += 1
+        self.client = OpenAIWrapper(config_list=self.config_list, cache_seed=self.cache_seed)
+
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]

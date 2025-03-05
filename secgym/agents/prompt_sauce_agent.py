@@ -81,9 +81,10 @@ class PromptSauceAgent:
                  retry_num=10,
                  retry_wait_time=5,
                  ):
+        self.cache_seed = cache_seed
         self.config_list = config_list
         self.temperature = temperature
-        self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
+        self.client = OpenAIWrapper(config_list=config_list, cache_seed=self.cache_seed)
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
         if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model']:
             sys_prompt = O1_PROMPT
@@ -153,7 +154,11 @@ class PromptSauceAgent:
     def _add_message(self, msg: str, role: str="user"):
         self.messages.append(msging(msg, role))
 
-    def reset(self):
+    def reset(self, change_seed=True):
+        if change_seed:
+            self.cache_seed += 1
+        self.client = OpenAIWrapper(config_list=self.config_list, cache_seed=self.cache_seed)
+
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]

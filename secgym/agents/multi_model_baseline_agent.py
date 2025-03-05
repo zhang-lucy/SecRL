@@ -64,7 +64,7 @@ class MultiModelBaselineAgent:
                  retry_num=10,
                  retry_wait_time=5,
                  ):
-        
+        self.cache_seed = cache_seed
         self.master_client = OpenAIWrapper(config_list=config_list_master, cache_seed=cache_seed)
         self.slave_client = OpenAIWrapper(config_list=config_list_slave, cache_seed=cache_seed)
         self.config_list_master = config_list_master
@@ -154,7 +154,12 @@ class MultiModelBaselineAgent:
     def _add_message(self, msg: str, role: str="user"):
         self.messages.append(msging(msg, role))
 
-    def reset(self):
+    def reset(self, change_seed=True):
+        if change_seed:
+            self.cache_seed += 1
+        self.master_client = OpenAIWrapper(config_list=self.config_list_master, cache_seed=self.cache_seed)
+        self.slave_client = OpenAIWrapper(config_list=self.config_list_slave, cache_seed=self.cache_seed)
+
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
         if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
