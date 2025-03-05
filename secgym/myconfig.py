@@ -86,7 +86,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -94,7 +94,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-2",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -102,7 +102,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-3",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -110,7 +110,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-4",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -118,7 +118,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-5",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -126,7 +126,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-6",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -134,7 +134,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-7",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -142,7 +142,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-8",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -150,7 +150,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-9",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -158,7 +158,7 @@ CONFIG_LIST = [
     "model": "gpt-4o-mini-10",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["4o-mini"],
     "azure_ad_token_provider": token_provider
   },
@@ -500,8 +500,8 @@ if __name__ == "__main__":
 #   client = OpenAIWrapper(config_list=config_list_35, cache_seed=None)
 #   print("Test gpt 35", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
-  client = OpenAIWrapper(config_list=config_list_4o, cache_seed=None)
-  print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+  #client = OpenAIWrapper(config_list=config_list_4o, cache_seed=None)
+  #print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
   # client = OpenAIWrapper(config_list=config_list_4o_mini, cache_seed=None)
   # print("Test gpt 4o-mini", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
@@ -518,3 +518,14 @@ if __name__ == "__main__":
 
   # client = OpenAIWrapper(config_list=config, cache_seed=None)
   # print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
+
+  import autogen
+  def filter_config_list(config_list, model_name):
+    config_list = autogen.filter_config(config_list, {'tags': [model_name]})
+    if len(config_list) == 0:
+        raise ValueError(f"model {model_name} not found in the config list, please put 'tags': ['{model_name}'] in the config list to inicate this model")
+    return config_list
+  
+  agent_config_list = filter_config_list(CONFIG_LIST, "4o-mini")
+  client = OpenAIWrapper(config_list=agent_config_list, cache_seed=None)
+  print("Test gpt 4o-mini", client.create(messages=[{"role": "user", "content":"hello what model are you?"}]).choices[0].message.content)
