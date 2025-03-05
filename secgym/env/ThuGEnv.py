@@ -338,6 +338,7 @@ class ThuGEnv(gym.Env):
             Tuple[np.ndarray, float, bool, Dict]: The observation, reward, done, and info.
         """
         eval_dict = self._eval(answer)
+        eval_dict['submitted_answer'] = answer
         reward = eval_dict["reward"]
         return "", reward, True, eval_dict
 

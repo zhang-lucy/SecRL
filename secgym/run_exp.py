@@ -102,7 +102,6 @@ def run_experiment(
                 print(f"Skipping question {i+1} as it has been solved")
                 break
 
-        
         #saving logs
         result_dict = {
             "nodes": current_question_key,
@@ -110,7 +109,6 @@ def run_experiment(
             "question_dict": thug_env.curr_question,
             "trials": trials,
         }
-        result_dict.update(agent.get_logging())
         accum_logs.append(result_dict)
         accum_reward += reward
         accum_success += reward == 1
