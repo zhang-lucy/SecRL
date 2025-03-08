@@ -166,7 +166,6 @@ if __name__ == "__main__":
         sol_check_reflection=True,
         step_checking=True,
         strict_check=False,
-        cache_seed=cache_seed,
     )
 
     agent_map = {

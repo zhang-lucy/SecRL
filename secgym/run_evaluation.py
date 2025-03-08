@@ -114,7 +114,7 @@ def filter_config_list(config_list, model_name):
 
 if __name__ == "__main__":
     eval_model = "gpt-4o"
-    cache_seed = 110
+    cache_seed = 133
     temperature = 0
     eval_config_list = filter_config_list(CONFIG_LIST, eval_model)
     evaluator = Evaluator(
@@ -124,6 +124,7 @@ if __name__ == "__main__":
         step_checking=True,
         strict_check=False,
         verbose=False,
+        cache_seed=cache_seed,
     )
 
     base_files = [
