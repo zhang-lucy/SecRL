@@ -8,28 +8,55 @@ token_provider = get_bearer_token_provider(
 )
 
 CONFIG_LIST = [
+  # {
+  #   "model": "gpt-4o-0513-spot",
+  #   "base_url": "https://devpythiaaoaiauseast.openai.azure.com",
+  #   "api_type": "azure",
+  #   "api_version": "2024-08-01-preview",
+  #   "tags": ["gpt-4o"],
+  #   "azure_ad_token_provider": token_provider
+  # },
+  # {
+  #   "model": "gpt-4o-0513-spot",
+  #   "base_url": "https://devpythiaaoaiswedencentral.openai.azure.com",
+  #   "api_type": "azure",
+  #   "api_version": "2025-01-01-preview",
+  #   "tags": ["gpt-4o"],
+  #   "azure_ad_token_provider": token_provider
+  # },
+  # {
+  #   "model": "gpt-4-0125-spot",
+  #   "base_url": "https://devpythiaaoaicanadacentral.openai.azure.com",
+  #   "api_type": "azure",
+  #   "api_version": "2024-08-01-preview",
+  #   "tags": ["gpt-4o"],
+  #   "azure_ad_token_provider": token_provider
+  # },
   {
-    "model": "gpt-4o-0513-spot",
-    "base_url": "https://devpythiaaoaiauseast.openai.azure.com",
+    "model": "gpt-4o",
+    "base_url": "https://devpythiaaoaieus2.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["gpt-4o"],
+    "price": [2.5/1000, 10.0/1000],
     "azure_ad_token_provider": token_provider
   },
   {
-    "model": "gpt-4o-0513-spot",
-    "base_url": "https://devpythiaaoaiswedencentral.openai.azure.com",
-    "api_type": "azure",
-    "api_version": "2024-08-01-preview",
-    "tags": ["gpt-4o"],
-    "azure_ad_token_provider": token_provider
+     "model": "gpt-4o-0806",
+      "base_url": "https://devpythiaaoainwus3.openai.azure.com",
+      "api_type": "azure",
+      "api_version": "2025-01-01-preview",
+      "tags": ["gpt-4o"],
+      "price": [2.5/1000, 10.0/1000],
+      "azure_ad_token_provider": token_provider
   },
   {
-    "model": "gpt-4-0125-spot",
-    "base_url": "https://devpythiaaoaicanadacentral.openai.azure.com",
+    "model": "gpt-4o",
+    "base_url": "https://metabase-aoi-eus2.openai.azure.com",
     "api_type": "azure",
-    "api_version": "2024-08-01-preview",
+    "api_version": "2025-01-01-preview",
     "tags": ["gpt-4o"],
+    "price": [2.5/1000, 10.0/1000],
     "azure_ad_token_provider": token_provider
   },
   {
@@ -81,7 +108,6 @@ CONFIG_LIST = [
       "price": [15.0/1000, 60.0/1000],
       "azure_ad_token_provider": token_provider
   },
-
   {
     "model": "gpt-4o-mini",
     "base_url": "https://secphibench-aoai-eastus.openai.azure.com",

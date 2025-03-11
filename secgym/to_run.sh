@@ -11,9 +11,9 @@
 
 # --------------------------------------------
 # prompt sauce, 1 trial, step 15, gpt-4o
-python run_exp.py --agent prompt_sauce --cache_seed 345 --model gpt-4o --num_trials 1
+# python run_exp.py --agent prompt_sauce --cache_seed 345 --model gpt-4o --num_trials 1 (done)
 # run but use 3 trials, make sure use the same cache_seed as above
-python run_exp.py --agent prompt_sauce --cache_seed 345 --model gpt-4o --num_trials 3
+# python run_exp.py --agent prompt_sauce --cache_seed 345 --model gpt-4o --num_trials 3 (done)
 
 
 # --------------------------------------------
