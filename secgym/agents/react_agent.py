@@ -40,6 +40,7 @@ class ReActAgent:
                  ):
         self.config_list = config_list
         self.temperature = temperature
+        self.cache_seed = cache_seed
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         sys_prompt = BASE_PROMPT
         if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model']:
