@@ -46,7 +46,8 @@ def run_evaluation(
         if env_entry:
             assert env_entry['question']['question'] == agent_log_entry['question_dict']['question']
 
-        if not info['submit']:
+        if not info.get("submit", False):
+            print(f"question {agent_log_entry['nodes']} | Not submitted", info)
             continue # skip if not submitted
         
         # get env log entry
@@ -88,6 +89,9 @@ def run_evaluation(
             print("Evaluation", eval_dict['check_ans_response'])
             print("Reflection on Explanation", eval_dict['check_ans_reflection'])
             print("---"*50)
+        else:
+            print(f"question {agent_log_entry['nodes']} | reward: {old_reward} | No change")
+
 
     print(f"Re-evaluated {reevaluated_count} questions | Changed reward: {changed_reward}")
 

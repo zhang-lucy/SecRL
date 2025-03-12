@@ -205,19 +205,21 @@ class Evaluator:
             self.ans_check_prompt = FUZZY_ANSWER_CHECK_PROMPT
             self.ans_check_reflection_prompt = FUZZY_ANSWER_CHECK_REFLECTION_PROMPT
     
-    def _retry_create(self, messages, **kwargs):
-        """Retry at None response"""
+    def _retry_create(self, messages, match_pattern=None, **kwargs):
+        """Retry at None response, or no match pattern found"""
         tmp_config = self.llm_config.copy()
         tmp_config.update(kwargs)
-        client = OpenAIWrapper(**tmp_config)
-        
-        response = client.create(messages=messages)
         for i in range(10):
-            if response.choices[0].message.content is not None:
-                break
-            tmp_config["cache_seed"] = self.cache_seed+1+i
+            tmp_config["cache_seed"] = self.cache_seed+i
             client = OpenAIWrapper(**tmp_config)
             response = client.create(messages=messages)
+            if response.choices[0].message.content is not None:
+                if match_pattern is not None:
+                    results = re.search(match_pattern, response.choices[0].message.content)
+                    if results is not None:
+                        break
+                else:
+                    break
         return response
     
     def _get_json_response(
@@ -341,14 +343,17 @@ class Evaluator:
     def check_single_response(self, question: dict, submitted_answer: str) -> dict:
         # Call LLM to evaluate the answer
         input_str = EVAL_ANSWER_TEMPLATE.format(question=get_full_question(question), golden_answer=question["answer"], submitted_answer=submitted_answer)
+        match_pattern = r"Is_Answer_Correct: (True|False)"
         response = self._retry_create(messages=[
-            msging(self.ans_check_prompt, role="system"), 
-            msging(input_str, role="user")
-        ])
+                msging(self.ans_check_prompt, role="system"), 
+                msging(input_str, role="user")
+            ],
+            match_pattern=match_pattern
+        )
 
         # Parse the response
         response = response.choices[0].message.content
-        decision = re.search(r"Is_Answer_Correct: (True|False)", response)
+        decision = re.search(match_pattern, response)
         decision = decision.group(1)
         if self.verbose:
             print("Ground Truth Answer:", question["answer"])
@@ -361,9 +366,9 @@ class Evaluator:
                 msging(self.ans_check_reflection_prompt, role="system"), 
                 msging(input_str+"\n"+response, role="user")
             ]
-            reflect_response = self._retry_create(messages=messages).choices[0].message.content
+            reflect_response = self._retry_create(messages=messages, match_pattern=match_pattern).choices[0].message.content
 
-            decision = re.search(r"Is_Answer_Correct: (True|False)", reflect_response)
+            decision = re.search(match_pattern, reflect_response)
             decision = decision.group(1)
             return_dict["check_ans_reflection"] = reflect_response
             return_dict['reward'] = int(decision == "True")
