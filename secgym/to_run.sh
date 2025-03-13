@@ -18,7 +18,7 @@
 
 # --------------------------------------------
 # gpt-4o run react for 3 trials, keep the same cache_seed as the existing one
-python run_exp.py --agent react --cache_seed 121 --model gpt-4o --num_trials 3
+# python run_exp.py --agent react --cache_seed 121 --model gpt-4o --num_trials 3 (done)
 # 4o-mini run react for 3 trials, keep the same cache_seed as the existing one
 python run_exp.py --agent react --cache_seed 124 --model 4o-mini --num_trials 3
 
