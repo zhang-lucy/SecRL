@@ -59,6 +59,7 @@ class PromptSauceReflexionAgent:
                  ):
         self.config_list = config_list
         self.temperature = temperature
+        self.cache_seed = cache_seed
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]

@@ -20,22 +20,22 @@
 # gpt-4o run react for 3 trials, keep the same cache_seed as the existing one
 # python run_exp.py --agent react --cache_seed 121 --model gpt-4o --num_trials 3 (done)
 # 4o-mini run react for 3 trials, keep the same cache_seed as the existing one
-python run_exp.py --agent react --cache_seed 124 --model 4o-mini --num_trials 3
+# python run_exp.py --agent react --cache_seed 124 --model 4o-mini --num_trials 3 (done)
 
 
 # --------------------------------------------
 
-# # prompt sauce reflexion, 3 trials, 4o-mini, rerun with 15 steps
-# python run_exp.py --agent ps_reflexion --cache_seed 34 --model 4o-mini --num_trials 3
-# # prompt sauce reflexion, 3 trials, 4o, rerun with 15 steps
-# python run_exp.py --agent ps_reflexion --cache_seed 34 --model gpt-4o --num_trials 3
+# # # prompt sauce reflexion, 3 trials, 4o-mini, rerun with 15 steps
+# python run_exp.py --agent ps_reflexion --cache_seed 234 --model 4o-mini --num_trials 3 (done)
+# # # prompt sauce reflexion, 3 trials, 4o, rerun with 15 steps
+# python run_exp.py --agent ps_reflexion --cache_seed 234 --model gpt-4o --num_trials 3 (done)
 
 
 # # --------------------------------------------
 # # react reflexion, 3 trials, 4o-mini, rerun with 15 steps
-# python run_exp.py --agent react_reflexion --cache_seed 34 --model 4o-mini --num_trials 3
+python run_exp.py --agent react_reflexion --cache_seed 348 --model 4o-mini --num_trials 3
 # # react reflexion, 3 trials, 4o, rerun with 15 steps
-# python run_exp.py --agent react_reflexion --cache_seed 34 --model gpt-4o --num_trials 3
+python run_exp.py --agent react_reflexion --cache_seed 348 --model gpt-4o --num_trials 3
 
 
 
