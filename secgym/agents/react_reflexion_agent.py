@@ -68,7 +68,8 @@ class ReActReflexionAgent:
             messages=messages,
             retry_num=self.retry_num,
             retry_wait_time=self.retry_wait_time,
-            temperature=self.temperature
+            temperature=self.temperature,
+            stop=["Observation:", "observation:"]
         )
         return response.choices[0].message.content
     
@@ -121,9 +122,13 @@ class ReActReflexionAgent:
         if self.step_count >= self.max_steps-1 and self.submit_summary:
             summary_prompt = "You have reached maximum number of steps. Please summarize your findings of key information, and sumbit them."
             self._add_message(summary_prompt, role="system")
+        
+        split_str = "\nAction:"
+        if "**Action:**" in response:
+            split_str = "\n**Action:**"
 
         try:
-            thought, action = response.strip().split(f"\nAction:")
+            thought, action = response.strip().split(split_str)
             self._add_message(response.strip(), role="assistant")
         except:
             print("\nRetry Split Action:")

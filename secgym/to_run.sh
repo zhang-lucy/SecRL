@@ -33,9 +33,9 @@
 
 # # --------------------------------------------
 # # react reflexion, 3 trials, 4o-mini, rerun with 15 steps
-python run_exp.py --agent react_reflexion --cache_seed 348 --model 4o-mini --num_trials 3
-# # react reflexion, 3 trials, 4o, rerun with 15 steps
-python run_exp.py --agent react_reflexion --cache_seed 348 --model gpt-4o --num_trials 3
+# python run_exp.py --agent react_reflexion --cache_seed 378 --model 4o-mini --num_trials 3 (done)
+# # # react reflexion, 3 trials, 4o, rerun with 15 steps
+# python run_exp.py --agent react_reflexion --cache_seed 378 --model gpt-4o --num_trials 3 (done)
 
 
 
