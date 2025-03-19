@@ -37,11 +37,9 @@
 # # # react reflexion, 3 trials, 4o, rerun with 15 steps
 # python run_exp.py --agent react_reflexion --cache_seed 378 --model gpt-4o --num_trials 3 (done)
 
-
-
 # --------------------------------------------
 # TODO: run train set with react reflexion
-# python run_exp.py --agent react_reflexion --cache_seed 34 --model gpt-4o --num_trials 3 --split train
+# python run_exp.py --agent react_reflexion --cache_seed 349 --model gpt-4o --num_trials 3 --split train (done)
 
 
 
