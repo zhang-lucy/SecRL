@@ -233,7 +233,13 @@ class Evaluator:
         ]
         for i in range(10):
             try:
-                response = self._retry_create(messages=messages, response_format= { "type": "json_object" }).choices[0].message.content
+                tmp_config = self.llm_config.copy()
+                tmp_config["cache_seed"] = self.cache_seed+10+i
+                client = OpenAIWrapper(**tmp_config)
+                response = client.create(
+                    messages=messages,
+                    response_format= { "type": "json_object" }
+                ).choices[0].message.content
                 if "```json" in response:
                     print("Spearating ```json placeholder")
                     response = response.split("```json")[1].split("```")[0]
@@ -243,7 +249,6 @@ class Evaluator:
                 break
             except Exception as e:
                 print(f"Error: {e}: {response}, retry {i+1} time.")
-                self.llm_config["cache_seed"] = self.cache_seed+10+i
         
         self.llm_config["cache_seed"] = self.cache_seed
         if not isinstance(response, dict):
