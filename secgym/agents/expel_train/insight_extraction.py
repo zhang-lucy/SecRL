@@ -22,7 +22,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Extract insights from experience trajectories')
     parser.add_argument('--max_trials', type=int, default=3,
                         help='Maximum number of trials per question')
-    parser.add_argument('--json_path', type=str, default='/Users/kevin/Downloads/SecRL/secgym/final_results/ReflexionAgent_gpt-4o_c101_alert_level_t0_s15_trial3_train',
+    parser.add_argument('--json_path', type=str, default='secgym/final_results/ReActReflexionAgent_gpt-4o_c349_alert_level_t0_s15_trial3_train',
                         help='Path to experience JSON files')
     parser.add_argument('--correct_batch_size', type=int, default=4,
                         help='Size of batches for correct examples')
