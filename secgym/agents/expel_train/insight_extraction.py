@@ -235,6 +235,7 @@ def parse_tool_response(completion: Dict[str, Any], model: str) -> Tuple[Action,
         else:
             return Action(type=ActionType.ADD, content=""), False
     except:
+        print(f"Error parsing tool call: {tool_call}, continue")
         return Action(type=ActionType.ADD, content=""), False
 
 
