@@ -22,7 +22,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Extract insights from experience trajectories')
     parser.add_argument('--max_trials', type=int, default=3,
                         help='Maximum number of trials per question')
-    parser.add_argument('--json_path', type=str, default='secgym/final_results/ReActReflexionAgent_gpt-4o_c349_alert_level_t0_s15_trial3_train',
+    parser.add_argument('--json_path', type=str, default='final_results/ReActReflexionAgent_gpt-4o_c349_alert_level_t0_s15_trial3_train',
                         help='Path to experience JSON files')
     parser.add_argument('--correct_batch_size', type=int, default=4,
                         help='Size of batches for correct examples')
@@ -373,6 +373,16 @@ def format_context(context: Union[str, Dict[str, str]]) -> str:
             context = context[context_key]
         return context_string
 
+def truncate_user_msg_length(
+    messages: List[Dict[str, str]],
+    truncate_length: int = 20000,
+):
+    for i, message in enumerate(messages):
+        if message['role'] == 'user':
+            message['content'] = message['content'][:truncate_length] + ' ... (Truncated)'
+        messages[i] = message
+    return messages
+    
 
 def format_correct_batch(batch_correct_messages: List[Dict[str, str]], task_dicts: List[Dict[str, str]]) -> str:
     """Given a list of correct messages from different nodes, output a clean format for the LLM to ingest"""
@@ -381,7 +391,8 @@ def format_correct_batch(batch_correct_messages: List[Dict[str, str]], task_dict
     for i, (correct_message, task_dict) in enumerate(zip(batch_correct_messages, task_dicts)):
         context_string = format_context(task_dict['context'])
         # we only take the messages, and since the first and second messages are the system prompt and question, we skip them
-        trajectory_string += f"<trajectory_{i}>\n<question>{task_dict['question']}</question>\n<context>{context_string}</context>\n{correct_message['messages'][2:]}\n</trajectory_{i}>\n"
+        truncated_correct_messages = truncate_user_msg_length(correct_message['messages'][2:])
+        trajectory_string += f"<trajectory_{i}>\n<question>{task_dict['question']}</question>\n<context>{context_string}</context>\n{truncated_correct_messages}\n</trajectory_{i}>\n"
     return return_string.format(trajectory_string)
 
 
@@ -392,8 +403,10 @@ def format_correct_incorrect_pair(correct_messages: Dict[str, str], incorrect_me
     context_string = format_context(task_dict['context'])
     trajectory_string += f"<question>{task_dict['question']}</question>\n<context>{context_string}</context>\n"
     # we only take the messages, and since the first and second messages are the system prompt and question, we skip them
-    trajectory_string += f"<correct_trajectory>\n{correct_messages['messages'][2:]}\n</correct_trajectory>\n"
-    trajectory_string += f"<incorrect_trajectory>\n{incorrect_messages['messages'][2:]}\n</incorrect_trajectory>\n"
+    truncated_correct_messages = truncate_user_msg_length(correct_messages['messages'][2:])
+    truncated_incorrect_messages = truncate_user_msg_length(incorrect_messages['messages'][2:])
+    trajectory_string += f"<correct_trajectory>\n{truncated_correct_messages}\n</correct_trajectory>\n"
+    trajectory_string += f"<incorrect_trajectory>\n{truncated_incorrect_messages}\n</incorrect_trajectory>\n"
     return return_string.format(trajectory_string, trajectory_string)
 
 
