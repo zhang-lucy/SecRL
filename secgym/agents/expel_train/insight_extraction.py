@@ -233,9 +233,9 @@ def parse_tool_response(completion: Dict[str, Any], model: str) -> Tuple[Action,
         elif tool_call['name'] == 'add_insight':
             return Action(type=ActionType.ADD, content=tool_call['arguments']['content']), True
         else:
-            return Action(type=ActionType.Add, content=""), False
+            return Action(type=ActionType.ADD, content=""), False
     except:
-        return Action(type=ActionType.Add, content=""), False
+        return Action(type=ActionType.ADD, content=""), False
 
 
 def collect_message_dicts(experience_paths: List[str], max_trials: int) -> Tuple[List[Dict[str, str]], List[Tuple[Dict[str, str], Dict[str, str]]], List[Dict[str, str]], List[Dict[str, str]]]:
