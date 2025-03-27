@@ -468,8 +468,8 @@ def main():
     #     # base_url=OPENAI_API_BASE,
     # )
     client = AzureOpenAI(
-        api_version="2024-08-01-preview",
-        azure_endpoint="https://devpythiaaoaiauseast.openai.azure.com",
+        api_version="2025-01-01-preview",
+        azure_endpoint="https://metabase-aoi-eus2.openai.azure.com",
         azure_ad_token_provider=token_provider,
     )
 
