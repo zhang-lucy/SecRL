@@ -323,7 +323,10 @@ def update_insight_list(messages: Dict[str, str], llm: Callable, max_steps: str,
             messages=messages,
             **generation_kwargs,
         )
-        messages.append({'role': 'assistant', 'content': completion.choices[0].message.content})
+        if completion.choices[0].message.content is None:
+            messages.append({'role': 'assistant', 'content': ""})
+        else:
+            messages.append({'role': 'assistant', 'content': completion.choices[0].message.content})
         if USE_TOOLS:
             action, success = parse_tool_response(completion, MODEL_NAME)
         else:
