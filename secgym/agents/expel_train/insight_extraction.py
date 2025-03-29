@@ -318,11 +318,17 @@ def check_action_validity(action: Action, list_insights: List[Tuple[str, int]]) 
 
 def update_insight_list(messages: Dict[str, str], llm: Callable, max_steps: str, list_insights: List[Tuple[str, int]], starting_vote: int, generation_kwargs: Dict[str, Any] = {}) -> Tuple[List[Tuple[str, int]], Dict[str, Any]]:
     for i in range(1, max_steps + 1):
-        completion = llm.chat.completions.create(
-            model=MODEL_NAME,
-            messages=messages,
-            **generation_kwargs,
-        )
+        try:
+            completion = llm.chat.completions.create(
+                model=MODEL_NAME,
+                messages=messages,
+                **generation_kwargs,
+            )
+        except Exception as e:
+            print(f"Error in LLM call: {e}")
+            messages.append({'role': 'assistant', 'content': ""})
+            messages.append({'role': 'user', 'content': "Your last action was not successfully parsed due to content filtering issue with oai. Please try again."})
+            continue
         if completion.choices[0].message.content is None:
             messages.append({'role': 'assistant', 'content': ""})
         else:
