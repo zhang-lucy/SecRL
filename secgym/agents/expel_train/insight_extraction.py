@@ -26,7 +26,7 @@ def parse_arguments():
                         help='Path to experience JSON files')
     parser.add_argument('--correct_batch_size', type=int, default=4,
                         help='Size of batches for correct examples')
-    parser.add_argument('--model_name', type=str, default='gpt-4o-mini',
+    parser.add_argument('--model_name', type=str, default='gpt-4o',
                         help='Model name to use for insight extraction')
     parser.add_argument('--seed', type=int, default=24,
                         help='Random seed for reproducibility')
@@ -204,7 +204,9 @@ def parse_tool_response(completion: Dict[str, Any], model: str) -> Tuple[Action,
     elif 'gpt' in model.lower():
         tool_calls = []
         for toolcall in completion.choices[0].message.tool_calls:
-            tool_calls.append(toolcall.function.dict())
+            tmp = toolcall.function.dict()
+            tmp['arguments'] = json.loads(tmp['arguments'])
+            tool_calls.append(tmp)
     else:
         raise ValueError(f"Invalid model: {model}")
     if len(tool_calls) == 0:
@@ -513,6 +515,8 @@ def main():
             generation_kwargs=generation_kwargs,
         )
         logs.append(messages)
+    with open(OUTPUT_PATH, 'w') as f:
+        json.dump([list_insight[0] for list_insight in list_insights], f)
     print('Starting to extract insights for batched correct trajectories...')
     for correct_batch_prompt in list_batched_correct_prompts:
         formatted_insights = format_insights(list_insights)
