@@ -5,6 +5,7 @@ from .prompt_sauce_reflexion_agent import PromptSauceReflexionAgent
 from .react_reflexion_agent import ReActReflexionAgent
 from .multi_model_baseline_agent import MultiModelBaselineAgent
 from .react_agent import ReActAgent
+from .expel_agent import ExpelAgent
 
 __all__ = [
     "BaselineAgent",
@@ -14,5 +15,6 @@ __all__ = [
     "MultiModelBaselineAgent",
     "ReActAgent",
     "PromptSauceReflexionAgent",
-    "ReActReflexionAgent"
+    "ReActReflexionAgent",
+    "ExpelAgent",
 ]

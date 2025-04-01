@@ -63,6 +63,7 @@ class BaselineAgent:
                  retry_num=10,
                  retry_wait_time=5,
                  ):
+        self.cache_seed = cache_seed
         self.config_list = config_list
         self.temperature = temperature
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)

@@ -65,13 +65,19 @@ class ExperiencePool:
         return self.format_demonstration([doc.metadata for doc in retrieved_docs])
 
     def format_demonstration(self, demonstrations: List[Dict[str, str]]) -> str:
-        # TODO            
-        raise NotImplementedError("Needs to be implemented")
+        demo_str = demonstrations[0]['messages'][1]['content'] + '\n'
+        for m in demonstrations[0]['messages'][2:]:
+            if m['role'] == 'user':
+                demo_str += f"Observation: {m['content'][:10000]}\n\n"
+            else:
+                demo_str += f"{m['content']}\n"
+        return demo_str
+
 
 
 if __name__ == "__main__":
     experience_pool = ExperiencePool(
-        correct_trajectories_path='corrects.jsonl',
+        correct_trajectories_path='/Users/kevin/Downloads/SecRL/secgym/agents/expel_train/corrects_30.jsonl',
         embed_type='both'
     )
     print(experience_pool.get_demonstrations({'context': 'context', 'question': 'What is the capital of France?'}, 1))

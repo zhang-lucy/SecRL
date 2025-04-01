@@ -7,7 +7,7 @@ from secgym.env.evaluator import Evaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
-from secgym.agents import BaselineAgent, PromptSauceAgent, MultiModelBaselineAgent, ReActAgent, PromptSauceReflexionAgent, ReActReflexionAgent
+from secgym.agents import BaselineAgent, PromptSauceAgent, MultiModelBaselineAgent, ReActAgent, PromptSauceReflexionAgent, ReActReflexionAgent, ExpelAgent
 
 #config_list_4_turbo, config_list_35
 
@@ -52,7 +52,10 @@ def run_experiment(
             
             # reset environment and agent
             observation, _ = thug_env.reset(i) # first observation is question dict
-            agent.reset()
+            if agent.name == "ExpelAgent":
+                agent.reset(question_dict=thug_env.curr_question)
+            else:
+                agent.reset()
 
             # check if question has been tested before
             current_question_key = f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}"
@@ -189,6 +192,15 @@ if __name__ == "__main__":
             config_list_master=agent_config_list_master,
             config_list_slave=agent_config_list,
             cache_seed=cache_seed, 
+            temperature=temperature,
+            max_steps=max_steps,
+        )
+    elif args.agent == "expel":
+        test_agent = ExpelAgent(
+            config_list=agent_config_list,
+            insight_path="agents/expel_train/insights.json", # TODO:
+            experience_path="agents/expel_train/corrects.jsonl",
+            cache_seed=cache_seed,
             temperature=temperature,
             max_steps=max_steps,
         )
