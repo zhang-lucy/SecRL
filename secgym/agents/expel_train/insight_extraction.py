@@ -204,7 +204,7 @@ def parse_tool_response(completion: Dict[str, Any], model: str) -> Tuple[Action,
     elif 'gpt' in model.lower():
         tool_calls = []
         if not completion.choices[0].message.tool_calls:
-            return Action(type=ActionType.Add, content=""), False
+            return Action(type=ActionType.ADD, content=""), False
         for toolcall in completion.choices[0].message.tool_calls:
             tmp = toolcall.function.dict()
             tmp['arguments'] = json.loads(tmp['arguments'])
