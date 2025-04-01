@@ -46,9 +46,9 @@ def parse_arguments():
                         help='OpenAI API key')
     parser.add_argument('--openai_api_base', type=str, default="http://localhost:8000/v1",
                         help='OpenAI API base URL')
-    parser.add_argument('--correct_incorrect_steps', type=int, default=30,
+    parser.add_argument('--correct_incorrect_steps', type=int, default=None,
                         help='Number of correct/incorrect pairs to process (None for all)')
-    parser.add_argument('--correct_batch_steps', type=int, default=30,
+    parser.add_argument('--correct_batch_steps', type=int, default=None,
                         help='Number of correct batches to process (None for all)')
     return parser.parse_args()
 
