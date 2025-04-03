@@ -61,6 +61,7 @@ def run_experiment(
             current_question_key = f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}"
             if current_question_key in tested_question_keys:
                 print(f"Skipping question with key {current_question_key}")
+                break
 
             # run one episode
             for s in range(thug_env.max_steps):
@@ -237,7 +238,6 @@ if __name__ == "__main__":
             num_test=-1, # set to -1 to run all questions
             num_trials=num_trials,
         )
-        test_agent.reset()
 
         with open(f'{base_dir}/{sub_dir}/results.txt', 'a') as f:
             f.write(f"Model: {model}, Attack: {attack}, Agent: {agent_name}, Cache Seed: {cache_seed}, Temperature: {temperature}, Layer: {layer}, Max Steps: {max_steps}, Eval Model: {eval_model}, Num Trials: {num_trials}\n")
