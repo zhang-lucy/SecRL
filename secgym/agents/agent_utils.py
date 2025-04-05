@@ -4,12 +4,11 @@ from autogen import OpenAIWrapper
 import time
 from typing import List
 from openai.types.chat import ChatCompletion
-
+from azure.ai.inference import ChatCompletionsClient
+from azure.ai.inference.models import ChatCompletions
 
 def msging(msg: str, role: str="user"):
     return {"role": role, "content": msg}
-
-
 
 def sql_parser(action: str, code_block=False):
     # remove ` in the str
@@ -30,6 +29,25 @@ def sql_parser(action: str, code_block=False):
             return action[:action.index(";")], True, submit
         return action, True, submit
     return action, False, submit
+
+def call_llm_foundry(
+        client:ChatCompletionsClient, 
+        model:str,
+        messages:List[str], 
+        retry_num=10, 
+        retry_wait_time=5,
+        temperature=None,
+        stop=None
+    ) -> ChatCompletions:
+
+    for _ in range(retry_num):
+        try: 
+            response = client.complete(messages=messages, temperature=temperature, stop=stop)
+            break
+        except TimeoutError as e:
+            time.sleep(retry_wait_time)
+    return response
+
 
 def call_llm(
         client:OpenAIWrapper, 

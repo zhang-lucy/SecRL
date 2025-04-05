@@ -33,6 +33,12 @@ CONFIG_LIST = [
   #   "azure_ad_token_provider": token_provider
   # },
   {
+    "model": "r1",
+    "endpoint" : "https://DeepSeek-R1-secrl.eastus.models.ai.azure.com",
+    "api_type": "ai_foundry",
+    "tags": ["r1"], 
+  },
+  {
     "model": "gpt-4o",
     "base_url": "https://devpythiaaoaieus2.openai.azure.com",
     "api_type": "azure",
@@ -398,7 +404,7 @@ config_list_4o = [
     "api_type": "azure",
     "api_version": "2024-08-01-preview",
     "azure_ad_token_provider": token_provider
-  }
+  },
 ]
 
 # config_list_4o = [

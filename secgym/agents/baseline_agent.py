@@ -1,5 +1,9 @@
 from autogen import OpenAIWrapper
-from secgym.agents.agent_utils import sql_parser, msging, call_llm
+from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_foundry
+from azure.ai.inference import ChatCompletionsClient
+from azure.core.credentials import AzureKeyCredential
+from secgym.config_key import api_key
+
 # from tenacity import retry, wait_fixed
 
 BASE_PROMPT = """You are a security analyst. 
@@ -66,7 +70,16 @@ class BaselineAgent:
         self.cache_seed = cache_seed
         self.config_list = config_list
         self.temperature = temperature
-        self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
+        
+        if "ai_foundry" in config_list[0]['api_type']:
+            self.client = ChatCompletionsClient(
+            endpoint= config_list[0]['endpoint'],
+            credential=AzureKeyCredential(api_key),
+            seed =self.cache_seed
+            )
+        elif "azure" in config_list[0]['api_type']:
+            self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
+        
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
         if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model']:
             sys_prompt = O1_PROMPT
@@ -83,14 +96,25 @@ class BaselineAgent:
         return "BaselineAgent"
 
     def _call_llm(self, messages):
-        response = call_llm(
-            client=self.client, 
-            model=self.config_list[0]['model'],
-            messages=messages,
-            retry_num=self.retry_num,
-            retry_wait_time=self.retry_wait_time,
-            temperature=self.temperature
-        )
+
+        if "azure" in self.config_list[0]['api_type']:
+            response = call_llm(
+                client=self.client, 
+                model=self.config_list[0]['model'],
+                messages=messages,
+                retry_num=self.retry_num,
+                retry_wait_time=self.retry_wait_time,
+                temperature=self.temperature
+            )
+        elif "ai_foundry" in self.config_list[0]['api_type']:
+            response = call_llm_foundry(
+                client=self.client, 
+                model=self.config_list[0]['model'],
+                messages=messages,
+                retry_num=self.retry_num,
+                retry_wait_time=self.retry_wait_time,
+                temperature=self.temperature
+            )
         return response.choices[0].message.content
         
     def act(self, observation: str):
@@ -128,9 +152,15 @@ class BaselineAgent:
         return parsed_action, submit
     
     def get_logging(self):
+        
+        if "azure" in self.config_list[0]['api_type']:
+            usage = self.client.total_usage_summary
+        elif "ai_foundry" in self.config_list[0]['api_type']:
+            usage = "N/A"
+
         return {
             "messages": self.messages,
-            "usage_summary": self.client.total_usage_summary,
+            "usage_summary": usage,
         }
     
     def _add_message(self, msg: str, role: str="user"):
@@ -139,11 +169,21 @@ class BaselineAgent:
     def reset(self, change_seed=True):
         if change_seed:
             self.cache_seed += 1
-        self.client = OpenAIWrapper(config_list=self.config_list, cache_seed=self.cache_seed)
+        
+        if "ai_foundry" in self.config_list[0]['api_type']:
+            self.client = ChatCompletionsClient(
+            endpoint= self.config_list[0]['endpoint'],
+            credential=AzureKeyCredential(api_key),
+            seed =self.cache_seed
+            )
+        elif "azure" in self.config_list[0]['api_type']:
+            self.client = OpenAIWrapper(config_list=self.config_list, cache_seed=self.cache_seed)
 
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
         if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
-        self.client.clear_usage_summary()
+
+        if "azure" in self.config_list[0]['api_type']:
+            self.client.clear_usage_summary()
