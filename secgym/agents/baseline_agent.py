@@ -1,5 +1,5 @@
 from autogen import OpenAIWrapper
-from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_foundry
+from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_foundry, update_model_usage
 from azure.ai.inference import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential
 from secgym.config_key import api_key
@@ -90,13 +90,13 @@ class BaselineAgent:
         self.step_count = 0
         self.retry_num = retry_num
         self.retry_wait_time = retry_wait_time
+        self.totoal_usage = {}
         
     @property
     def name(self):
         return "BaselineAgent"
 
     def _call_llm(self, messages):
-
         if "azure" in self.config_list[0]['api_type']:
             response = call_llm(
                 client=self.client, 
@@ -115,6 +115,7 @@ class BaselineAgent:
                 retry_wait_time=self.retry_wait_time,
                 temperature=self.temperature
             )
+        update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
         return response.choices[0].message.content
         
     def act(self, observation: str):
@@ -152,15 +153,9 @@ class BaselineAgent:
         return parsed_action, submit
     
     def get_logging(self):
-        
-        if "azure" in self.config_list[0]['api_type']:
-            usage = self.client.total_usage_summary
-        elif "ai_foundry" in self.config_list[0]['api_type']:
-            usage = "N/A"
-
         return {
             "messages": self.messages,
-            "usage_summary": usage,
+            "usage_summary": self.totoal_usage,
         }
     
     def _add_message(self, msg: str, role: str="user"):
@@ -184,6 +179,4 @@ class BaselineAgent:
         if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
-
-        if "azure" in self.config_list[0]['api_type']:
-            self.client.clear_usage_summary()
+        self.totoal_usage = {}

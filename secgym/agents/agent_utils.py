@@ -48,6 +48,44 @@ def call_llm_foundry(
             time.sleep(retry_wait_time)
     return response
 
+def update_total_usage(total_usage, new_usage):
+    """
+    Recursively update the total_usage dictionary with values from new_usage.
+    
+    Parameters:
+    - total_usage (dict): The running total usage dictionary.
+    - new_usage (dict): The new usage data to be added.
+    """
+    for key, value in new_usage.items():
+        if isinstance(value, dict):
+            # Initialize a nested dictionary if it doesn't exist.
+            if key not in total_usage:
+                total_usage[key] = {}
+            update_total_usage(total_usage[key], value)
+        elif isinstance(value, int):
+            # Initialize the key to 0 if it doesn't exist.
+            if key not in total_usage:
+                total_usage[key] = 0
+            total_usage[key] += value
+
+def update_model_usage(total_usage_by_model:dict, model_name:str, usage_dict:dict):
+    """
+    Update the total usage for a given model with the new response data.
+    
+    Parameters:
+    - total_usage_by_model (dict): Dictionary mapping model names to their cumulative usage.
+    - model_name (str): The name of the model.
+    - usage_dict (dict): The new usage data to be added.
+    """
+    assert isinstance(total_usage_by_model, dict), "total_usage_by_model should be a dictionary"
+    assert isinstance(model_name, str), "model_name should be a string"
+    assert isinstance(usage_dict, dict), "usage_dict should be a dictionary"
+    # If the model is not in the total_usage_by_model, initialize its usage dictionary.
+    if model_name not in total_usage_by_model:
+        total_usage_by_model[model_name] = {}
+    
+    update_total_usage(total_usage_by_model[model_name], usage_dict)
+
 
 def call_llm(
         client:OpenAIWrapper, 

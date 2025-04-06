@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
-from secgym.env.evaluator import Evaluator
+from secgym.env.evaluator import LLMEvaluator, Evaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
@@ -44,8 +44,9 @@ def run_experiment(
             agent.replay_buffer = []
         tested_num += 1 # increment tested number of questions
 
-        trials = {}
-        for trial in range(num_trials):
+        is_solved = False
+        trials_dict = {}
+        for tid in range(num_trials):
             if i == num_test:
                 print(f"Tested {num_test} questions. Stopping...")
                 break
@@ -60,8 +61,16 @@ def run_experiment(
             # check if question has been tested before
             current_question_key = f"{thug_env.curr_question['start_alert']}-{thug_env.curr_question['end_alert']}"
             if current_question_key in tested_question_keys:
-                print(f"Skipping question with key {current_question_key}")
-                break
+                # get the log for the question
+                for log in accum_logs:
+                    if log.get("nodes") == current_question_key:
+                        trials_dict = log["trials"]
+                        break
+                # make sure the trials_dict reaches the number of trials
+                if len(trials_dict) >= num_trials:
+                    is_solved = True
+                    print(f"Skipping question with key {current_question_key}")
+                    break
 
             # run one episode
             for s in range(thug_env.max_steps):
@@ -87,31 +96,31 @@ def run_experiment(
                     "incident": agent.incident,
                     "question": thug_env.curr_question,
                     "reward": reward,
-                    "trial": trial,
+                    "trial": tid,
                 }
                 agent.replay_buffer.append(replay)
             
-            # printing logs
-            print(f"Question {i+1} | Reward: {reward} || Accumlated Success: {accum_success}/{tested_num}={accum_success/(tested_num):.3f} | Avg Reward so far: {accum_reward/(tested_num):.3f}")  
-            print("*"*50, "\n", "*"*50)
 
-            trials[trial] = {
+            trials_dict[tid] = {
                 "reward": reward,
                 "info": info,
             }
-            trials[trial].update(agent.get_logging())
+            trials_dict[tid].update(agent.get_logging())
 
             # correct answer found -> stop trials
             if reward == 1:
                 print(f"Skipping question {i+1} as it has been solved")
                 break
+        
+        if is_solved:
+            continue
 
         #saving logs
         result_dict = {
             "nodes": current_question_key,
             "reward": reward,
             "question_dict": thug_env.curr_question,
-            "trials": trials,
+            "trials": trials_dict,
         }
         accum_logs.append(result_dict)
         accum_reward += reward
@@ -163,7 +172,7 @@ if __name__ == "__main__":
     agent_config_list = filter_config_list(CONFIG_LIST, model)
     eval_config_list = filter_config_list(CONFIG_LIST, eval_model)
 
-    evaluator = Evaluator(
+    llmevaluator = LLMEvaluator(
         config_list=eval_config_list, 
         cache_seed=cache_seed,
         ans_check_reflection=True, 
@@ -224,7 +233,7 @@ if __name__ == "__main__":
 
         thug_env = ThuGEnv(
             attack=attack,
-            evaluator=evaluator,
+            evaluator=llmevaluator,
             save_file=save_env_file,
             max_steps=max_steps,
             split=args.split,

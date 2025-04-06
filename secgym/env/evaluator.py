@@ -176,6 +176,34 @@ For each step, you must have three fields:
 """
 
 class Evaluator:
+    def __init__(self):
+        pass
+
+    def checking(self, question: dict, submitted_answer: str) -> dict:
+        """Check the correctness of the submitted answer.
+        Args:
+            question (dict): The question dictionary containing the question, answer, and solution.
+            submitted_answer (str): The submitted answer to be evaluated.
+
+        Returns:
+            dict: A dictionary containing the evaluation results. Must have "reward" key.
+        """
+        raise NotImplementedError("Please implement the checking method in your evaluator class.")
+
+
+class StaticEvaluator(Evaluator):
+    def __init__(self):
+        pass
+    
+    def checking(self, question: dict, submitted_answer: str) -> dict:
+        # string matching
+        if question["answer"].strip() == submitted_answer.strip():
+            return {"reward": 1}
+        return {"reward": 0}
+
+
+
+class LLMEvaluator(Evaluator):
     def __init__(self,
                  config_list,
                  cache_seed: int = 41,

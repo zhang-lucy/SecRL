@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union
 import os
 from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
-from secgym.env.evaluator import Evaluator
+from secgym.env.evaluator import Evaluator, LLMEvaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 import autogen
 from secgym.agents.agent_utils import sql_parser
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     cache_seed = 133
     temperature = 0
     eval_config_list = filter_config_list(CONFIG_LIST, eval_model)
-    evaluator = Evaluator(
+    evaluator = LLMEvaluator(
         config_list=eval_config_list, 
         ans_check_reflection=True, 
         sol_check_reflection=True,
