@@ -115,7 +115,7 @@ class BaselineAgent:
                 retry_wait_time=self.retry_wait_time,
                 temperature=self.temperature
             )
-        update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
+        update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
         return response.choices[0].message.content
         
     def act(self, observation: str):
