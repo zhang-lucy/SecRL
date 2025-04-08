@@ -33,6 +33,12 @@ CONFIG_LIST = [
   #   "azure_ad_token_provider": token_provider
   # },
   {
+    "model": "phi4",
+    "endpoint": "https://Phi-4-secrl.eastus.models.ai.azure.com",
+    "api_type": "ai_foundry",
+    "tags": ["phi4"],
+  },
+  {
     "model": "r1",
     "endpoint" : "https://DeepSeek-R1-secrl.eastus.models.ai.azure.com",
     "api_type": "ai_foundry",
