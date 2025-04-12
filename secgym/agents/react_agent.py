@@ -40,13 +40,18 @@ Action can be one of the following:
 You should only give one thought-action per response. The action from your response will be executed and the result will be shown to you.
 Follow the format "Thought: ....\nAction: ...." exactly.
 Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
+
+Below are some demonstrations. Note that `Observation` denotes the returned logs from the database.
+Many of the returned logs are reduced for brevity (replaced with `...`).
 """
 
 for i, file in enumerate(os.listdir(os.path.join(curr_path, "react_examples"))):
     with open(os.path.join(curr_path, "react_examples", file), "r") as f:
         BASE_PROMPT +=  f"\nExample {i+1}: \n" + f.read() + "\n" + "-"*50
+        O1_PROMPT +=  f"\nExample {i+1}: \n" + f.read() + "\n" + "-"*50
 
 BASE_PROMPT = BASE_PROMPT[:-50].strip()
+O1_PROMPT = O1_PROMPT[:-50].strip()
 
 class ReActAgent:
     def __init__(self,
@@ -100,8 +105,9 @@ class ReActAgent:
                 temperature=self.temperature,
                 stop=["Observation:", "observation:"]
             )
+            update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
         elif "ai_foundry" in self.config_list[0]['api_type']:
-             response = call_llm_foundry(
+            response = call_llm_foundry(
                 client=self.client, 
                 model=self.config_list[0]['model'],
                 messages=messages,
@@ -110,7 +116,8 @@ class ReActAgent:
                 temperature=self.temperature,
                 stop=["Observation:", "observation:"]
             )
-        update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
+            update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
+        
         return response.choices[0].message.content
         
     def act(self, observation: str):

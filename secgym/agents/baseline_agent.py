@@ -106,6 +106,7 @@ class BaselineAgent:
                 retry_wait_time=self.retry_wait_time,
                 temperature=self.temperature
             )
+            update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
         elif "ai_foundry" in self.config_list[0]['api_type']:
             response = call_llm_foundry(
                 client=self.client, 
@@ -115,7 +116,7 @@ class BaselineAgent:
                 retry_wait_time=self.retry_wait_time,
                 temperature=self.temperature
             )
-        update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
+            update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
         return response.choices[0].message.content
         
     def act(self, observation: str):
