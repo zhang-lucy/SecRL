@@ -87,7 +87,7 @@ class ThuGEnv(gym.Env):
             save_file: Union[str, bool] = True,
             max_steps: int = 15,
             max_entry_return: int = 15, # database entry return limit
-            max_str_len: int = 50000, # maximum string length to return 100000
+            max_str_len: int = 100000, # maximum string length to return 100000
             # container_name: str = "mysql-container",
             database_name: str = "env_monitor_db", # sql database name
             # port: str = "3306",

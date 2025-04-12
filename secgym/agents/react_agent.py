@@ -1,7 +1,9 @@
 from autogen import OpenAIWrapper
-from secgym.agents.agent_utils import sql_parser, msging, call_llm
+from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_foundry, update_model_usage
 import os
-
+from azure.ai.inference import ChatCompletionsClient
+from azure.core.credentials import AzureKeyCredential
+from secgym.config_key import api_key
 curr_path = os.path.dirname(os.path.abspath(__file__))
 
 BASE_PROMPT = """You are a security analyst. 
@@ -20,6 +22,24 @@ Action can be one of the following:
 
 Below are some demonstrations. Note that `Observation` denotes the returned logs from the database.
 Many of the returned logs are reduced for brevity (replaced with `...`).
+"""
+O1_PROMPT = """You are a security analyst. 
+You need to answer a given security question by querying the database.
+The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
+Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
+
+Your response should always be a thought-action pair:
+Thought: <your reasoning>
+Action: <your action>
+
+In Thought, you can analyse and reason about the current situation, 
+Action can be one of the following: 
+(1) execute[<your sql query>], which executes the SQL query. For example, execute[DESCRIBE table_name].
+(2) submit[<your answer>], which is the final answer to the question
+
+You should only give one thought-action per response. The action from your response will be executed and the result will be shown to you.
+Follow the format "Thought: ....\nAction: ...." exactly.
+Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
 """
 
 for i, file in enumerate(os.listdir(os.path.join(curr_path, "react_examples"))):
@@ -41,10 +61,20 @@ class ReActAgent:
         self.config_list = config_list
         self.temperature = temperature
         self.cache_seed = cache_seed
-        self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
+
+        if "ai_foundry" in config_list[0]['api_type']:
+            self.client = ChatCompletionsClient(
+            endpoint= config_list[0]['endpoint'],
+            credential=AzureKeyCredential(api_key),
+            seed =self.cache_seed
+            )
+        elif "azure" in config_list[0]['api_type']:
+            self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
+        
         sys_prompt = BASE_PROMPT
-        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model']:
-            raise ValueError("O1 and O3 models prompt is not set for ReactAgent")
+        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model']:
+            sys_prompt = O1_PROMPT
+            #raise ValueError("O1 and O3 models prompt is not set for ReactAgent")
         self.messages = [{"role": "system", "content": sys_prompt}]
 
         self.max_steps = max_steps
@@ -52,21 +82,35 @@ class ReActAgent:
         self.step_count = 0
         self.retry_num = retry_num
         self.retry_wait_time = retry_wait_time
+        self.totoal_usage = {}
         
     @property
     def name(self):
         return "ReactAgent"
 
     def _call_llm(self, messages):
-        response = call_llm(
-            client=self.client, 
-            model=self.config_list[0]['model'],
-            messages=messages,
-            retry_num=self.retry_num,
-            retry_wait_time=self.retry_wait_time,
-            temperature=self.temperature,
-            stop=["Observation:", "observation:"]
-        )
+        
+        if "azure" in self.config_list[0]['api_type']:
+            response = call_llm(
+                client=self.client, 
+                model=self.config_list[0]['model'],
+                messages=messages,
+                retry_num=self.retry_num,
+                retry_wait_time=self.retry_wait_time,
+                temperature=self.temperature,
+                stop=["Observation:", "observation:"]
+            )
+        elif "ai_foundry" in self.config_list[0]['api_type']:
+             response = call_llm_foundry(
+                client=self.client, 
+                model=self.config_list[0]['model'],
+                messages=messages,
+                retry_num=self.retry_num,
+                retry_wait_time=self.retry_wait_time,
+                temperature=self.temperature,
+                stop=["Observation:", "observation:"]
+            )
+        update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
         return response.choices[0].message.content
         
     def act(self, observation: str):
@@ -106,7 +150,7 @@ class ReActAgent:
     def get_logging(self):
         return {
             "messages": self.messages,
-            "usage_summary": self.client.total_usage_summary,
+            "usage_summary": self.totoal_usage,
         }
     
     def _add_message(self, msg: str, role: str="user"):
@@ -115,11 +159,20 @@ class ReActAgent:
     def reset(self, change_seed=True):
         if change_seed:
             self.cache_seed += 1
-        self.client = OpenAIWrapper(config_list=self.config_list, cache_seed=self.cache_seed)
+        
+        if "ai_foundry" in self.config_list[0]['api_type']:
+            self.client = ChatCompletionsClient(
+            endpoint= self.config_list[0]['endpoint'],
+            credential=AzureKeyCredential(api_key),
+            seed =self.cache_seed
+            )
+        elif "azure" in self.config_list[0]['api_type']:
+            self.client = OpenAIWrapper(config_list=self.config_list, cache_seed=self.cache_seed)
 
         self.step_count = 0
         sys_prompt = BASE_PROMPT
-        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
-            raise ValueError("O1 and O3 models prompt is not set for ReactAgent")
+        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model'] or "r1" in self.config_list[0]['model']:
+            sys_prompt = O1_PROMPT
+            #raise ValueError("O1 and O3 models prompt is not set for ReactAgent")
         self.messages = [{"role": "system", "content": sys_prompt}]
-        self.client.clear_usage_summary()
+        self.totoal_usage = {}
