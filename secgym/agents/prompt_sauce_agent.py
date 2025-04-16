@@ -161,6 +161,8 @@ class PromptSauceAgent:
 
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
+        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model'] or "r1" in self.config_list[0]['model']:
+            sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
         self.client.clear_usage_summary()
 
