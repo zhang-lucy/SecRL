@@ -62,6 +62,25 @@ CONFIG_LIST = [
       "price": [2.5/1000, 10.0/1000],
       "azure_ad_token_provider": token_provider
   },
+  { #
+    "model": "gpt-4.1",
+    "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2025-01-01-preview",
+    "tags": ["gpt-4.1"],
+    "price": [2.0/1000, 8.0/1000],
+    "azure_ad_token_provider": token_provider
+  },
+  { #https://metabase-aoi-eus2.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview
+     #https://metabase-aoi-eus2.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview
+    "model": "gpt-4.1",
+    "base_url": "https://metabase-aoi-eus2.openai.azure.com",
+    "api_type": "azure",
+    "api_version": "2025-01-01-preview",
+    "tags": ["gpt-4.1"],
+    "price": [2.0/1000, 8.0/1000],
+    "azure_ad_token_provider": token_provider
+  },
   {
     "model": "gpt-4o",
     "base_url": "https://metabase-aoi-eus2.openai.azure.com",
@@ -369,7 +388,6 @@ config_list_4o_mini = [
   }
 ]
 
-
 config_list_4o = [
   {
     "model": "gpt-4o-0513-spot",
@@ -573,6 +591,6 @@ if __name__ == "__main__":
         raise ValueError(f"model {model_name} not found in the config list, please put 'tags': ['{model_name}'] in the config list to inicate this model")
     return config_list
   
-  agent_config_list = filter_config_list(CONFIG_LIST, "4o-mini")
+  agent_config_list = filter_config_list(CONFIG_LIST, "gpt-4.1")
   client = OpenAIWrapper(config_list=agent_config_list, cache_seed=None)
   print("Test gpt 4o-mini", client.create(messages=[{"role": "user", "content":"hello what model are you?"}]).choices[0].message.content)
