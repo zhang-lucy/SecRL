@@ -101,17 +101,14 @@ def analysis(data:dict, verbose:bool=False, round_cut=-1):
         "eval_error_count": eval_error_count,
         "fail_to_run_count": fail_to_run_count
     }
-
-def analysis_v2(data:dict, verbose:bool=False):
+def analysis_v2(data:dict, verbose:bool=False, round_cut=-1):
     """Analyze the data and print out the results
 
     Args:
         data (dict): The data to be analyzed, load an "agent log" json file
-        
+        verbose (bool, optional): Whether to print verbose output. Defaults to False.
+        round_cut (int, optional): Maximum round to consider. Defaults to -1 (no cut).
     """
-    # if round_cut != -1 and "trials" in data[0]:
-    #     # print("Warning: use round_cut with trial data")
-    #     pass
     total_len = len(data)
     total_reward = 0
     total_round = 0
@@ -150,40 +147,48 @@ def analysis_v2(data:dict, verbose:bool=False):
             round_count[p] = 0
 
         assert "trials" in k, "Expecting trials in question dict"
-        assert len(k['trials']) ==1, f"Expecting only one trial, got {len(k['trials'])}"
-        # assert no round cut
-
-        # 1. count reward
-        total_reward += k['reward']
-        if k['reward'] > 0:
-            non_zero_reward_count += 1
-        if k['reward'] == 1:
-            success_count += 1
-        path_count[p] += 1
-        reward_count[p] += k['reward']
+        assert len(k['trials']) == 1, f"Expecting only one trial, got {len(k['trials'])}"
         
         last_trial = list(k["trials"].values())[-1]
+        
+        # Apply round cut if specified
+        tmp_round = (len(last_trial.get("messages", [])) - 1) // 2
+        if round_cut != -1 and tmp_round > round_cut:
+            reward = 0  # Set reward to 0 if exceeding round cut
+            tmp_round = round_cut
+        else:
+            reward = k['reward']
+        
+        total_round += tmp_round
 
+        # 1. count reward
+        total_reward += reward
+        if reward > 0:
+            non_zero_reward_count += 1
+        if reward == 1:
+            success_count += 1
+        path_count[p] += 1
+        reward_count[p] += reward
+        
         # 2. count usage
         try:
-            _, total_prompt_tokens, total_completion_tokens = add_to_usage(last_trial['usage_summary'], total_cost, total_prompt_tokens, total_completion_tokens)
+            model = list(last_trial['usage_summary'].keys())[-1]
+            total_prompt_tokens += last_trial['usage_summary'][model]['prompt_tokens']
+            total_completion_tokens += last_trial['usage_summary'][model]['completion_tokens']
         except Exception as e:
-            print(f"Error calculating usage: usage summar {last_trial['usage_summary']}")
+            print(f"Error calculating usage: usage summary {last_trial['usage_summary']}")
         
-        # 3. not counting round for now
-
         # 4. check if submitted, if evaluated correctly
         if not last_trial['info'].get("submit"):
             not_submit_count += 1
         else:
-            if not (last_trial['info'].get("is_json_success", True) and last_trial['info'].get("is_reflect_success"), True):
+            if not (last_trial['info'].get("is_json_success", True) and last_trial['info'].get("is_reflect_success", True)):
                 print(f"Eval error for {k['nodes']}", last_trial['info'])
                 eval_error_count += 1
 
     if verbose:
         print(f"Average reward: {total_reward}/{total_len} = {round(total_reward/total_len,6)}")
         print(f"Average round: {total_round}/{total_len} = {round(total_round/total_len,6)}")
-
 
     return {
         "total_len": total_len,
@@ -193,6 +198,9 @@ def analysis_v2(data:dict, verbose:bool=False):
         "success_count": success_count, # reward==1
         "non_zero_reward_count": non_zero_reward_count, # for evaluator usefullness
         "not_submit_count": not_submit_count, # not counting for now
+        
+        # Round information
+        "total_round": total_round,
 
         # Efficiency / Computational Analysis
         "total_cost": total_cost,
