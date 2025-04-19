@@ -38,7 +38,7 @@ Then run the following command to start the mysql container:
 
 
 ```bash
-python setup_database.py --csv_folder <path_to_csv_folder>
+python setup_database.py --csv <path_to_csv_folder> --port <port> --sql_file <path_to_sql_file> --container_name <container_name> 
 ```
 
 

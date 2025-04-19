@@ -146,6 +146,7 @@ def get_args():
     parser.add_argument("--agent", type=str, default="react", help="Agent to use for the experiment")
     parser.add_argument("--num_trials", type=int, default=1, help="Number of trials to run for each question if not solved")
     parser.add_argument("--split", type=str, default="test", help="Split to use for the experiment")
+    parser.add_argument("--full_db", action="store_true", help="Use full database for the experiment")
     args = parser.parse_args()
     return args
 
@@ -165,9 +166,10 @@ if __name__ == "__main__":
     cache_seed = args.cache_seed
     temperature = args.temperature
     max_steps = args.max_steps
-    assert args.layer in ["log", "alert"], "Layer must be either 'log' or 'alert'"
+    assert args.layer in ["log", "alert", "alert_only"], "Layer must be either 'log' or 'alert'"
     layer = args.layer
     num_trials = args.num_trials
+    use_full_db = args.full_db
 
     agent_config_list = filter_config_list(CONFIG_LIST, model)
     eval_config_list = filter_config_list(CONFIG_LIST, eval_model)
@@ -221,7 +223,10 @@ if __name__ == "__main__":
     os.makedirs(base_dir, exist_ok=True)
     agent_name = test_agent.name
 
-    sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}_s{max_steps}_trial{num_trials}"
+    if use_full_db:
+        sub_dir = f"{agent_name}_{model}_c{cache_seed}_full_db_{layer}_level_t{temperature}_s{max_steps}_trial{num_trials}"
+    else:
+        sub_dir = f"{agent_name}_{model}_c{cache_seed}_{layer}_level_t{temperature}_s{max_steps}_trial{num_trials}"
     if args.split != "test":
         sub_dir += f"_{args.split}"
     os.makedirs(f"{base_dir}/{sub_dir}", exist_ok=True)
@@ -237,8 +242,9 @@ if __name__ == "__main__":
             save_file=save_env_file,
             max_steps=max_steps,
             split=args.split,
+            use_full_db=use_full_db,
+            layer=layer,
         )
-        thug_env.check_layer(layer) # check if revelant tables is in the database for the layer
         
         avg_success, tested_num, avg_reward = run_experiment(
             agent=test_agent,

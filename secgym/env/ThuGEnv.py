@@ -60,7 +60,7 @@ ATTACKS = {
     },
 }
 
-AlphineSkiHouse = {
+AlphineSkiHouseInfo = {
     "port": "3314",
     "container_name": "alphineskihouse"
 }
@@ -92,11 +92,14 @@ class ThuGEnv(gym.Env):
             database_name: str = "env_monitor_db", # sql database name
             # port: str = "3306",
             split: str = "test",
+            use_full_db: bool = False,
+            layer: str = "alert",
     ):
         self.noise_level = noise_level
         self.max_steps = max_steps
         self.max_entry_return = max_entry_return
         self.max_str_len = max_str_len
+        self.layer = layer
         # evaluator
         self.evaluator = evaluator
 
@@ -121,6 +124,13 @@ class ThuGEnv(gym.Env):
             self.attack = attack
 
         attack_info = ATTACKS[self.attack]
+        if use_full_db:
+            print("Warning: Replace dataset with full dataset.")
+            attack_info["port"] = AlphineSkiHouseInfo["port"]
+            attack_info["container_name"] = AlphineSkiHouseInfo["container_name"]
+        if self.layer == "alert_only":
+            attack_info['container_name'] += "_alert_only"
+            print(f"Warning: Change container name to {attack_info['container_name']} for alert only, using the same port as {ATTACKS[self.attack]['container_name']}.")
 
         curr_path = os.path.dirname(os.path.abspath(__file__))
         if split == "test":
@@ -157,6 +167,7 @@ class ThuGEnv(gym.Env):
             with open(self.save_file, "r") as f:
                 self.all_logs = json.load(f)
 
+        self.check_layer(layer)
 
     def get_attack_list(self):
         """Get the list of attacks.
@@ -356,7 +367,7 @@ class ThuGEnv(gym.Env):
         return eval_dict
     
     def check_layer(self, layer: str) -> None:
-        assert layer in ["alert", 'log'], "Layer should be either 'alert' or 'log'."
+        assert layer in ["alert", 'log', 'alert_only'], "Layer should be 'alert', 'log' or 'alert_only'."
 
         tables, _ = self.execute_query(f"SHOW TABLES;")
         # print(tables)
@@ -371,6 +382,12 @@ class ThuGEnv(gym.Env):
             assert "AlertEvidence" in tables, "With 'alert' level, the table 'AlertEvidence' should be present."
             assert "AlertInfo" in tables, "With 'alert' level, the table 'AlertInfo' should be present."
             assert "SecurityAlert" in tables, "With 'alert' level, the table 'SecurityAlert' should be present."
+        elif layer == "alert_only":
+            assert "AlertEvidence" in tables, "With 'alert_only' level, the table 'AlertEvidence' should be present."
+            assert "AlertInfo" in tables, "With 'alert_only' level, the table 'AlertInfo' should be present."
+            assert "SecurityAlert" in tables, "With 'alert_only' level, the table 'SecurityAlert' should be present."
+            assert "AADServicePrincipalSignInLogs" not in tables, "With 'alert_only' level, the table 'AADServicePrincipalSignInLogs' should not be present."
+            assert "OfficeActivity" not in tables, "With 'alert_only' level, the table 'OfficeActivity' should not be present."
             
 
 

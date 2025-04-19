@@ -310,7 +310,7 @@ def debug_tables(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup a MySQL database from CSV files')
     parser.add_argument('--csv', type=str, help='Folder containing the CSV files')
-    parser.add_argument('--port', type=str, default="3306", help='Port number for the MySQL container')
+    parser.add_argument('--port', type=str, help='Port number for the MySQL container')
     parser.add_argument('--sql_file', type=str, help='Output SQL file')
     parser.add_argument('--container_name', type=str, help='Name of the MySQL container')
     parser.add_argument('--database_name', type=str, default="env_monitor_db", help='Name of the database')
@@ -322,6 +322,9 @@ if __name__ == "__main__":
 
     csv_folder = to_abs_path(args.csv)
     sql_file_path = to_abs_path(args.sql_file)
+    if args.layer == "alert_only":
+        sql_file_path = sql_file_path.replace(".sql", "_alert_only.sql")
+        args.container_name = args.container_name+"_alert_only"
     os.makedirs(os.path.dirname(sql_file_path), exist_ok=True)
     print(os.path.dirname(sql_file_path))
     
@@ -339,6 +342,23 @@ if __name__ == "__main__":
     elif args.layer == "alert":
         # - Alert level: Have access to all:
         skip_tables = ["AzureDiagnostics", "LAQueryLogs"]
+    elif args.layer == "alert_only":
+        skip_tables = []
+        for fname in os.listdir(csv_folder):
+            if fname.endswith(".meta") or fname.startswith("._"):
+                continue
+            if fname.endswith(".csv"):
+                skip_tables.append(fname.replace(".csv", ""))
+            elif os.path.isdir(os.path.join(csv_folder, fname)):
+                skip_tables.append(fname)
+            else:
+                raise ValueError(f"Invalid file type: {fname}")
+
+            # remove SecurityIncident", "SecurityAlert", "AlertEvidence", "AlertInfo" from the list
+        skip_tables.remove("SecurityIncident")
+        skip_tables.remove("SecurityAlert")
+        skip_tables.remove("AlertEvidence")
+        skip_tables.remove("AlertInfo")
     else:
         raise ValueError(f"Invalid layer: {args.layer}")
 
