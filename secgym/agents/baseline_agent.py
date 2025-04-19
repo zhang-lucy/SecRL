@@ -57,6 +57,24 @@ Follow the format "Thought: ....\nAction: ...." exactly.
 Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
 """
 
+R1_PROMPT = """You are a security analyst. 
+You need to answer a given security question by querying the database.
+The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
+Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
+
+First reason about the current situation within the <thinking> </thinking> block.
+Then, put your summarized thoughts in Thought and give your action:
+Thought: <your reasoning>
+Action: <your action>
+
+Action can be one of the following: 
+(1) execute[<your sql query>], which executes the SQL query. For example, execute[DESCRIBE table_name].
+(2) submit[<your answer>], which is the final answer to the question
+
+Follow the format "Thought: ....\nAction: ...." exactly after the <thinking> </thinking> block.
+Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
+"""
+
 class BaselineAgent:
     def __init__(self,
                  config_list,
@@ -84,6 +102,9 @@ class BaselineAgent:
         if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model']:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
+        if "deepseek" in config_list[0]['model']:
+            self.messages = []  # no system prompt for deepseek
+            print("Deepseek model, no system prompt")
 
         self.max_steps = max_steps
         self.submit_summary = submit_summary
@@ -120,7 +141,10 @@ class BaselineAgent:
         return response.choices[0].message.content
         
     def act(self, observation: str):
-        self._add_message(observation, role="user")
+        if "deepseek" in self.config_list[0]['model'] and len(self.messages) == 0:
+            self._add_message(f"{R1_PROMPT}\n\nQuestion: {observation}", role="user")
+        else:
+            self._add_message(observation, role="user")
         response = self._call_llm(messages=self.messages)
         print(response)
 
@@ -180,4 +204,7 @@ class BaselineAgent:
         if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model'] or "r1" in self.config_list[0]['model']:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
+        if "deepseek" in self.config_list[0]['model']:
+            self.messages = []  # no system prompt for deepseek
+            print("Deepseek model, no system prompt")
         self.totoal_usage = {}
