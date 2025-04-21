@@ -66,8 +66,6 @@ In you response, you should give your thoughts and actions. The reasoning proces
 You should ONLY have ONE action per response in the <answer> </answer> block, it can be one of the following based on your reasoning:
 (1) <answer>execute[<your sql query>]</answer>, which executes the SQL query. For example, execute[DESCRIBE table_name]. You should give sql queries to explore the schema and acquire information.
 (2) <answer>submit[<your answer>]</answer>, which is the final answer to the question. When you believe you have enough information to answer the question, you can submit your answer.
-
-Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
 """
 
 class BaselineAgent:
@@ -98,7 +96,7 @@ class BaselineAgent:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
         if "r1" in config_list[0]['model']:
-            self.messages = []  # no system prompt for deepseek
+            self.messages = [{"role": "system", "content": R1_PROMPT}]  # no system prompt for deepseek
             print("Deepseek model, no system prompt")
 
         self.max_steps = max_steps
@@ -137,8 +135,8 @@ class BaselineAgent:
         return response.choices[0].message.content
         
     def act(self, observation: str):
-        if "deepseek" in self.config_list[0]['model'] and len(self.messages) == 0:
-            self._add_message(f"{R1_PROMPT}\n\nQuestion: {observation}", role="user")
+        if "r1" in self.config_list[0]['model'] and len(self.messages) == 0:
+            self._add_message(observation, role="user")
         else:
             self._add_message(observation, role="user")
         response = self._call_llm(messages=self.messages)
@@ -207,7 +205,7 @@ class BaselineAgent:
         elif "r1" in self.config_list[0]['model']:
             sys_prompt = R1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
-        if "r1" in self.config_list[0]['model']:
-            self.messages = []  # no system prompt for deepseek
-            print("Deepseek model, no system prompt")
+        # if "r1" in self.config_list[0]['model']:
+        #     self.messages = []  # no system prompt for deepseek
+        #     print("Deepseek model, no system prompt")
         self.totoal_usage = {}
