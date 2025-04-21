@@ -65,7 +65,9 @@ Note there are more than 20 tables in the database, so you may need to explore t
 In you response, you should give your thoughts and actions. The reasoning process and action are enclosed within <think> </think> and <answer> </answer> tags,
 You should ONLY have ONE action per response in the <answer> </answer> block, it can be one of the following based on your reasoning:
 (1) <answer>execute[<your sql query>]</answer>, which executes the SQL query. For example, execute[DESCRIBE table_name]. You should give sql queries to explore the schema and acquire information.
-(2) <answer>submit[<your answer>]</answer>, which is the final answer to the question. When you believe you have enough information to answer the question, you can submit your answer.
+(2) <answer>submit[<your answer>]</answer>, which submits the final answer to the question. When you believe you have enough information to answer the question, you can submit your answer.
+
+Please do not do excessive thinking. Briefly reason about the current situation and then give your action.
 """
 
 class BaselineAgent:
