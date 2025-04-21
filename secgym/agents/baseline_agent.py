@@ -58,20 +58,15 @@ Do not include any other information in your response. Wait for the response fro
 """
 
 R1_PROMPT = """You are a security analyst. 
-You need to answer a given security question by querying the database.
+You need to interact with a database with MYSQL queries to collect info and then answer a given security question.
 The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
 Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
 
-First reason about the current situation within the <thinking> </thinking> block.
-Then, put your summarized thoughts in Thought and give your action:
-Thought: <your reasoning>
-Action: <your action>
+In you response, you should give your thoughts and actions. The reasoning process and action are enclosed within <think> </think> and <answer> </answer> tags,
+You should ONLY have ONE action per response in the <answer> </answer> block, it can be one of the following based on your reasoning:
+(1) <answer>execute[<your sql query>]</answer>, which executes the SQL query. For example, execute[DESCRIBE table_name]. You should give sql queries to explore the schema and acquire information.
+(2) <answer>submit[<your answer>]</answer>, which is the final answer to the question. When you believe you have enough information to answer the question, you can submit your answer.
 
-Action can be one of the following: 
-(1) execute[<your sql query>], which executes the SQL query. For example, execute[DESCRIBE table_name].
-(2) submit[<your answer>], which is the final answer to the question
-
-Follow the format "Thought: ....\nAction: ...." exactly after the <thinking> </thinking> block.
 Do not include any other information in your response. Wait for the response from one action before giving the next thought-action pair. DO NOT make assumptions about the data that are not observed in the logs.
 """
 
@@ -153,10 +148,14 @@ class BaselineAgent:
             self._add_message(summary_prompt, role="system")
 
         split_str = "\nAction:"
+        if "deepseek" in self.config_list[0]['model']:
+            split_str = "<answer>"
+
         if "**Action:**" in response:
             split_str = "\n**Action:**"
         try:
             thought, action = response.strip().split(split_str)
+            action = action.replace("<answer>", "").replace("</answer>", "")
             self._add_message(response.strip(), role="assistant")
         except:
             print("\nRetry Split Action:")
@@ -164,6 +163,7 @@ class BaselineAgent:
             action = self._call_llm(self.messages + [msging(f"{thought}\nAction:")])
             print(action)
             action = action.strip()
+            action = action.replace("<answer>", "").replace("</answer>", "")
             if not "Thought" in thought:
                 thought = f"Thought: {thought}"
             self._add_message(f"{thought}\nAction:{action}", role="assistant")
