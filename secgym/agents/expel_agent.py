@@ -70,7 +70,11 @@ class ExpelAgent:
         self.config_list = config_list
         self.temperature = temperature
         self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
-        self.sys_prompt = BASE_PROMPT + """\nThe following are some experiences you gather on a similar task of question answering. Use these as references to help you answer the current question.\n"""
+        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model']:
+            self.sys_prompt = O1_PROMPT + """\nThe following are some experiences you gather on a similar task of question answering. Use these as references to help you answer the current question.\n"""
+        else:
+            self.sys_prompt = BASE_PROMPT + """\nThe following are some experiences you gather on a similar task of question answering. Use these as references to help you answer the current question.\n"""
+        
         with open(insight_path, 'r') as f:
             self.insights = json.load(f)
         for i, insight in enumerate(self.insights):
