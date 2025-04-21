@@ -97,7 +97,7 @@ class BaselineAgent:
         if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model']:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
-        if "deepseek" in config_list[0]['model']:
+        if "r1" in config_list[0]['model']:
             self.messages = []  # no system prompt for deepseek
             print("Deepseek model, no system prompt")
 
@@ -130,7 +130,8 @@ class BaselineAgent:
                 messages=messages,
                 retry_num=self.retry_num,
                 retry_wait_time=self.retry_wait_time,
-                temperature=self.temperature
+                temperature=self.temperature,
+                stop=['</answer>'],
             )
             update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
         return response.choices[0].message.content
@@ -201,10 +202,12 @@ class BaselineAgent:
 
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
-        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model'] or "r1" in self.config_list[0]['model']:
+        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
             sys_prompt = O1_PROMPT
+        elif "r1" in self.config_list[0]['model']:
+            sys_prompt = R1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
-        if "deepseek" in self.config_list[0]['model']:
+        if "r1" in self.config_list[0]['model']:
             self.messages = []  # no system prompt for deepseek
             print("Deepseek model, no system prompt")
         self.totoal_usage = {}
