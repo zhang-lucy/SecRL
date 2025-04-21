@@ -147,7 +147,7 @@ class BaselineAgent:
             self._add_message(summary_prompt, role="system")
 
         split_str = "\nAction:"
-        if "deepseek" in self.config_list[0]['model']:
+        if "r1" in self.config_list[0]['model']:
             split_str = "<answer>"
 
         if "**Action:**" in response:
