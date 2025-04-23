@@ -37,7 +37,7 @@ def call_llm_foundry(
         retry_num=10, 
         retry_wait_time=5,
         temperature=None,
-        stop=None
+        stop=None,
     ) -> ChatCompletions:
 
     for _ in range(retry_num):

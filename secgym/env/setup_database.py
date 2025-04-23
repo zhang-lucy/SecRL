@@ -93,7 +93,7 @@ def create_container(
             # check log to see "ready for connections"
             print("Waiting for the container to start...")
 
-            time_limit = 300
+            time_limit = 600
             time_step = 2
             while time_limit > 0:
                 container.reload()

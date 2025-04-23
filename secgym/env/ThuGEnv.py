@@ -62,7 +62,7 @@ ATTACKS = {
 
 AlphineSkiHouseInfo = {
     "port": "3314",
-    "container_name": "alphineskihouse"
+    "container_name": "alpineskihouse"
 }
 
 def start_container(container_name):
