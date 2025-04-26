@@ -1,4 +1,6 @@
 from azure.identity import get_bearer_token_provider, AzureCliCredential
+from azure.ai.inference import ChatCompletionsClient
+from azure.core.credentials import AzureKeyCredential
 
 # aoai_endpoint = "https://medeina-openai-dev-011.openai.azure.com/"
 # aoai_emb_endpoint = "https://medeinaapi-dev-openai-san.openai.azure.com/"
@@ -62,25 +64,69 @@ CONFIG_LIST = [
       "price": [2.5/1000, 10.0/1000],
       "azure_ad_token_provider": token_provider
   },
-  { #
-    "model": "gpt-4.1",
-    "base_url": "https://devpythiaaoaieus2.openai.azure.com",
+  # {
+  #   "model": "gpt-4.1",
+  #   "endpoint" : "https://metabase-aoi-eus2.openai.azure.com/openai/deployments/gpt-4.1",
+  #   "api_type": "ai_foundry",
+  #   "tags": ["gpt-4.1"], 
+  # },
+  { 
+    "model": "o4-mini",
+    "base_url": "https://devpythiaaoaieus2.openai.azure.com/",
     "api_type": "azure",
-    "api_version": "2025-01-01-preview",
+    "api_version": "2024-12-01-preview",
+    "tags": ["o4-mini"],
+    "price": [1.1/1000, 4.4/1000],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "o4-mini",
+    "base_url": "https://metabase-aoi-eus2.openai.azure.com/",
+    "api_type": "azure",
+    "api_version": "2024-12-01-preview",
+    "tags": ["o4-mini"],
+    "price": [1.1/1000, 4.4/1000],
+    "azure_ad_token_provider": token_provider
+  },
+  {
+    "model": "gpt-41",
+    "base_url": "https://metabase-aoi-eus2.openai.azure.com/",
+    "api_type": "azure",
+    "api_version": "2024-12-01-preview",
     "tags": ["gpt-4.1"],
     "price": [2.0/1000, 8.0/1000],
     "azure_ad_token_provider": token_provider
   },
-  { #https://metabase-aoi-eus2.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview
-     #https://metabase-aoi-eus2.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview
-    "model": "gpt-4.1",
-    "base_url": "https://metabase-aoi-eus2.openai.azure.com",
+  {
+    "model": "gpt-41-mini",
+    "base_url": "https://metabase-aoi-eus2.openai.azure.com/",
     "api_type": "azure",
-    "api_version": "2025-01-01-preview",
-    "tags": ["gpt-4.1"],
-    "price": [2.0/1000, 8.0/1000],
+    "api_version": "2024-12-01-preview",
+    "tags": ["gpt-4.1-mini"],
+    "price": [0.4/1000, 1.6/1000],
     "azure_ad_token_provider": token_provider
   },
+  {
+    "model": "gpt-41-nano",
+    "base_url": "https://metabase-aoi-eus2.openai.azure.com/",
+    "api_type": "azure",
+    "api_version": "2024-12-01-preview",
+    "tags": ["gpt-4.1-nano"],
+    "price": [0.1/1000, 0.4/1000],
+    "azure_ad_token_provider": token_provider
+  },
+  # { #https://metabase-aoi-eus2.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview
+  #    #https://metabase-aoi-eus2.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview
+  #   "model": "o1",
+  #   #"deployment": "gpt-4.1",
+  #   #"model_name": "gpt-4.1",
+  #   "base_url": "https://metabase-aoi-eus2.openai.azure.com/",
+  #   "api_type": "azure",
+  #   "api_version": "2024-12-01-preview",
+  #   "tags": ["gpt-4.1"],
+  #   "price": [2.0/1000, 8.0/1000],
+  #   "azure_ad_token_provider": token_provider
+  # },
   {
     "model": "gpt-4o",
     "base_url": "https://metabase-aoi-eus2.openai.azure.com",
@@ -559,8 +605,9 @@ config_list_4_combin = [
 
 if __name__ == "__main__":
 
-  from autogen import OpenAIWrapper
   import autogen
+  from autogen import OpenAIWrapper
+  
 
 #   client = OpenAIWrapper(config_list=config_list_35, cache_seed=None)
 #   print("Test gpt 35", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
@@ -584,13 +631,17 @@ if __name__ == "__main__":
   # client = OpenAIWrapper(config_list=config, cache_seed=None)
   # print("Test gpt 4o", client.create(messages=[{"role": "user", "content":"hello"}]).choices[0].message.content)
 
-  import autogen
   def filter_config_list(config_list, model_name):
     config_list = autogen.filter_config(config_list, {'tags': [model_name]})
     if len(config_list) == 0:
         raise ValueError(f"model {model_name} not found in the config list, please put 'tags': ['{model_name}'] in the config list to inicate this model")
     return config_list
   
-  agent_config_list = filter_config_list(CONFIG_LIST, "gpt-4.1")
+  agent_config_list = filter_config_list(CONFIG_LIST, "gpt-4.1-nano")
   client = OpenAIWrapper(config_list=agent_config_list, cache_seed=None)
-  print("Test gpt 4o-mini", client.create(messages=[{"role": "user", "content":"hello what model are you?"}]).choices[0].message.content)
+  # client = ChatCompletionsClient(
+  #           endpoint= agent_config_list[0]['endpoint'],
+  #           credential=AzureKeyCredential(api_key),
+  #           seed =100
+  #           )
+  print("Test gpt 4.1-nano", client.create(messages=[{"role": "user", "content":"hello what model are you?"}]).choices[0].message.content)
