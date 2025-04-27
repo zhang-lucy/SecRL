@@ -1,3 +1,9 @@
+# python setup_database.py \
+#     --csv data_anonymized/alphineskihouse \
+#     --port 3314 \
+#     --sql_file sql_files/alpineskihouse.sql \
+#     --container_name alpineskihouse \
+#     --respawn
 python setup_database.py \
   --csv data_anonymized/incidents/incident_5 \
   --port 3306 \

@@ -67,7 +67,9 @@ You should ONLY have ONE action per response in the <answer> </answer> block, it
 (1) <answer>execute[<your sql query>]</answer>, which executes the SQL query. For example, execute[DESCRIBE table_name]. You should give sql queries to explore the schema and acquire information.
 (2) <answer>submit[<your answer>]</answer>, which submits the final answer to the question. When you believe you have enough information to answer the question, you can submit your answer.
 
-Please do not do excessive thinking. Briefly reason about the current situation and then give your action. DO NOT make assumptions about the data that are not observed in the logs.
+Please do not do excessive reasoning. Briefly reason about the current situation and then give your action quickly. DO NOT make assumptions about the data that are not observed in the logs. Be conside and precice in your response.
+
+Time is of the essence, you only have 15 actions before you must submit your answer. If you are not sure about the answer, you may answer in an enumerative way, such as "I think the answer is A, B, C, D". Do not give more than 10 enumerations. 
 """
 
 class BaselineAgent:
