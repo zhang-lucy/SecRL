@@ -32,6 +32,21 @@ CONFIG_LIST = [
   #   "tags": ["gpt-4o"],
   #   "azure_ad_token_provider": token_provider
   # },
+      {
+        "model": "gemini-2.5-flash-preview-04-17",
+        "api_key": open("/Users/kevin/Downloads/SecRL/googlekey").read().strip(),
+        "api_type": "google",
+        "tags": ["gemini-2.5-flash"],
+        # "price": [0.03/1000, 0.05/1000],
+    },
+      {
+        "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("/Users/kevin/Downloads/SecRL/deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["llama3-8b"],
+        "price": [0.03/1000, 0.05/1000],
+    },
   {
     "model": "phi4",
     "endpoint": "https://Phi-4-secrl.eastus.models.ai.azure.com",
