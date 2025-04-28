@@ -36,7 +36,7 @@ CONFIG_LIST = [
   # },
       {
         "model": "gemini-2.5-flash-preview-04-17",
-        "api_key": open("/Users/kevin/Downloads/SecRL/googlekey").read().strip(),
+        "api_key": open("googlekey").read().strip(),
         "api_type": "google",
         "tags": ["gemini-2.5-flash"],
         # "price": [0.03/1000, 0.05/1000],
@@ -44,7 +44,7 @@ CONFIG_LIST = [
       {
         "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
         "base_url": "https://api.deepinfra.com/v1/openai",
-        "api_key": open("/Users/kevin/Downloads/SecRL/deepinfrakey").read().strip(),
+        "api_key": open("deepinfrakey").read().strip(),
         "api_type": "openai",
         "tags": ["llama3-8b"],
         "price": [0.03/1000, 0.05/1000],
@@ -652,7 +652,7 @@ if __name__ == "__main__":
         raise ValueError(f"model {model_name} not found in the config list, please put 'tags': ['{model_name}'] in the config list to inicate this model")
     return config_list
   
-  agent_config_list = filter_config_list(CONFIG_LIST, "gpt-4.1-nano")
+  agent_config_list = filter_config_list(CONFIG_LIST, "llama3-8b")
   client = OpenAIWrapper(config_list=agent_config_list, cache_seed=None)
   # client = ChatCompletionsClient(
   #           endpoint= agent_config_list[0]['endpoint'],

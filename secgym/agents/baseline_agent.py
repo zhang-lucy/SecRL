@@ -84,6 +84,7 @@ class BaselineAgent:
                  ):
         self.cache_seed = cache_seed
         self.config_list = config_list
+        self.temperature = temperature
 
         if "o4" in config_list[0]['model']:
             self.temperature = 1
