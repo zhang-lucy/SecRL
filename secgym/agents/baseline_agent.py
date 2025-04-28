@@ -84,7 +84,9 @@ class BaselineAgent:
                  ):
         self.cache_seed = cache_seed
         self.config_list = config_list
-        self.temperature = temperature
+
+        if "o4" in config_list[0]['model']:
+            self.temperature = 1
         
         if "ai_foundry" in config_list[0]['api_type']:
             self.client = ChatCompletionsClient(
@@ -96,7 +98,7 @@ class BaselineAgent:
             self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
-        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model']:
+        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model'] or "o4" in config_list[0]['model']:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
         if "r1" in config_list[0]['model']:
@@ -204,7 +206,7 @@ class BaselineAgent:
 
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
-        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
+        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model'] or "o4" in self.config_list[0]['model']:
             sys_prompt = O1_PROMPT
         elif "r1" in self.config_list[0]['model']:
             sys_prompt = R1_PROMPT
