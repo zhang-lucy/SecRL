@@ -88,13 +88,13 @@ class BaselineAgent:
         if "o4" in config_list[0]['model']:
             self.temperature = 1
         
-        if "ai_foundry" in config_list[0]['api_type']:
+        if "ai_foundry" in config_list[0].get('api_type'):
             self.client = ChatCompletionsClient(
             endpoint= config_list[0]['endpoint'],
             credential=AzureKeyCredential(api_key),
             seed =self.cache_seed
             )
-        elif "azure" in config_list[0]['api_type']:
+        else:
             self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
@@ -117,17 +117,9 @@ class BaselineAgent:
         return "BaselineAgent"
 
     def _call_llm(self, messages):
-        if "azure" in self.config_list[0]['api_type']:
-            response = call_llm(
-                client=self.client, 
-                model=self.config_list[0]['model'],
-                messages=messages,
-                retry_num=self.retry_num,
-                retry_wait_time=self.retry_wait_time,
-                temperature=self.temperature
-            )
-            update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
-        elif "ai_foundry" in self.config_list[0]['api_type']:
+        # print(f"Messages: {self.config_list[0]}")
+
+        if "ai_foundry" in self.config_list[0]['api_type']:
             response = call_llm_foundry(
                 client=self.client, 
                 model=self.config_list[0]['model'],
@@ -138,6 +130,17 @@ class BaselineAgent:
                 stop=['</answer>'],
             )
             update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.as_dict())
+        else:
+                    # if "azure" in self.config_list[0]['api_type']:
+            response = call_llm(
+                client=self.client, 
+                model=self.config_list[0]['model'],
+                messages=messages,
+                retry_num=self.retry_num,
+                retry_wait_time=self.retry_wait_time,
+                temperature=self.temperature
+            )
+            update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
         return response.choices[0].message.content
         
     def act(self, observation: str):
