@@ -41,13 +41,37 @@ CONFIG_LIST = [
         "tags": ["gemini-2.5-flash"],
         # "price": [0.03/1000, 0.05/1000],
     },
-      {
+    {
+        "model": "deepseek-ai/DeepSeek-R1",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["deepseek-r1"],
+        "price": [0.5/1000, 2.18/1000],
+    },
+       {
         "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
         "base_url": "https://api.deepinfra.com/v1/openai",
         "api_key": open("deepinfrakey").read().strip(),
         "api_type": "openai",
         "tags": ["llama3-8b"],
         "price": [0.03/1000, 0.05/1000],
+    },
+    {
+        "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["llama4-Mav-17b"],
+        "price": [0.17/1000, 0.60/1000],
+    },
+    {
+        "model": "meta-llama/Meta-Llama-3.1-405B-Instruct",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["llama3-405b"],
+        "price": [0.8/1000, 0.8/1000],
     },
   {
     "model": "phi4",
