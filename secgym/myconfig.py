@@ -36,18 +36,42 @@ CONFIG_LIST = [
   # },
       {
         "model": "gemini-2.5-flash-preview-04-17",
-        "api_key": open("/Users/kevin/Downloads/SecRL/googlekey").read().strip(),
+        "api_key": open("googlekey").read().strip(),
         "api_type": "google",
         "tags": ["gemini-2.5-flash"],
         # "price": [0.03/1000, 0.05/1000],
     },
-      {
-        "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    {
+        "model": "deepseek-ai/DeepSeek-R1",
         "base_url": "https://api.deepinfra.com/v1/openai",
-        "api_key": open("/Users/kevin/Downloads/SecRL/deepinfrakey").read().strip(),
+        "api_key": open("deepinfrakey").read().strip(),
         "api_type": "openai",
-        "tags": ["llama3-8b"],
-        "price": [0.03/1000, 0.05/1000],
+        "tags": ["deepseek-r1"],
+        "price": [0.5/1000, 2.18/1000],
+    },
+       {
+        "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["llama4-Scout-17b"],
+        "price": [0.08/1000, 0.3/1000],
+    },
+    {
+        "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["llama4-Mav-17b"],
+        "price": [0.17/1000, 0.60/1000],
+    },
+    {
+        "model": "meta-llama/Meta-Llama-3.1-405B-Instruct",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["llama3-405b"],
+        "price": [0.8/1000, 0.8/1000],
     },
   {
     "model": "phi4",
@@ -652,7 +676,7 @@ if __name__ == "__main__":
         raise ValueError(f"model {model_name} not found in the config list, please put 'tags': ['{model_name}'] in the config list to inicate this model")
     return config_list
   
-  agent_config_list = filter_config_list(CONFIG_LIST, "gpt-4.1-nano")
+  agent_config_list = filter_config_list(CONFIG_LIST, "llama3-8b")
   client = OpenAIWrapper(config_list=agent_config_list, cache_seed=None)
   # client = ChatCompletionsClient(
   #           endpoint= agent_config_list[0]['endpoint'],

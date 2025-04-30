@@ -68,9 +68,8 @@ You should ONLY have ONE action per response in the <answer> </answer> block, it
 (2) <answer>submit[<your answer>]</answer>, which submits the final answer to the question. When you believe you have enough information to answer the question, you can submit your answer.
 
 Please do not do excessive reasoning. Briefly reason about the current situation and then give your action quickly. DO NOT make assumptions about the data that are not observed in the logs. Be conside and precice in your response.
-
-Time is of the essence, you only have 15 actions before you must submit your answer. If you are not sure about the answer, you may answer in an enumerative way, such as "I think the answer is A, B, C, D". Do not give more than 10 enumerations. 
 """
+ 
 
 class BaselineAgent:
     def __init__(self,
@@ -85,6 +84,9 @@ class BaselineAgent:
         self.cache_seed = cache_seed
         self.config_list = config_list
         self.temperature = temperature
+
+        if "o4" in config_list[0]['model']:
+            self.temperature = 1
         
         if "ai_foundry" in config_list[0].get('api_type'):
             self.client = ChatCompletionsClient(
@@ -96,10 +98,10 @@ class BaselineAgent:
             self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         
         sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
-        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model']:
+        if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model'] or "R1" in config_list[0]['model'] or "o4" in config_list[0]['model'] or "meta-llama" in config_list[0]['model']:
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
-        if "r1" in config_list[0]['model']:
+        if "r1" in config_list[0]['model'] or "R1" in self.config_list[0]['model']:
             self.messages = [{"role": "system", "content": R1_PROMPT}]  # no system prompt for deepseek
             print("Deepseek model, no system prompt")
 
@@ -142,7 +144,7 @@ class BaselineAgent:
         return response.choices[0].message.content
         
     def act(self, observation: str):
-        if "r1" in self.config_list[0]['model'] and len(self.messages) == 0:
+        if ("r1" in self.config_list[0]['model' or "R1" in self.config_list[0]['model']]) and len(self.messages) == 0:
             self._add_message(observation, role="user")
         else:
             self._add_message(observation, role="user")
@@ -154,7 +156,7 @@ class BaselineAgent:
             self._add_message(summary_prompt, role="system")
 
         split_str = "\nAction:"
-        if "r1" in self.config_list[0]['model']:
+        if "r1" in self.config_list[0]['model'] or "R1" in self.config_list[0]['model']:
             split_str = "<answer>"
 
         if "**Action:**" in response:
@@ -207,9 +209,9 @@ class BaselineAgent:
 
         self.step_count = 0
         sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
-        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model']:
+        if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model'] or "o4" in self.config_list[0]['model'] or "meta-llama" in self.config_list[0]['model']:
             sys_prompt = O1_PROMPT
-        elif "r1" in self.config_list[0]['model']:
+        elif "r1" in self.config_list[0]['model'] or "R1" in self.config_list[0]['model']:
             sys_prompt = R1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
         # if "r1" in self.config_list[0]['model']:
