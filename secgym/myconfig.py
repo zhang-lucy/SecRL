@@ -49,7 +49,23 @@ CONFIG_LIST = [
         "tags": ["deepseek-r1"],
         "price": [0.5/1000, 2.18/1000],
     },
-       {
+    {
+        "model": "Qwen/Qwen3-32B",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["qwen3-32b"],
+        "price": [0.1/1000, 0.3/1000],
+    },
+    {
+        "model": "Qwen/Qwen3-14B",
+        "base_url": "https://api.deepinfra.com/v1/openai",
+        "api_key": open("deepinfrakey").read().strip(),
+        "api_type": "openai",
+        "tags": ["qwen3-14b"],
+        "price": [0.08/1000, 0.24/1000],
+    },
+    {
         "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
         "base_url": "https://api.deepinfra.com/v1/openai",
         "api_key": open("deepinfrakey").read().strip(),
