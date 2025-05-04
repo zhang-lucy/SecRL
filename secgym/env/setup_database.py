@@ -345,7 +345,7 @@ if __name__ == "__main__":
     elif args.layer == "alert_only":
         skip_tables = []
         for fname in os.listdir(csv_folder):
-            if fname.endswith(".meta") or fname.startswith("._"):
+            if fname.endswith(".meta") or fname.startswith("._") or fname.startswith(".DS_Store"):
                 continue
             if fname.endswith(".csv"):
                 skip_tables.append(fname.replace(".csv", ""))
