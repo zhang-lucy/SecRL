@@ -1,0 +1,158 @@
+Title: Multi-Stage Insider-Assisted Attack – Credential Harvesting, Lateral Movement & Persistence
+
+────────────────────────────
+EXECUTIVE SUMMARY
+
+Over several days beginning July 2, 2024, a sophisticated multi-stage attack was detected affecting key internal systems and high-privilege accounts. The threat actors employed a blend of reconnaissance, execution of malicious PowerShell commands, process injection, credential harvesting from LSASS memory, suspicious LDAP queries, unauthorized service creation, and Directory Services replication abuse (DCSync) to move laterally across the network. Indicators include anomalous use of legitimate tools decoyed under unexpected filenames, the creation of suspicious scheduled tasks and services, and abnormal queries against AD FS components. These series of events suggest attackers sought to gain privileged access, execute lateral movements and establish long‐term persistence while attempting to exfiltrate sensitive credentials.
+
+────────────────────────────
+INCIDENT TIMELINE
+
+• July 2, 2024, early morning – Initial indicators emerge on host MB-WINCLIENT:
+  – Multiple alerts report suspicious system process activity including suspicious PowerShell invocations (e.g., “A malicious PowerShell Cmdlet was invoked…”), execution of modified system binaries, and anomalous executable launches.
+  – Discovery events are recorded (e.g., suspicious scheduler activity, renamed system executables launched, and process injection incidents into trusted processes such as LSASS).
+
+• July 2, 2024, mid-morning – Lateral movement and credential access attempts:
+  – Alerts for “Suspicious access to LSASS service” indicate potential password dumping attempts.
+  – Several alerts note anomalous remote activity (triggered by unexpected Impacket toolkit usage) and suspicious LDAP queries aimed at gathering domain and object information.
+  – Further, multiple alerts report the creation and execution of scheduled tasks (“Suspicious Task Scheduler activity”) and the registration of unusual services (e.g., “Suspicious service registration”), suggesting the attackers are establishing persistence and evasion.
+
+• July 2–7, 2024 – Credential Harvesting and Privilege Escalation:
+  – Alerts related to code injection (e.g., “A process was injected with potentially malicious code”) and suspicious PowerShell cmdlet usage spread across the timeline.
+  – A series of events indicate active querying of directory services: suspicious LDAP queries and an eventual DCSync alert showing that one host (MB-DC1) received replication requests from MB-WINCLIENT.
+  – Additional alerts reveal that AD FS components were targeted. Two separate “Suspected AD FS DKM key read” alerts confine the action to both MB-DC1 (system-initiated) and gsmith (user-initiated), signaling an attempt to extract key material from ADFS.
+
+• July 7–10, 2024 – Malicious external communications and phishing:
+  – Office 365 Advanced Threat Protection and Microsoft Cloud App Security alert on “Email messages containing malicious URL removed after delivery” document compromised email dissemination.
+  – In parallel, an “Internal phishing lexpaign” alert highlights that a compromised user likely sent phishing emails to internal recipients to facilitate further lateral movement.
+  – Later on July 10, additional alerts confirm malicious URL click activity and further DCSync events, reinforcing that sensitive credential material may have been harvested.
+
+• July 10, 2024 – Final stages:
+  – Alerts regarding unauthorized service creation on a critical host (MB-ADFS) by user gsmith are recorded, possibly as a further attempt to execute malicious commands.
+  – The attack culminates with suspected AD FS key extraction actions and malicious URL click events that indicate ongoing compromise and potential exfiltration channels.
+
+────────────────────────────
+TECHNICAL ANALYSIS
+
+The incident graph reveals a complex series of interrelated events:
+
+1. Process & Command Activity:
+  – Multiple alerts (e.g., “A malicious PowerShell Cmdlet was invoked…” and suspicious renamed executables) indicate the attacker used legitimate system utilities (such as PowerShell, schtasks.exe, and Explorer) in unexpected ways.
+  – Decoy techniques were employed by renaming system executables and launching them with encoded commands. These tactics are intended to evade behavior‐based detection mechanisms.
+
+2. Credential and Memory Attacks:
+  – High-severity alerts such as “Suspicious access to LSASS service” and “Sensitive credential memory read” reveal exploitation attempts targeting LSASS, the process responsible for holding clear-text credentials. Techniques like process injection and memory dumping (aligned with MITRE ATT&CK T1055 and T1003.001/T1550.002) have been observed.
+  – The replication of directory services through DCSync-type behavior on MB-DC1 provides clear evidence of attackers attempting to duplicate credential data from domain controllers.
+
+3. Lateral Movement & Reconnaissance:
+  – Suspicious remote activity is identified, including the unexpected invocation of tools often associated with lateral movement (such as Impacket) and reconnaissance queries via LDAP.
+  – Several alerts (e.g., “Suspicious LDAP query”) indicate that attackers were using LDAP to enumerate domain structure and gain administrative insights, likely to identify high-value targets.
+
+4. Persistence & Evasion:
+  – Alerts related to “Suspicious Task Scheduler activity” and “Suspicious service registration/creation” underscore methods to maintain persistence within the environment.
+  – The unusual addition of credentials to an OAuth app (“Unusual addition of credentials to an OAuth app”) by Luciano Herrera suggests that attackers compromised privileged accounts and then created backdoor access in cloud applications (this aligns with persistence and credential abuse tactics).
+
+5. Email Phishing & External Communications:
+  – Office 365 Advanced Threat Protection alerts reflect phishing activity and subsequent remediation (removal/quarantine of malicious URL emails), indicating that the adversary also leveraged compromised email accounts to spread their attack internally.
+
+Relationships Between Events:
+• Alerts on process injection, PowerShell abuse, and modified executables connect to lateral movement and credential theft efforts.
+• LDAP query and DCSync events are correlated, suggesting reconnaissance and credential harvesting from Active Directory.
+• The successive alerts on unauthorized service and task creation indicate a timeline of persistence establishment.
+• Finally, cloud security alerts relating to phishing and OAuth credential modifications tie in the exfiltration and further spread of the compromise.
+
+────────────────────────────
+AFFECTED ENTITIES
+
+Systems and Hosts:
+  – MB-WINCLIENT: Multiple process injection and abnormal process execution alerts.
+  – MB-ADFS: Unauthorized service creation and suspicious AD FS key material extraction.
+  – MB-DC1: Involved in DCSync replication requests for credential harvesting.
+  – Various domain controllers indicated by LDAP queries and DCSync alerts.
+
+User Accounts:
+  – bjenkins (domain account, potential victim of LSASS and email phishing)
+  – pwilson (Luciano Herrera – high-privilege account; also involved in unusual OAuth credential addition and AD FS DKM key read)
+  – gsmith (account linked to suspicious service creation on MB-ADFS)
+
+Email and Cloud Entities:
+  – Suspicious email messages sent from compromised accounts
+  – Office 365 and Microsoft 365 cloud applications and OAuth app “SimulandApp” affected by credential modifications
+
+Supporting Entities:
+  – Various process objects (e.g., renamed executables “iy2orr1e.rrg.exe”, scheduled tasks, and PowerShell command processes)
+  – Network indicators including public IP addresses (e.g., 72.5.72.208) and malicious URL references detected in email
+
+────────────────────────────
+ATTACK METHODOLOGY
+
+• RECONNAISSANCE & DISCOVERY:
+  – Use of common tools (e.g., PowerShell, Impacket) under obfuscated names.
+  – LDAP queries to enumerate AD structure and identify high-value targets.
+
+• CREDENTIAL THEFT:
+  – Direct memory access attempts to LSASS and use of DCSync techniques.
+  – Suspicious read operations on AD FS distributed key manager (DKM) keys.
+
+• LATERAL MOVEMENT:
+  – Remote interactive sessions and exploitation of domain trust relationships.
+  – Execution of unauthorized scheduled tasks, service creation, and service registration to pivot between hosts.
+
+• PERSISTENCE & EVASION:
+  – Renaming executables and scheduled tasks to blend with benign activities.
+  – Unauthorized modification of OAuth applications (addition of credentials) to maintain backdoor access to cloud services.
+  – Process injection into system processes to obscure malicious activity.
+
+• PHISHING & EXFILTRATION:
+  – Use of compromised email accounts to send phishing messages internally.
+  – Malicious URL delivery detected and removed by cloud security tools.
+
+────────────────────────────
+INDICATORS OF COMPROMISE (IOCs)
+
+• Network Entities:
+  – IP Addresses: 72.5.72.208; Public IPs referenced in email alerts (e.g., V62.34.26.163)
+  – Malicious URL: http://kn017721628.wittytree-b6f239d6.northeurope.azurecontainerapps.io/ and https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/
+
+• Host & Process Artifacts:
+  – Renamed executables such as "iy2orr1e.rrg.exe" launched with encoded PowerShell commands 
+  – Scheduled tasks and unauthorized services (e.g., DDLOXJDSQSNGMUKKFUXQ created on MB-ADFS)
+  – Suspicious PowerShell command lines and LSASS access events
+
+• Credential Harvesting:
+  – DCSync replication requests from MB-WINCLIENT to MB-DC1
+  – AD FS DKM key read alerts (via both system and user-initiated activity)
+
+• Email/Cloud:
+  – Unauthorized addition of credentials to OAuth app “SimulandApp”
+  – Phishing email alerts identified by Microsoft Defender for Office 365
+
+────────────────────────────
+SEVERITY ASSESSMENT
+
+The incident is assessed as High severity.  
+• The multi-stage attack leverages a broad range of techniques—from initial reconnaissance and process obfuscation to advanced credential harvesting via LSASS and DCSync attacks—significantly increasing the risk for lateral movement and persistent compromise.  
+• High-privilege accounts (such as Luciano Herrera and gsmith) are targeted, and unauthorized changes to critical cloud applications suggest potential for further exfiltration and systemic impact.  
+• Compromised domain controllers and AD FS key material pose an immediate threat to the integrity of the organization’s authentication infrastructure.  
+• The combination of on-premises internal compromise and cloud-based credential modifications underscores the need for both remediation and enhanced monitoring.
+
+────────────────────────────
+IMPORTANT LABELS AND KEYWORDS
+
+• Labels/Tags: Lateral Movement, Credential Theft, Persistence, Defense Evasion, Process Injection, DCSync, LSASS Exploitation, OAuth Credential Abuse, Phishing, AD FS Key Extraction  
+• Keywords: Suspicious PowerShell, Process Injection, LDAP Query, DCSync, AD FS DKM, Malicious Service Creation, Renamed Executable, OAuth Credentials, Office 365 Threat, Cloud App Security, Advanced Threat Protection
+
+────────────────────────────
+CONCLUSION & RECOMMENDATIONS
+
+This incident demonstrates a coordinated multi-stage compromise involving both on-premises and cloud systems. Immediate steps must include:
+  – Detailed forensic analysis of affected hosts (especially MB-WINCLIENT, MB-ADFS, and MB-DC1).
+  – Credential reset and account revalidation for high-privilege users.
+  – Isolation and remediation of unauthorized services and scheduled tasks.
+  – Review and hardening of AD FS, domain controller, and OAuth configurations.
+  – Enhanced monitoring, updated endpoint protection signatures, and strengthened email and network filtering.
+
+Collaboration among internal response teams, cloud security specialists, and external support (e.g., Microsoft Support) is critical to fully contain and remediate the compromise.
+
+────────────────────────────
+End of Report.
