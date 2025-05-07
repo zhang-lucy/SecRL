@@ -1,78 +1,99 @@
-Title: Multi-Stage Business Email Compromise via Malicious URL, Unauthorized Sign‐Ins & Password Spray
+Title: Multi-Stage Phishing-Driven BEC and Account Takeover Attack
 
-────────────────────────────
-EXECUTIVE SUMMARY
-────────────────────────────
-On July 17–18, 2024, a coordinated multi-stage attack was detected and investigated. The attack began with a user clicking on a malicious URL embedded in an email, which initiated a cascade of events including anonymous and malicious IP sign‐ins, suspicious email inbox rule manipulations, and ultimately, business email compromise (BEC) activities. Later, a password spray attack led to a compromised user account. The attacker exploited vulnerabilities in email delivery and identity protection systems, using methods such as phishing and credential attacks, to gain unauthorized access, manipulate inbox settings, and exfiltrate sensitive messages. Prompt detection and response were triggered by alerts across Office 365 Advanced Threat Protection, Azure Active Directory Identity Protection, and Microsoft 365 Defender.
+1. EXECUTIVE SUMMARY  
+On July 17–18, 2024, the user “raphaelt@vnevado.alpineskihouse.co” (Nina Park) fell victim to a phishing campaign that delivered a malicious URL. Following the click, an attacker leveraged that access to perform unauthorized sign-ins from anonymizing and malicious IP addresses, manipulated the user’s Outlook inbox rules to hide incoming mail, and executed a business email compromise (BEC) fraud attempt by sending spoofed emails to external recipients. Over the next 24 hours, the attacker escalated with a password-spray attack against Azure AD, resulting in a confirmed account takeover. This multi-stage chain encompassed Initial Access (T1566), Credential Access (T1110), Defense Evasion (T1564), Collection (T1114), and Reconnaissance/Suspicious Activity (T1586).
 
-────────────────────────────
-INCIDENT TIMELINE
-────────────────────────────
-• 2024-07-17 10:50:25 UTC – Alert Node 0 (“A potentially malicious URL click was detected”) is generated after a user interaction with a known malicious URL, indicating initial exposure.
-  
-• 2024-07-17 10:56:50 UTC – Alert Node 11 (“Anonymous IP address”) records a sign-in from an anonymized IP (170.54.121.63) likely used to mask attacker identity.
-  
-• 2024-07-17 10:49–10:51 UTC – Alert Node 13 (“Email messages containing malicious URL removed after delivery”) logs emails harbouring the malicious URL. Email content was delivered and later quarantined.
-  
-• 2024-07-17 11:06:04 UTC – Alert Nodes 14 (“Suspicious inbox manipulation rule”) and 17 (“BEC financial fraud”) are triggered. These alerts signal that the attacker is adjusting mailbox rules to hide incoming messages and potentially facilitate data exfiltration and fraudulent financial communications.
-  
-• 2024-07-17 11:06:54 UTC – Alert Node 18 (“Suspicious emails sent by BEC-related user”) is raised when suspicious outbound emails hinting at BEC fraud are detected.
-  
-• 2024-07-17 13:48:02 UTC – Alert Node 23 (“Malicious IP address”) confirms additional sign-in activity from the known-malicious IP tied to earlier events, reinforcing the suspicion of external compromise.
-  
-• 2024-07-18 14:36:59 UTC – Alert Node 24 (“Password Spray”) documents a credential attack where a series of common passwords were attempted across multiple accounts.
-  
-• 2024-07-18 14:54:18 UTC – Alert Node 25 (“Account compromised following a password-spray attack”) confirms that a user account (raphaelt@vnevado.alpineskihouse.co) was accessed from an unusual location and browser, consolidating evidence of compromise.
+2. INCIDENT TIMELINE  
+2024-07-17 10:49:35 UTC  
+• Alert (13): “Email messages containing malicious URL removed after delivery”  
+– A phishing email from alyssat@vnevado.alpineskihouse.co (IP 254.241.243.229) with subject “Lee Don’t miss 1969-Con Event next month” delivered to raphaelt@… and quarantined post-delivery.  
 
-────────────────────────────
-TECHNICAL ANALYSIS
-────────────────────────────
-1. Initial Phishing & Malicious URL (Node 0):
-   • A malicious URL was clicked by a user (raphaelt@vnevado.alpineskihouse.co). 
-   • The embedded URL (nodes 5 and 10) points to a suspicious Azure Container App instance which could be hosting exploit code or phishing content.
-   • Techniques referenced: T1566 (phishing) and its subtechnique T1566.002.
+2024-07-17 10:50:25 UTC  
+• Alert (0): “A potentially malicious URL click was detected”  
+– User clicked http://ms175052280.orangecliff-… (T1566.002).  
 
-2. Anonymous & Malicious Sign-ins (Nodes 11, 12, 23):
-   • Anonymous IP alert from IP 170.54.121.63 signified a login using anonymization tools.
-   • This same IP later appears in a “Malicious IP address” alert, validating its reputation for undesirable behavior in sign-in attempts.
-   • This is indicative of an initial access phase, where the attacker covers tracks by using anonymizer VPNs or Tor browsers.
+2024-07-17 10:56:50 UTC  
+• Alert (11): “Anonymous IP address”  
+– Sign-in to raphaelt@… from Tor/VPN IP 170.54.121.63 (Amsterdam) (Initial Access).  
+• Alert (23): “Malicious IP address”  
+– Corroborates sign-in from 170.54.121.63 flagged as malicious.  
+• Alert (24): “Password Spray”  
+– Credential spray detected from same IP targeting multiple accounts.
 
-3. Email Delivery and Quarantine (Node 13):
-   • Malicious emails containing the URL were initially delivered (mail exfiltration attempt) and later removed.
-   • These events indicate a failure in pre-delivery filtering and demonstrate an attempt to evade detection by initially allowing delivery then removing the content after initial spread.
+2024-07-17 11:04:19 UTC  
+• Phish URL cleanup processed (alert 13 final state).  
 
-4. Suspicious Inbox Manipulation & BEC Activity (Nodes 14, 17, 18):
-   • The “Suspicious inbox manipulation rule” alert points to unauthorized changes to mailbox rules.
-   • The creation of these rules was likely designed to hide legitimate emails or redirect communications, facilitating the BEC financial fraud attack.
-   • Alert Node 17 ("BEC financial fraud") confirms further that the attacker was attempting to hide incoming emails, a common indicator of BEC.
-   • Alert Node 18 shows outbound suspicious emails being sent from the compromised account to an unusual recipient (Nathan@avoriaz.alpineskihouse.co). This represents lateral movement and active exploitation of the compromised email system.
+2024-07-17 11:06:04 UTC  
+• Alert (14): “Suspicious inbox manipulation rule”  
+– Attacker created hidden/move/delete rule in Nina Park’s mailbox (Defense Evasion T1564.008).  
+• Alert (17): “BEC financial fraud”  
+– Attacker created hide-incoming-mail rule in Azure AD session (Collection T1114.002).
 
-5. Password Spray & Account Compromise (Nodes 24, 25):
-   • Alert Node 24 flagged a password spray attack; multiple accounts were targeted using common passwords.
-   • The final alert (Node 25) proves that post-spray, the attacker successfully logged in from an unusual location/browser. This confirmed compromise of the target account (raphaelt@vnevado.alpineskihouse.co) and correlates strongly with the account’s subsequent suspicious activity.
-  
-Interrelationships:
-   • Graph edges show that the initial malicious URL (Node 0) is tightly coupled with subsequent email delivery and manipulation events (Node 13), pointing to a chain reaction.
-   • The compromised account entity (associated with “Nina Park” and "raphaelt@vnevado.alpineskihouse.co" from Nodes 4, 6, 7, 8, 9) links directly to inbox manipulation (Node 14), BEC-related financial fraud (Node 17), and suspicious sending behavior (Node 18).
-   • IP-centric alerts (Nodes 11, 12, 23, 24, 25) are interconnected, suggesting that the same external malicious infrastructure was used in both initial access and subsequent password spray actions.
+2024-07-17 11:06:54 UTC  
+• Alert (18): “Suspicious emails sent by BEC-related user”  
+– Spoofed email “Re: Lee Don’t miss 777-Con Event next month” sent from raphaelt@… to Nathan@avoriaz.alpineskihouse.co (IP 237.7.81.122) (T1586).
 
-────────────────────────────
-AFFECTED ENTITIES
-────────────────────────────
-• User Accounts:
-   – raphaelt@vnevado.alpineskihouse.co (compromised mailbox)
-   – Associated account details linked to “Nina Park” (with identifiers such as Sid S-1-5-21-1874151667-3554330288-105586563-1715 and AadUserId e036dee7-fa23-42ef-a019-468c8d3401f1).
+2024-07-18 13:48:02 UTC  
+• Duplicate “Malicious IP address” alert reconfirms prior sign-in risk.  
 
-• Mail Messages:
-   – Malicious email messages initially delivered (referenced in Node 13) 
-   – Suspicious emails sent to Nathan@avoriaz.alpineskihouse.co (Nodes 18, 20, 21, 22)
+2024-07-18 14:36:59 UTC  
+• Alert (24) processing completes for Password Spray detection.  
 
-• Network/IP addresses:
-   – 170.54.121.63 (Anonymous/Malicious IP used for sign-ins and password spray)
-   – 237.7.81.122 (Attacker IP implicated in inbox rule manipulations and outbound emails)
+2024-07-18 14:54:18 UTC  
+• Alert (25): “Account compromised following a password-spray attack”  
+– Confirmed unauthorized sign-in from unusual location/browser, Nina Park’s account fully compromised.
 
-• Cloud Applications:
-   – Microsoft Exchange Online (Node 15 via cloud-application involvement)
+3. TECHNICAL ANALYSIS  
+Alert 13 & 0 (T1566.002)  
+– A phishing email from alyssat@… (IP 254.241.243.229) targeted raphaelt@… with a malicious link. Office 365 ATP quarantined subsequent deliveries, but the user clicked before removal, establishing initial foothold.  
 
-────────────────────────────
-A
+Alert 11, 23 & 24 (Initial Access & Credential Access)  
+– Shortly after the click, a cloud-logon from IP 170.54.121.63 (Amsterdam; anonymizer/Tor) succeeded, indicating the attacker either harvested credentials or session tokens. Azure AD Identity Protection flagged the IP as both anonymous and malicious and detected a password spray against multiple accounts.  
+
+Alerts 14 & 17 (Defense Evasion & Collection)  
+– Within 15 minutes of initial access, the attacker modified Nina Park’s Outlook inbox rules to hide or delete incoming messages, preventing detection and facilitating covert BEC operations.  
+
+Alert 18 (Suspicious Activity)  
+– Using the compromised mailbox, the attacker dispatched fraudulent invoices or event invitations to “Nathan@avoriaz…”, likely aiming to extort or redirect payments (BEC/T1586).  
+
+Alerts 25 (Account Compromise Confirmation)  
+– A day later, a full account takeover is confirmed post-password-spray; sign-in patterns and browser attributes were anomalous.  
+
+Edge relationships track the progression from the original phishing alert (0) through email quarantine events (13), to account alerts (11, 23, 24), inbox manipulation (14, 17), outbound BEC (18), and final takeover (25).  
+
+4. AFFECTED ENTITIES  
+– User Account: Nina Park (raphaelt@vnevado.alpineskihouse.co; AadUserId e036dee7-…)  
+– Mailbox: raphaelt@vnevado.alpineskihouse.co  
+– Phishing sender: alyssat@vnevado.alpineskihouse.co; IP 254.241.243.229  
+– Malicious URLs:  
+  • http://ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io/  
+  • https://ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io/  
+– Attacker IPs: 170.54.121.63 (anon/malicious), 237.7.81.122 (SMTP relay for BEC)  
+– External Target: Nathan@avoriaz.alpineskihouse.co  
+– Cloud App: Microsoft Exchange Online (AppId 20893)  
+
+5. ATTACK METHODOLOGY (TTP)  
+– T1566.002 Phishing: Malicious link delivered via email.  
+– T1110.003/T1110.001 Credential Access: Password spray.  
+– T1564.008 Defense Evasion: Inbox rule manipulation.  
+– T1114.002 Collection: Hidden rule created to exfiltrate incoming email.  
+– T1586 Suspicious Activity: Outbound BEC emails.  
+– Persistence & Lateral Move: Retained mailbox control, risk session tokens.  
+
+6. INDICATORS OF COMPROMISE (IOCs)  
+– Phishing URL: ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io  
+– Sender IP: 254.241.243.229  
+– Attacker IPs: 170.54.121.63, 237.7.81.122  
+– Compromised account UPN: raphaelt@vnevado.alpineskihouse.co  
+– External recipient: nathan@avoriaz.alpineskihouse.co  
+– NetworkMessageIds: 2dbfc9f0-951f-4dd2-692b-08dca64b9909, 47e56987-44a0-45c4-d1b1-08dca6508dd1  
+
+7. SEVERITY ASSESSMENT  
+Overall Impact: High  
+– Initial phishing led to credential theft and unauthorized mailbox control.  
+– BEC attempts risk financial loss and reputational damage.  
+– Password spray expanded compromise to other accounts.  
+– Defense Evasion tactics concealed malicious activity.  
+
+8. KEY LABELS & KEYWORDS  
+Phishing, BEC, Business Email Compromise, Password Spray, Account Takeover, Inbox Rule Manipulation, Malicious URL, Anonymous IP, Malicious IP, Azure AD Identity Protection, Office 365 ATP.

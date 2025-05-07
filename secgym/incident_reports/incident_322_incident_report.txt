@@ -1,98 +1,88 @@
-Title: MULTI-STAGE CYBER ATTACK: From Malicious URL Phishing to Credential Dump and Cloud Lateral Movement
+Title: “Phishing‐Driven Domain Credential Harvest and Cloud Evasion Attack”
 
-──────────────────────────────
-EXECUTIVE SUMMARY
+EXECUTIVE SUMMARY  
+On August 1, 2024, an attacker deployed a multi‐stage campaign against AlpineSkiHouse. A targeted phishing email containing a malicious URL was delivered to user “alyssat@vnevado.alpineskihouse.co” (Hailey Johnson). The user clicked the link, which initiated further payload retrieval and C2 communications from the host vnevado-win11h. The actor then performed suspicious Azure Resource Manager operations via a proxy/TOR‐associated IP, abusing compromised credentials. Soon after, the adversary executed credential‐dumping commands on the domain controller vnevado-dc, extracting NTDS.dit via ntdsutil. The attack blended traditional e-mail phishing, proxy evasion, and on-premises credential theft to achieve domain compromise.
 
-On August 1, 2024, multiple correlated security alerts indicated that threat actors employed a multi-staged attack combining phishing via malicious URL emails, subsequent credential theft from the domain controller, and suspicious cloud (Azure Resource Manager) activities. Initial compromise was triggered by malicious URL clicks and a quarantined email containing the URL. Additional indicators, including abnormal proxy traffic and the extraction of Active Directory credentials via NTDS.dit and ntdsutil, signal lateral movement and credential access. Further, suspicious ARM operations from proxy IPs and risky account cloud activity suggest that the adversaries attempted to pivot towards cloud resource management as part of their broader attack campaign.
+INCIDENT TIMELINE  
+• 2024-08-01 11:26:07 UTC – Phishing mail with URL “dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io” delivered to alyssat@…  
+• 12:26:22 – “User accessed a link … quarantined by ZAP” alert (Node 23)  
+• 12:26:33 – “Malicious URL was clicked on that device” on host vnevado-win11h (Node 33)  
+• 12:28:19–12:33:14 – Proxy logs detect vnevado-win11h (231.60.52.209) connecting to login.micro.demo.antoinetest.ovh (Node 11)  
+• 12:32:45 – Suspicious Azure Resource Management activities by a “risky” user (Hailey Johnson) flagged, involving proxy IP 253.1.244.215 (Node 32)  
+• 12:33:16–12:33:44 – “Potentially malicious URL click detected” (Node 0)  
+• 12:34:30–12:36:30 – “Emails containing malicious URL removed after delivery” (Node 2)  
+• 12:36:22 – Azure Resource Manager operation from suspicious proxy IP (Node 25) targeting VM vnevado-dc  
+• 12:37:29 – Powershell invoked with encoded command dropping AD tools (Node 16 → process 2556)  
+• 12:37:30 – NTDS.dit dump via ntdsutil (“Suspicious credential dump” alert, Node 16)  
+• 12:37:30 – Ntdsutil collecting AD information for discovery & lateral movement (Node 22)  
+• 12:54:34–12:54:55 – Follow-up ZAP and MDATP collection alerts reiterate link activity (Nodes 22, 23)
 
-──────────────────────────────
-INCIDENT TIMELINE
+TECHNICAL ANALYSIS  
+Stage 1 – Initial Access (T1566.002)  
+• A phishing email (“Follow up – Security 101 content”) delivered to alyssat@… contained URL dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io.  
+• Hailey Johnson clicked it via msedge.exe (PID 4256) on host vnevado-win11h (172.33.118.200), triggering Office 365 ATP and ZAP quarantine.  
 
-• 12:26:22 – User Access Trigger:
-  – Alert “User accessed a link in an email subsequently quarantined by ZAP” indicates that an employee (Hailey Johnson/alyssat@vnevado.alpineskihouse.co) clicked on a suspicious link embedded in an email that was later quarantined. (Node 23)
+Stage 2 – Command & Control / Proxy Evasion  
+• vnevado-win11h (231.60.52.209) reached out to login.micro.demo.antoinetest.ovh, a TI-matched malicious domain.  
+• The attacker leveraged proxy/TOR IP 253.1.244.215 for Azure Resource Manager activities against subscription 7e838342-… (Resource Group ctfcat) and VM vnevado-dc.  
 
-• 12:26:33 – Endpoint Interaction:
-  – “Malicious URL was clicked on that device” alert is generated when a device interaction with the malicious URL is detected at the endpoint. (Node 33)
+Stage 3 – Credential Access (T1003, T1003.003)  
+• On domain controller vnevado-dc, PowerShell (PID 2556, SHA256=de96a6e6…ab32c) executed an encoded script to prepare an IFM snapshot.  
+• ntdsutil.exe (PID 6748, SHA256=0a302650…6e36b5e) ran “ac i ntds ifm create full c:\temp” to dump NTDS.dit.  
 
-• 12:28:19 – Proxy Log Anomaly:
-  – “Malicious Url detected in Proxy logs” is triggered due to a connection recorded from an internal IP (231.60.52.209, host vnevado-win11h) to an external suspicious domain (login.micro.demo.antoinetest.ovh). (Node 11)
+Stage 4 – Discovery & Collection (T1018; T1069.002; T1087.002; T1482)  
+• Ntdsutil usage flagged under Collection and Discovery categories—adversary gathering AD database and permissions for potential persistence or lateral movement.  
 
-• 12:32:45 – Risky Cloud Activity:
-  – “Suspicious Azure Resource Management activities by a risky user” alert is raised when ARM operations are performed by a user with a risky login session. (Node 32)
+Stage 5 – Cloud Evasion & Persistence (T1496)  
+• Risky user Hailey Johnson’s Azure activity raised Entra ID Protection alerts. The actor attempted ARM operations (VM run‐command, listing NICs, schedules) to probe or alter cloud assets.  
 
-• 12:33:16 to 12:33:44 – Phishing Engagement:
-  – “A potentially malicious URL click was detected” from the Office 365 Advanced Threat Protection engine confirms the user’s interaction with a malicious URL embedded in an email. (Node 0)
+AFFECTED ENTITIES  
+Accounts  
+• Hailey Johnson (alyssat@vnevado.alpineskihouse.co; AAD 5e5dd0bd-…)  
 
-• 12:34:30 to 12:36:30 – Email Cleanup Action:
-  – “Email messages containing malicious URL removed after delivery” alert documents the post-delivery removal of emails that carried the malicious URL, indicating an active phishing campaign. (Node 2)
+Hosts & Devices  
+• vnevado-win11h.vnevado.alpineskihouse.co (AadDeviceId 76707c40-…; IPs 231.60.52.209, 172.33.118.200)  
+• vnevado-dc.vnevado.alpineskihouse.co (Domain Controller; IP 65.233.23.156; MdatpDeviceId 43a4c3f27b4ff68…)  
+• Azure resources in subscription 7e838342-…: VM vnevado-dc, NIC vnevado-dc-nic, DevTestLab schedule shutdown-computevm-vnevado-dc  
 
-• 12:36:22 – Suspicious Cloud Operation:
-  – “Azure Resource Manager operation from suspicious proxy IP address” alert is raised when an ARM operation originates from an IP commonly associated with proxy services (such as TOR). (Node 25)
+Processes & Files  
+• msedge.exe (PID 4256)  
+• powershell.exe (PID 2556; SHA256=de96a6e6…)  
+• ntdsutil.exe (PID 6748; SHA256=0a302650…)  
 
-• 12:37:30 – Credential Theft Initiation:
-  – “Suspicious credential dump from NTDS.dit” is triggered when attackers dump the NTDS.dit file from the domain controller, aiming to harvest stored credentials. (Node 16)
-  – Associated processes (powershell.exe and ntdsutil.exe) are observed initiating the credential dump. (Nodes 17–21)
+Network Indicators  
+• URLs:  
+  – dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io  
+  – login.micro.demo.antoinetest.ovh  
+• IPs: 202.205.215.225, 228.3.31.94, 231.60.52.209, 253.1.244.215, 172.33.118.200  
 
-• 12:54:34 – Active Directory Reconnaissance:
-  – “Ntdsutil collecting Active Directory information” indicates adversaries are using native tools (ntdsutil) to gather AD data for lateral movement planning. (Node 22)
+ATTACK METHODOLOGY  
+• Initial Access: Phishing via malicious URL (T1566.002)  
+• Execution: Browser & PowerShell encoded commands (T1059)  
+• Persistence: ARM operations, cloud resource probing  
+• Privilege Escalation: Credential dumping from NTDS.dit (T1003.003)  
+• Discovery: AD database enumeration & system/network inventory (T1018; T1069.002; T1087.002)  
+• Collection: Exfiltration of credentials & configuration data (T1482)  
+• Defense Evasion: Use of zero-hour auto purge (ZAP), TOR‐associated proxy IP (T1496)  
 
-• 12:54:55 – Secondary Email Interaction:
-  – A repeat alert for “User accessed a link in an email subsequently quarantined by ZAP” further substantiates initial phishing engagement. (Node 23, repeated)
+INDICATORS OF COMPROMISE  
+• URLs:  
+  – dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io  
+  – https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/  
+  – login.micro.demo.antoinetest.ovh  
+• IP Addresses: 202.205.215.225; 231.60.52.209; 228.3.31.94; 253.1.244.215; 172.33.118.200  
+• File Hashes:  
+  – powershell.exe (SHA256=de96a6e69944335375dc1ac238336066889d9ffc7d73628ef4fe1b1b160ab32c)  
+  – ntdsutil.exe (SHA256=0a3026509dc46556021152242b9bb7956925d16953b05a2f548df717e5e36b5e)  
+• Accounts: Hailey Johnson (alyssat@…) – flagged as compromised  
+• Processes: PID 2556 (PowerShell); PID 6748 (ntdsutil.exe)  
 
-• 13:09:13 – Ongoing Cloud Activity:
-  – Another instance of ARM operation from a suspicious proxy IP confirms continued adversary activity against cloud resources. (Node 25)
+SEVERITY ASSESSMENT  
+Overall Impact: High  
+• Complete compromise of a user account and workstation  
+• Unauthorized credential dump of domain controller’s NTDS.dit threatens full AD domain takeover  
+• Use of proxy/TOR for cloud operations indicates intent to evade detection and abuse Azure resources  
+• Immediate risk of lateral movement, privilege escalation, and persistent foothold both on-prem and in cloud  
 
-• 13:19:20 – Additional Cloud Lateral Movement:
-  – “Suspicious Azure Resource Management activities by a risky user” alert is reinforced later in the timeline, indicating persistent efforts to exploit cloud resource management. (Node 32)
-
-• 13:49:58 – Repeat Endpoint Malicious Interaction:
-  – A final alert “Malicious URL was clicked on that device” is recorded, suggesting repeated or continued user interaction with malicious content. (Node 33)
-
-──────────────────────────────
-TECHNICAL ANALYSIS
-
-1. Phishing & Malicious URL Delivery (Nodes 0, 2, 23, 33)
-  – Detection events from Office 365 Advanced Threat Protection and Microsoft Defender for Office 365 confirm that phishing emails containing a malicious URL (dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io) were delivered. Users (notably “Hailey Johnson” and account alyssat@vnevado.alpineskihouse.co) clicked on these URLs.
-  – The emails were subsequently remediated (removed from inboxes via ZAP) and further corroborated by duplicate alerts indicating malicious URL clicks both at the email gateway and on the endpoint.
-
-2. Proxy Log Anomalies (Node 11)
-  – Proxy logs captured a connection from an internal host (vnevado-win11h with IP 231.60.52.209) to an externally hosted suspicious URL (login.micro.demo.antoinetest.ovh). This event confirms that the malicious URL propagated beyond user email interaction into network traffic, highlighting potential C2 or data exfiltration channels.
-
-3. Credential Dump & Lateral Movement (Nodes 16, 17–22)
-  – A high-severity alert reports a “Suspicious credential dump from NTDS.dit,” whereby threat actors used legitimate Windows tools (PowerShell and ntdsutil.exe) to extract credential data from the domain controller’s NTDS.dit file.
-  – Subsequent analysis indicates that ntdsutil was invoked to not only dump credentials but also to collect broader Active Directory information (“Ntdsutil collecting Active Directory information”), facilitating lateral movement and privilege escalation.
-  – Process chain details (commands invoked, associated file hashes, and parent/child relationships) reinforce the notion that standard system management tools were misused.
-
-4. Cloud Infrastructure Exploitation (Nodes 25, 32)
-  – Alerts from Microsoft Defender for Cloud and Azure Security Center indicate ARM operations originating from a suspicious proxy IP (253.1.244.215) and further ARM activity linked to a risky user session.
-  – The ARM activities were correlated with operations on critical Azure resources (e.g., virtual machine “vnevado-dc,” its NIC, and DevTestLab schedule), suggesting that attackers attempted to extend the breach to cloud assets in order to establish persistence or further compromise.
-
-5. Endpoint & Browser Artifacts (Nodes 33, 36, 37)
-  – The endpoint alert “Malicious URL was clicked on that device” ties back to host vnevado-win11h and is further associated with process artifacts (msedge.exe), which may indicate that the browser was exploited in order to interact with malicious content.
-  – Linkages to associated IP addresses (172.33.118.200) and the involvement of Microsoft Threat Protection further illuminate the breadth of the attack.
-
-──────────────────────────────
-AFFECTED ENTITIES
-
-• User Accounts:
-  – Hailey Johnson (and related account identities such as “alyssat@vnevado.alpineskihouse.co”)
-• Hosts/Devices:
-  – vnevado-win11h (Windows 11 host associated with proxy log anomalies and malicious URL clicks)
-  – vnevado-dc (Domain Controller targeted for credential dump and AD reconnaissance)
-  – Endpoints that executed processes (e.g., via msedge.exe, powershell.exe, ntdsutil.exe)
-• Email and Network Resources:
-  – Mail messages carrying malicious URLs and email quarantining action (Office 365 ATP, Microsoft Defender for Office 365)
-  – Proxy systems logging connections to external suspicious URLs
-• Cloud Infrastructure:
-  – Azure Resource Manager operations observed on virtual machine “vnevado-dc” and ancillary resources (network interfaces, DevTestLab schedules)
-  – Azure subscription and resource group “ctfcat” (ID: 7e838342-601f-4552-9baf-0dfb300cf555)
-
-──────────────────────────────
-ATTACK METHODOLOGY
-
-• Initial Access: 
-  – Use of phishing emails embedding malicious URLs to lure users into clicking and unwittingly compromising their devices.
-• Execution:
-  – Execution of malicious scripts via PowerShell (evidenced by encoded command lines) leading to credential harvesting.
-• Privilege Escalation & Credential Access:
-  – Dumping of NTDS.dit via legitimate Windows tools (ntdsutil.exe and Powe
+LABELS & KEYWORDS  
+Phishing; ZAP; InitialAccess; T1566.002; Powershell; nt​dsutil; CredentialAccess; T1003.003; Discovery; CloudEvasion; ARM; TOR; SuspiciousActivity; DomainController; AzureResourceManager; MITRE ATT&CK.

@@ -29,7 +29,7 @@ def generate_incident_report(nxgraph):
     graph_representation = get_graph_representation(nxgraph)
     
     # Use o3-mini model from Azure configuration
-    agent_config_list = filter_config_list(CONFIG_LIST, "o3-mini")
+    agent_config_list = filter_config_list(CONFIG_LIST, "o4-mini")
     llm_client = OpenAIWrapper(config_list=agent_config_list, cache_seed=None)
     
     # Create a comprehensive prompt for the LLM

@@ -1,128 +1,109 @@
-Title: Multi-Stage Kerberos Exploitation, Credential Theft, and Lateral Movement Attack
+Title of the multi-stage attack  
+“Operation Alpine Storm”  
 
-────────────────────────────────────────
-1. EXECUTIVE SUMMARY
+EXECUTIVE SUMMARY  
+Between June 27, 2024 14:30 UTC and June 27, 2024 14:35 UTC, a human-operated intrusion chain hit AlpineSkiHouse’s environment. Starting with a malicious URL click, the adversary executed a PowerShell “DomainDominance27” script to drop dual-use tools (Mimikatz, Rubeus, PsExec), disabled real-time antivirus, harvested credentials via Mimikatz and Rubeus (kerberoasting), created a backup domain account (BDAdmin), injected SID history into that account for elevated privileges, performed DCSync against the domain controller, and used overpass-the-hash and pass-the-ticket techniques to move laterally. Core systems compromised: vnevado-Win10V (user tgs2z/Ethan Brooks), vnevado-Win10B (user fk8mq/Emma Clark), and vnevado-DC.  
 
-Over the course of a coordinated attack campaign, multiple adversary techniques were observed across several endpoints in the network. Attackers leveraged well‐known credential theft and exploitation tools – including Rubeus, Mimikatz, and PsExec – to perform kerberoasting, dump credentials from LSASS memory, inject malicious SID history, and use overpass-the‐hash/pass‐the‐ticket techniques. These activities enabled lateral movement, unauthorized access to sensitive domain resources via replication (DCSync) and remote command execution, and potential interference with Microsoft Defender Antivirus. In addition, suspicious email activity and malicious URL clicks were detected, suggesting that a broader campaign of initial access and reconnaissance via malicious email may have assisted lateral pivoting. The overall incident indicates a high-severity compromise with critical internal accounts and infrastructure hosts affected.
+INCIDENT TIMELINE  
+2024-06-27 14:31:27 UTC  
+ • “Orchestrator.ps1” kicks off on vnevado-Win10V as user tgs2z.  
+2024-06-27 14:32:08  
+ • DomainDominance27.ps1 executed by tgs2z → drops PsExec, Mimikatz, Rubeus.  
+2024-06-27 14:32:12 → 14:32:25  
+ • Recon (whoami, net user/group/domain queries) by tgs2z (Discovery T1087).  
+2024-06-27 14:32:21  
+ • Antivirus alert: Kekeo malware detected (informational).  
+2024-06-27 14:32:35  
+ • Mimikatz “sekurlsa::logonpasswords” (Credential Access T1003).  
+2024-06-27 14:32:37  
+ • Mimikatz Pass-the-Hash (“sekurlsa::pth”) targeting accounts kyleg & fk8mq (T1550.003).  
+2024-06-27 14:32:46 → 14:32:52  
+ • Mimikatz “sekurlsa::pth /run:Get-KRBTicket.ps1” and Rubeus ticket theft (kerberoasting T1558.003).  
+ • Disable Windows Defender real-time monitoring (Defense Evasion T1562.001).  
+2024-06-27 14:33:14 → 14:33:27  
+ • PsExec from vnevado-Win10V to vnevado-Win10B to run Rubeus and dump service tickets (Lateral Movement T1021.002).  
+2024-06-27 14:33:32 → 14:33:38  
+ • Mimikatz “kerberos::ptt” and DCSync via “lsadump::dcsync” (Credential Access T1003.006).  
+2024-06-27 14:33:43  
+ • New domain user BDAdmin created on vnevado-Win10V (Persistence T1136.002).  
+2024-06-27 14:34:10  
+ • PowerShell adds SIDHistory for BDAdmin in NTDS and restarts service (Privilege Escalation T1134.005).  
+ • Suspicious service launched on vnevado-DC (Execution T1569.002).  
+2024-06-27 14:34:38 → 14:34:44  
+ • Additional SID history injection and suspicious service injection on DC.  
+2024-06-27 14:35  
+ • Root cause analysis and remediation completed (alerts resolved).  
+2024-06-27 17:04  
+ • tgs2z clicks malicious URL in quarantined email (Initial Access T1566.002).  
 
-────────────────────────────────────────
-2. INCIDENT TIMELINE
+TECHNICAL ANALYSIS  
+1. Initial Access (Phishing T1566.002):  
+   – vnevado-Win10V user tgs2z clicks URL “ac27145722.livelygrass-8d4c4013…” delivered via email.  
+2. Execution & Tool Deployment:  
+   – DomainDominance27.ps1 drops PsExec, Mimikatz, Rubeus. Tools hashed as:  
+     • PsExec.exe SHA256: 57492d33b7c0755bb411b22d2dfdfdf088cbbfcd010e30dd8d425d5fe66adff4  
+     • Mimikatz.exe SHA256: 912018ab3c6b16b39ee84f17745ff0c80a33cee241013ec35d0281e40c0658d9  
+     • Rubeus.exe SHA256: a1fddd460edd35ed449d32cc43bc15675c48a314a6fa5fb158e3bc4fea460be1  
+3. Defense Evasion & Persistence:  
+   – Disabled Defender real-time monitoring via Set-MpPreference.  
+   – Created BDAdmin account and injected SIDHistory (S-1-5-32-544) to escalate privileges.  
+4. Credential Access:  
+   – Mimikatz “sekurlsa::logonpasswords” dumps plaintext creds from LSASS.  
+   – Kerberoasting via Rubeus “dump /service:xfbzkp /user:lucasb” to steal service tickets.  
+   – Overpass-the-hash: forging TGT from NTLM hashes.  
+5. Lateral Movement (T1021.002):  
+   – PsExec remote executions to vnevado-Win10B and vnevado-DC to run Rubeus/Mimikatz.  
+6. Domain Persistence & Control:  
+   – SID history injection and NTDS restarts on vnevado-DC.  
+   – DCSync replication from DC to exfiltrate all account hashes (T1003.006).  
+7. Pass-the-Ticket (T1550.003):  
+   – Pass TGTs to authenticate as Julian Burke on alternate hosts.  
 
-• June 27, 2024 – Early in the day, alerts began appearing against endpoints. Multiple events were logged including:
-  – Execution of suspicious services and processes using “PSEXESVC.exe” on endpoints.
-  – “Possible use of the Rubeus kerberoasting tool” detected with command lines requesting Kerberos tickets targeting SPNs.
-  – Concurrent “Malicious credential theft tool execution detected” alerts flagging usage of Mimikatz to dump credentials.
-  – “SID history injection” alerts indicated attempts to alter account SID history to gain elevated privileges.
-  – “Suspicious service launched” events and system tampering (e.g. disabling Defender’s real‐time monitoring) were observed.
-  – PsExec events (“PsExec launched a command on a remote device”) confirmed remote command execution across devices.
-  – Overpass‑the‑hash and pass‑the‑ticket techniques were flagged as unauthorized authentication attempts.
-• Later on June 27, 2024 – Additional alerts captured directory replication requests (DCSync) originating from a high‐privilege account (Julian Burke, IT Director) and signifying a DCSync attack.
-• July 04, 2024 – Further alerts including “Microsoft Defender Antivirus tampering” and additional Mimikatz execution events were recorded. Suspicious remote activity and a cluster of alerts from Office 365 Advanced Threat Protection pointed to related anomalous mailbox and URL events.
-• July 10, 2024 – Azure Advanced Threat Protection (or Microsoft 365 Defender) reported enumeration activity (“User and IP address reconnaissance (SMB)”) from VNEVADO-Win10V targeting VNEVADO-DC, along with malicious URL click/ removal events detected in email.
+AFFECTED ENTITIES  
+Hosts:  
+ • vnevado-Win10V (MachineID 7cc55a46…) – initial foothold, tgs2z “DomainDominance”.  
+ • vnevado-Win10B (MachineID 5c626a5b…) – lateral target for Rubeus.  
+ • vnevado-DC (MachineID 43a4c3f27…) – domain controller impacted by DCSync & SID injection.  
+Accounts:  
+ • tgs2z / Ethan Brooks (S-5-7-21-…1422) – initial operator account.  
+ • fk8mq / Emma Clark (S-1-5-21-…1517) – service account / ticket target.  
+ • lucasb / Julian Burke (S-1-5-21-…1120) – IT director, ticket impersonation.  
+ • BDAdmin – attacker-created backup domain admin.  
+Network & URLs:  
+ • IP 118.254.65.186 – phishing link source.  
+ • IP 141.216.110.153 – RDP lateral drop.  
+ • IP 35.202.74.47 – Win10B management.  
+ • URL https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/  
 
-────────────────────────────────────────
-3. TECHNICAL ANALYSIS
+ATTACK METHODOLOGY (MITRE ATT&CK)  
+• Initial Access: T1566.002 Phishing Link  
+• Execution: T1059.001 cmd, T1059.003 PowerShell  
+• Defense Evasion: T1562 (Disable AV), T1134.005 SID History Injection  
+• Persistence: T1136.002 New Account  
+• Privilege Escalation: T1134.005, T1550.002 Pass-the-Hash  
+• Credential Access: T1003.* (LSASS dump, DCSync), T1558.003 Kerberoasting  
+• Lateral Movement: T1021.002 PsExec, T1105 Remote File Copy  
+• Collection: T1550.003 Pass-the-Ticket  
+• Discovery: T1087, T1049 SMB sessions  
+• Impact: T1489 Service Stop (NTDS), T1543.003 Service Registry  
 
-a. Credential Theft and Kerberoasting
-  – “Possible use of the Rubeus kerberoasting tool” alerts document attackers requesting service tickets (Kerberos SPNs) and using them to either decrypt tickets for plaintext credentials or conduct pass‑the‑ticket attacks.
-  – “Malicious credential theft tool execution detected” events repeatedly indicate the use of Mimikatz. Command lines featured parameters such as “sekurlsa::dcsync” and “sekurlsa::pth” which point to dumping LSASS memory and impersonation of privileged accounts.
-  – The “Mimikatz credential theft tool” alert confirms that this hacktool – widely known for harvesting credentials – was present and active, showing high confidence of credential compromise.
+INDICATORS OF COMPROMISE  
+File hashes:  
+ • Mimikatz.exe SHA256: 912018ab3c6b16b39ee84f17745ff0c80a33cee241013ec35d0281e40c0658d9  
+ • Rubeus.exe SHA256: a1fddd460edd35ed449d32cc43bc15675c48a314a6fa5fb158e3bc4fea460be1  
+ • PsExec.exe SHA256: 57492d33b7c0755bb411b22d2dfdfdf088cbbfcd010e30dd8d425d5fe66adff4  
+ • DomainDominance27.ps1 SHA256: b284932e65dd50b731f2c6dc266ab4fe46287581498ac4dc50f13922b58d8c72  
+Malicious URL:  
+ • https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/  
+Phishing IP:  
+ • 118.254.65.186  
 
-b. Privilege Escalation and Lateral Movement
-  – SID history injection alerts reveal that attackers manipulated SID history values on existing domain user objects to elevate privileges.
-  – Additional alerts document overpass‑the‑hash methods (using previously captured credentials to authenticate without clear-text passwords) and pass‑the‑ticket activity, suggesting the reuse of stolen Kerberos tickets for lateral movement.
-  – PsExec events (“PsExec launched a command on a remote device”) document remote execution of commands. This tool is frequently used to move laterally in enterprise networks.
+SEVERITY ASSESSMENT  
+Overall Impact: Critical  
+• Complete domain compromise via DCSync and account migration  
+• Backdoor domain admin created (BDAdmin)  
+• Credentials for all high-value accounts dumped  
+• Persistent access and full lateral control across environment  
 
-c. Directory Services and DCSync Attacks
-  – A “Suspected DCSync attack” alert was raised when Julian Burke – a high‐privilege account – initiated a replication request from VNEVADO-DC. DCSync exploits allow an attacker to replicate password hashes from the domain controller.
-  – A “Suspected identity theft (pass‐the‐ticket)” event confirms that an adversary successfully used a stolen Kerberos ticket from one host (VNEVADO-Win10B) to gain access on another endpoint (VNEVADO-Win10V).
-
-d. Defensive Evasion and Service Tampering
-  – “Microsoft Defender Antivirus tampering” alerts indicate attempts to disable or interfere with the antivirus service, likely to avoid detection of their illicit activities.
-  – Several suspicious processes (using cmd.exe and powershell commands) were observed stopping services like “ntds” followed by actions to inject SID history.
-
-e. Email and Reconnaissance Activity
-  – Office 365 Advanced Threat Protection alerts such as “A potentially malicious URL click was detected” and “Email messages containing malicious URL removed” show that phishing or malicious URLs were leveraged.
-  – Additional alerts from Microsoft 365 Defender captured SMB enumeration (“User and IP address reconnaissance”) from VNEVADO-Win10V and atypical mail clusters suggest attackers performed internal reconnaissance.
-
-────────────────────────────────────────
-4. AFFECTED ENTITIES
-
-Hosts:
-  • VNEVADO-DC – Domain Controller (subject to DCSync and replication requests)
-  • VNEVADO-Win10B – Endpoint used by high‐privilege accounts – evidence of ticket theft and initial credential dumping
-  • VNEVADO-Win10V – Endpoint used for lateral movement and remote command execution
-
-Accounts:
-  • Emma Clark – Helpdesk Administrator account – targeted for kerberoasting and overpass‑the‑hash activity
-  • Julian Burke – IT Director – involved in DCSync replication request indicating possible identity theft
-  • Ethan Brooks – Account Executive – associated with reconnaissance activities and email events
-  • xfbzkp – Additional account used in kerberoasting operations
-  • Additional domain accounts exhibiting SID history injection manipulation
-
-Tools and Files:
-  • Rubeus.exe – Kerberoasting tool (hashes provided in alert entries)
-  • Mimikatz.exe – Credential dump tool (multiple alerts)
-  • PSEXESVC.exe – PsExec service binary used for remote execution
-  • domaindominance27.ps1 – Script used in account replication attempts
-  • Get-KRBTicket.ps1 – Script to extract/deploy Kerberos tickets
-  • Malicious URL: https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/
-
-Network/Infrastructure Elements:
-  • IP addresses including 35.202.74.47, 65.233.23.156, and 141.216.110.153
-  • DNS names such as vnevado-dc.vnevado.alpineskihouse.co
-
-────────────────────────────────────────
-5. ATTACK METHODOLOGY
-
-The attackers appear to have followed a multi-stage attack plan:
-  a. Initial Access & Reconnaissance:
-   – Likely entry achieved via malicious URL in phishing emails (as indicated by Office 365 alerts) and subsequent exploration using SMB session enumeration.
-  b. Credential Harvesting:
-   – Rubeus was employed to request and dump Kerberos tickets (kerberoasting).
-   – Mimikatz was executed to dump credentials from LSASS memory, and to attempt DCSync operations.
-  c. Privilege Escalation:
-   – SID history injection was used to elevate privileges of existing domain accounts.
-  d. Lateral Movement & Remote Execution:
-   – PsExec was used to launch remote commands that allowed pivoting across endpoints.
-   – Overpass-the-hash and pass-the-ticket techniques facilitated unauthorized authentication across hosts.
-  e. Defensive Evasion:
-   – Attempts to tamper with Microsoft Defender Antivirus settings and disable security services.
-  f. Directory Service Exploitation:
-   – DCSync attacks and replication requests suggested that the adversary sought to replicate domain controller data such as password hashes.
-
-────────────────────────────────────────
-6. INDICATORS OF COMPROMISE (IoCs)
-
-• File Indicators:
-  – Rubeus.exe hashes (e.g., SHA256: a1fddd460edd35ed449d32cc43bc15675c48a314a6fa5fb158e3bc4fea460be1)
-  – Mimikatz.exe hashes (e.g., SHA256: 912018ab3c6b16b39ee84f17745ff0c80a33cee241013ec35d0281e40c0658d9)
-  – PSEXESVC.exe (hashes provided in alert details)
-• Network Indicators:
-  – IP addresses: 35.202.74.47, 65.233.23.156, 141.216.110.153
-  – Malicious URL: https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/
-• Account/Entity Indicators:
-  – Accounts: Emma Clark, Julian Burke, Ethan Brooks, xfbzkp
-  – Anomalous use of domain account SID history and replication requests (DCSync)
-• Command-Line and Process Indicators:
-  – Commands such as “sekurlsa::pth”, “lsadump::dcsync”, and “net.exe stop ntds … Add-ADDBSidHistory …”
-  – PsExec command lines launching remote processes
-
-────────────────────────────────────────
-7. SEVERITY ASSESSMENT
-
-Based on the breadth and depth of techniques utilized—including advanced credential harvesting, privilege escalation, lateral movement, and directory replication—the overall impact is assessed as High. The incident affects high-value accounts and critical infrastructure components (domain controllers and endpoints) and demonstrates adversary persistence with multiple defensive evasion tactics. Immediate containment, thorough forensic analysis, password resets, and review of system integrity on affected hosts are recommended.
-
-────────────────────────────────────────
-8. IMPORTANT LABELS/KEYWORDS
-
-• Kerberoasting • Pass-The-Ticket • Overpass-The-Hash • SID History Injection • DCSync Attack • Mimikatz • Rubeus • PsExec • Lateral Movement • Credential Theft • Antivirus Tampering • Directory Replication • Email Phishing • Reconnaissance
-
-────────────────────────────────────────
-CONCLUSION
-
-This multi-stage attack exhibits characteristics of an advanced persistent threat (APT) that has successfully compromised internal credentials and used a variety of tools to maneuver laterally while evading defensive measures. It is imperative to conduct forensic investigations on involved endpoints, reset credentials, isolate affected machines, and analyze logs comprehensively to determine the full extent of the compromise and prevent future incidents.
-
-Recommendations include ensuring complete patching, strengthening monitoring for abnormal Kerberos activities and SID history modifications, and confirming that all endpoints run updated antivirus/EDR solutions to detect similar activity in the future.
-
-End of Report.
+IMPORTANT LABELS AND KEYWORDS  
+AlpineSkiHouse, human-operated, DomainDominance27, Kerberoasting, DCSync, SIDHistory, overpass-the-hash, pass-the-ticket, Mimikatz, Rubeus, PsExec, Phishing, Zero-hour Auto Purge (ZAP), Domain Controller.

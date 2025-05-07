@@ -1,162 +1,89 @@
-========================================
-Title: Multi-Stage Credential Abuse and Lateral Exploitation via Anonymous Access, Inbox Manipulation, and SAP Compromise
-========================================
+Title of the multi-stage attack  
+Business Email Compromise & Data Exfiltration via Inbox Rule Manipulation and SAP Access  
 
-1. EXECUTIVE SUMMARY
-----------------------------------------
-On July 22, 2024, a sophisticated multi-vector attack was detected targeting a single compromised account (Jordan P / laylaw@vnevado.alpineskihouse.co). The adversary began with anonymous, high-risk sign-in attempts from anonymized IP addresses, progressed through the creation and manipulation of suspicious inbox rules to facilitate concealment and possible phishing, attempted credential abuse with password spraying, and ultimately exploited access to sensitive enterprise applications such as Microsoft Exchange Online, Office 365, and SAP. In parallel, additional alerts indicated suspicious SAP authentications and business email compromise (BEC) related activities, potentially aimed at financial fraud and data exfiltration.
+1. EXECUTIVE SUMMARY  
+Over a 36-hour period beginning July 22, 2024, an attacker leveraged anonymous IP logons and a password-spray campaign to gain initial access to the corporate Azure AD account of “Jordan P” (laylaw@vnevado.alpineskihouse.co). Once inside, the actor deployed malicious inbox rules (T1564.008) to hide and move mail for exfiltration, conducted a business-email-compromise (BEC) campaign against an internal recipient (tony@avoriaz.alpineskihouse.co), and then authenticated to SAP (T1078) to harvest sensitive financial data. The incident spans techniques in Initial Access, Credential Access, Defense Evasion, Collection and Exfiltration, and culminates in potential financial fraud.
 
-2. INCIDENT TIMELINE
-----------------------------------------
-• 2024-07-22 08:41 – 08:45 UTC:  
-  • Initial sign-in attempt from an anonymous IP (95.202.65.202) detected (Alert Node 0).  
-  • Evidence of a covert logon session using anonymizing tools is observed.
+2. INCIDENT TIMELINE  
+2024-07-22 08:41:20 UTC  
+ • Azure AD Identity Protection Alert (AnonymousLogin, Medium)  
+ • Client IP 95.202.65.202 (Frankfurt, DE, Tor/anonymizer) signs in as AadUserId=89e933b9…ef82  
 
-• 2024-07-22 09:07 – 09:11 UTC:  
-  • A subsequent sign-in from another anonymous IP (192.238.237.190) is recorded (Alert Node 3), indicating a second attempt to obfuscate identity during access.
+2024-07-22 08:41:20 UTC (same event processed later)  
+ • IPC Password Spray Alert (T1110.003, T1110.001, High) from IP 95.202.65.202  
 
-• 2024-07-22 08:18 – 09:38 UTC:  
-  • Early indicators of mailbox rule manipulation are logged (Alert Node 5) on the target user’s inbox – rule creation (“ITCleanup” moving messages to “RSS Feeds”) suggestive of preparatory actions for concealing activity or exfiltrating communications.
+2024-07-22 09:07:43 UTC  
+ • Second Anonymous IP sign-in (192.238.237.190, Hamburg, DE) for same user  
 
-• 2024-07-22 09:37 UTC:  
-  • Two concurrent alerts are triggered:  
-    – A suspicious inbox manipulation rule (Alert Node 16) with associated remediation procedures.  
-    – A BEC financial fraud alert (Alert Node 17) implies that compromised mailbox settings are being used to facilitate fraudulent transactions.
+2024-07-22 09:38 UTC (window 09:18–09:49)  
+ • MCAS “Suspicious inbox manipulation rule” (High)  
+   – New MoveToFolder rule “ITCleanup” on laylaw@…  
+   – IPs involved: 180.144.153.174, 95.202.65.202, 192.238.237.190, and attacker IP 255.246.85.58  
+ • MTP / Defender365 “Suspicious inbox manipulation rule” (High, T1564.008)  
+ • Azure AD “BEC financial fraud” (High)  
 
-• 2024-07-22 09:38 UTC:  
-  • Suspicious emails emanating from the compromised account (Alert Node 18) are sent to an external recipient (tony@avoriaz.alpineskihouse.co), further confirming lateral movement.
+2024-07-22 09:38:16 UTC  
+ • MTP “Suspicious emails sent by BEC-related user” (High, T1586)  
+   – laylaw@… → tony@avoriaz.alpineskihouse.co via IP 255.246.85.58  
 
-• 2024-07-22 09:46 UTC:  
-  • Multiple SAP-related alerts appear almost simultaneously:  
-    – A suspicious SAP authentication (Alert Node 23) is triggered when the compromised account accesses SAP.  
-    – Additional SAP authentication alerts (Nodes 26 and 27) confirm that the same account continues risky access, potentially to search or modify sensitive financial information.
+2024-07-22 09:46:21 UTC  
+ • MTP “Suspicious SAP authentication” (Medium, T1078)  
+   – laylaw@… signs in to SAP app “Lia” (AppId=100) from IP 107.253.5.27  
+ • Repeat SAP alerts processed at 12:59, 13:19, 14:09 UTC  
 
-• 2024-07-23 14:23 UTC:  
-  • A Password Spray alert (Alert Node 28) is recorded, indicating that the attacker also initiated brute-force attempts against various accounts using common passwords.
+2024-07-23 14:23 UTC (retroactive processing)  
+ • IPC Password Spray attack detection re-flagged against same request  
 
-• 2024-07-23 16:09 UTC:  
-  • A Possible BEC financial fraud alert (Alert Node 29) consolidates earlier BEC suspicious activities, reinforcing the notion of financial fraud or data exfiltration attempts.
+2024-07-23 16:05–16:09 UTC  
+ • MTP “Possible BEC financial fraud” (Medium, T1114.003)  
+   – laylaw@… flagged as Compromised  
 
-3. TECHNICAL ANALYSIS
-----------------------------------------
-• Anonymous Sign-Ins (Nodes 0 & 3):  
-  – Alerts reveal sign-in activity using anonymous IP addresses (95.202.65.202 and 192.238.237.190).  
-  – These attempts, flagged with medium severity and classified under Initial Access, indicate methods to mask true geographic origins via anonymizers such as Tor or VPNs.
+3. TECHNICAL ANALYSIS  
+• Initial Access: Anonymous IP alerts (Nodes 0 & 3) and Password Spray (Node 28) indicate brute-force attempts from Tor-exit and anonymizing VPNs (95.202.65.202, 192.238.237.190).  
+• Defense Evasion & Persistence: MCAS and Defender365 detect creation of a stealth inbox rule “ITCleanup” (Nodes 5 & 16) to auto-move or hide legitimate emails in Jordan P’s mailbox, with attacker IP 255.246.85.58 marked “Attacker.”  
+• Collection & Exfiltration: Suspicious outbound email (Node 18) to tony@avoriaz.alpineskihouse.co carries potential fraudulent instructions or invoice requests (T1586). A mail-message entity (Node 20–22) tied to IP 255.246.85.58 confirms exfiltration channel  
+• Lateral Movement & Data Harvesting: Multiple “Suspicious SAP authentication” alerts (Nodes 23, 26, 27) show same compromised account signing into enterprise SAP application “Lia” using stolen credentials, searching financial records (T1078).  
 
-• Suspicious Inbox Manipulation (Nodes 5 & 16):  
-  – Multiple alerts describe the creation and modification of inbox rules in the target mailbox.  
-  – The creation of a “MoveToFolder” rule (e.g., ITCleanup moving messages to “RSS Feeds”) is anomalous and points to tactics meant to hide phishing, delete legitimate emails, or automate exfiltration.  
-  – Entities linked include the compromised account “Jordan P” and associated cloud applications (Microsoft Exchange Online and Office 365).
+Edge relationships confirm that all major alerts pivot on the single compromised account (AadUserId=89e933b9…ef82), with IPs and cloud-application entities linking each stage.  
 
-• Business Email Compromise (BEC) and Fraud Attempts (Nodes 17 & 29):  
-  – Alerts flag high-risk actions where the manipulated mailbox is exploited to send fraudulent emails.  
-  – The BEC financial fraud incidents involve both direct fraudulent rule creation and suspicious outbound messaging, highlighting a concerted effort to leverage the compromised account for financial gain.
+4. AFFECTED ENTITIES  
+Accounts  
+ • laylaw@vnevado.alpineskihouse.co (Jordan P, SID S-1-5-21-…-1602)  
+ • tony@avoriaz.alpineskihouse.co (mailbox recipient)  
 
-• Suspicious SAP Authentication (Nodes 23, 26 & 27):  
-  – Alerts indicate that post-compromise, the adversary accessed SAP systems.  
-  – The alerts suggest the attacker might be harvesting or altering sensitive financial information, which could be used to prepare further social engineering or phishing campaigns.
+IP Addresses  
+ • 95.202.65.202 (Frankfurt, Tor exit)  
+ • 192.238.237.190 (Hamburg)  
+ • 180.144.153.174 (Contextual)  
+ • 255.246.85.58 (Attacker source)  
+ • 107.253.5.27 (SAP access)  
 
-• Password Spray Attack (Node 28):  
-  – A high-severity alert indicates a password spraying attempt targeting multiple accounts using the same weak credentials.  
-  – The overlapping IP (95.202.65.202) confirms its role in initial access and brute-force credential attacks under the CredentialAccess tactic.
+Cloud Applications  
+ • Microsoft Exchange Online (AppId 20893)  
+ • Office 365 / Microsoft 365 (AppId 11161)  
+ • SAP “Lia” (AppId 100)  
 
-Relationships:  
-  – The compromised account “Jordan P” (and various representations via AadUserId, Sid, and email) is central to nearly all events.  
-  – Multiple alerts are connected via shared entities (anonymous IPs, cloud applications, and mailboxes), suggesting the adversary pivoted from initial anonymous access to account compromise and lateral movement into critical enterprise resources.  
-  – Correlation between SAP authentications, BEC alerts, and password spraying establishes a coherent attack chain that includes initial access, persistence, and potential data exfiltration.
+Mailboxes & Messages  
+ • Inbox rule “ITCleanup”  
+ • mailMessage to tony@avoriaz.alpineskihouse.co  
 
-4. AFFECTED ENTITIES
-----------------------------------------
-• User Accounts:  
-  – Jordan P (AadUserId: 89e933b9-5b2e-4bd6-bcdf-033db707ef82)  
-  – Impersonated and compromised mail account: laylaw@vnevado.alpineskihouse.co
+5. ATTACK METHODOLOGY (MITRE ATT&CK)  
+ • Initial Access: T1110.003 Password Spray; AnonymousLogin (AZURE_AD_IDP)  
+ • Defense Evasion: T1564.008 Inbox Rule Hiding  
+ • Credential Access: Password Spray; Risky Sign-in Alerts  
+ • Collection: T1114.002 Email Collection; T1586 Phishing  
+ • Exfiltration: Native Mail Forwarding  
+ • Lateral Movement: T1078 Valid Accounts (SAP sign-in)  
 
-• Mailboxes:  
-  – Primary mailbox of Jordan P  
-  – External recipient mailbox: tony@avoriaz.alpineskihouse.co
+6. INDICATORS OF COMPROMISE (IOCs)  
+ • IPs: 95.202.65.202 / 192.238.237.190 / 255.246.85.58 / 107.253.5.27  
+ • Compromised Account: AadUserId 89e933b9-5b2e-4bd6-bcdf-033db707ef82  
+ • Inbox Rule Name: ITCleanup  
+ • Malicious mail recipient: tony@avoriaz.alpineskihouse.co  
+ • Cloud AppId: 100 (SAP Lia)  
 
-• Cloud Applications:  
-  – Microsoft Exchange Online  
-  – Office 365 (Microsoft 365)  
-  – SAP (enterprise application)  
-  – Lia application (node 24, representing an SAP contextual application instance)
+7. SEVERITY ASSESSMENT  
+Overall impact is High. The attacker achieved account takeover of a privileged user mailbox, established persistent mailbox rule-based exfiltration, orchestrated BEC fraud, and accessed sensitive financial systems. The combination of credential compromise, data manipulation, and potential fund diversion poses significant financial and reputational risk.
 
-• IP Addresses:  
-  – 95.202.65.202 (Anonymous sign-in source; also used in the password spray attack)  
-  – 192.238.237.190 (Second anonymous access source)  
-  – 180.144.153.174, 255.246.85.58 (Associated with suspicious inbox manipulation and attacker activity)  
-  – 107.253.5.27 (Contextual IP associated with SAP authentications)
-
-5. ATTACK METHODOLOGY (Tactics, Techniques, Procedures)
-----------------------------------------
-• Initial Access & Reconnaissance:  
-  – Use of anonymizing IP addresses (Tactics: InitialAccess) to hide the origin of intrusion (Technique: Anonymous Login).
-
-• Credential Exploitation:  
-  – Password spray attack (Tactics: CredentialAccess; Techniques: T1110.003, T1110.001) intended to breach multiple accounts using common passwords.
-
-• Persistence & Defense Evasion:  
-  – Suspicious manipulation of inbox rules (Techniques: T1564, sub-technique T1564.008) to hide evidence of intrusion or to automate phishing and exfiltration.
-  – Business Email Compromise tactics to facilitate unauthorized financial transactions.
-
-• Lateral Movement & Abuse of Privileges:  
-  – SAP authentication alerts indicate lateral movement into critical enterprise systems (Technique: using valid compromised credentials – T1078).
-
-• Impact:  
-  – Fraudulent email communications and potential exfiltration attempts (indicating financial fraud attempts and data exfiltration strategies).
-
-6. INDICATORS OF COMPROMISE (IOCs)
-----------------------------------------
-• IP Addresses:  
-  – 95.202.65.202 (primary anonymous and spray source)  
-  – 192.238.237.190  
-  – 180.144.153.174  
-  – 255.246.85.58  
-  – 107.253.5.27
-
-• Account Identifiers:  
-  – AadUserId: 89e933b9-5b2e-4bd6-bcdf-033db707ef82 (central compromised account)  
-  – SID: S-1-5-21-1740051960-3534030288-108486866-1602
-
-• Application Artifacts:  
-  – Suspicious inbox rule “ITCleanup” on the mailbox laylaw@vnevado.alpineskihouse.co  
-  – Anomalous SAP sign-in events accompanying defense evasion alerts
-
-• Behavioral:  
-  – Unusual sign-in sessions via anonymized IPs  
-  – Multiple cloud logon sessions with inconsistent user agent/geo-location information  
-  – Temporal clustering of suspicious inbox rule changes, outbound emails, and SAP authentications
-
-7. SEVERITY ASSESSMENT
-----------------------------------------
-Overall Impact: HIGH  
-• The multi-staged attack leverages valid credentials and stealth techniques making detection difficult until multiple systems are compromised.  
-• Financial fraud risk is evident with BEC-related alerts.  
-• Lateral movement into critical enterprise systems (SAP, Office 365, Exchange Online) escalates potential data loss and financial exposure.  
-• The password spray attempt suggests a broad probing scope beyond the initial compromised account, indicating potential wider impact.
-
-8. KEY LABELS AND KEYWORDS
-----------------------------------------
-• Multi-Stage Attack  
-• Anonymous Login  
-• Credential Access  
-• Password Spray  
-• Business Email Compromise (BEC)  
-• Inbox Rule Manipulation  
-• SAP Authentication Abuse  
-• Lateral Movement  
-• Defense Evasion  
-• Microsoft 365 Defender  
-• Azure Active Directory Identity Protection  
-
-========================================
-Conclusion and Recommendations
-----------------------------------------
-• Immediately validate and quarantine the compromised account (Jordan P/laylaw@vnevado.alpineskihouse.co), reset credentials, and review MFA settings.  
-• Investigate the anomalous sign-in events associated with the flagged anonymous IP addresses.  
-• Audit and remove any unauthorized inbox rules and ensure mailbox integrity.  
-• Conduct a thorough review of SAP access logs and restrict high-privilege operations pending further investigation.  
-• Expand password policy enforcement and review password spray attempt logs for possible broader compromise.  
-• Initiate an incident response and forensic analysis to determine lateral movement scope and potential data exfiltration.
-
-This comprehensive report is intended to inform security teams and incident responders of the multilayered nature of the attack and guide immediate and strategic remediation efforts.
+8. IMPORTANT LABELS & KEYWORDS  
+Business Email Compromise (BEC), Password Spray, Anonymous IP, Inbox Rule Manipulation, SAP Authentication, T1110, T1564.008, T1586, T1078, Initial Access, Defense Evasion, Collection, Exfiltration.
