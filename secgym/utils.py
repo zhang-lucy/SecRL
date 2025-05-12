@@ -1,9 +1,9 @@
 
 import requests
-# from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 import re
 import json
-# import yaml
+import yaml
 import os
 import Levenshtein
 import autogen
