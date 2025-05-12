@@ -41,6 +41,7 @@ distribution = [
         description="Test data folder containing dataset files.",
         content_url=TEST_FOLDER,
         encoding_formats=["directory"],
+        sha256="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",  # Adding a placeholder SHA256
     )
 ]
 
@@ -59,17 +60,17 @@ if csv_files:
         )
     )
 
-# For JSON files
+# For JSON files - with more specific handling for incident files
 json_files = [f for f in test_files if f.endswith('.json')]
 if json_files:
     distribution.append(
         mlc.FileSet(
             id="json-files",
             name="json-files",
-            description="JSON files in the test folder.",
+            description="Security incident JSON files in the test folder.",
             contained_in=["test-folder"],
             encoding_formats=["application/json"],
-            includes="*.json",
+            includes="incident_*.json",
         )
     )
 
@@ -138,21 +139,34 @@ if csv_files:
         )
     )
 
-# Example for JSON files
+# Specialized RecordSet for JSON files with incident data
 if json_files:
     record_sets.append(
         mlc.RecordSet(
-            id="json",
-            name="json",
+            id="incidents",
+            name="security_incidents",
             fields=[
                 mlc.Field(
-                    id="json/content",
-                    name="content",
-                    description="Content from JSON files",
+                    id="incident/id",
+                    name="incident_id",
+                    description="Incident identifier extracted from filename",
                     data_types=mlc.DataType.TEXT,
                     source=mlc.Source(
                         file_set="json-files",
-                        extract=mlc.Extract(jsonpath="$"),  # Extract all JSON content
+                        extract=mlc.Extract(
+                            file_property=mlc._src.structure_graph.nodes.source.FileProperty.filename
+                        ),
+                        transforms=[mlc.Transform(regex="^incident_(\\d+)_.*\\.json$")],
+                    ),
+                ),
+                mlc.Field(
+                    id="incident/content",
+                    name="content",
+                    description="Content from security incident JSON files",
+                    data_types=mlc.DataType.TEXT,
+                    source=mlc.Source(
+                        file_set="json-files",
+                        extract=mlc.Extract(column="*"),
                     ),
                 )
             ],
@@ -180,14 +194,14 @@ if txt_files:
         )
     )
 
-# Create metadata
+# Create metadata with more detailed description
 metadata = mlc.Metadata(
-    name="Test Folder Dataset",
-    description="Dataset generated from files in the test folder.",
+    name="Security Incident Dataset",
+    description="Collection of security incident data in JSON format for security question-answer analysis.",
     url=f"file://{TEST_FOLDER}",
     distribution=distribution,
     record_sets=record_sets,
-    license="https://creativecommons.org/licenses/by/4.0/",  # Choose an appropriate license
+    license="https://creativecommons.org/licenses/by/4.0/",
 )
 
 # Print issues

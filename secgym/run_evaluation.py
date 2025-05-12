@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Union
 import os
-from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
+from secgym.env.ThuGEnv import ExcytinEnv, ATTACKS
 from secgym.env.evaluator import Evaluator, LLMEvaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 import autogen

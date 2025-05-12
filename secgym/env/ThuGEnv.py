@@ -19,42 +19,42 @@ from secgym.env.evaluator import LLMEvaluator
 
 ATTACKS = {
     "incident_5": {
-        "qafile": "min_overlap/test/incident_5_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_5_qa_incident_o1-ga_c42.json",
         "port": "3306",
         "container_name": "incident_5"
     },
     "incident_38": {
-        "qafile": "min_overlap/test/incident_38_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_38_qa_incident_o1-ga_c42.json",
         "port": "3307",
         "container_name": "incident_38"
     },
     "incident_34": {
-        "qafile": "min_overlap/test/incident_34_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_34_qa_incident_o1-ga_c42.json",
         "port": "3308",
         "container_name": "incident_34"
     },
     "incident_39": {
-        "qafile": "min_overlap/test/incident_39_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_39_qa_incident_o1-ga_c42.json",
         "port": "3309",
         "container_name": "incident_39"
     },
     "incident_55": {
-        "qafile": "min_overlap/test/incident_55_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_55_qa_incident_o1-ga_c42.json",
         "port": "3310",
         "container_name": "incident_55"
     },
     "incident_134": {
-        "qafile": "min_overlap/test/incident_134_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_134_qa_incident_o1-ga_c42.json",
         "port": "3311",
         "container_name": "incident_134"
     },
     "incident_166": {
-        "qafile": "min_overlap/test/incident_166_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_166_qa_incident_o1-ga_c42.json",
         "port": "3312",
         "container_name": "incident_166"
     },
     "incident_322": {
-        "qafile": "min_overlap/test/incident_322_qa_incident_o1-ga_c42.json",
+        "qafile": "test/incident_322_qa_incident_o1-ga_c42.json",
         "port": "3313",
         "container_name": "incident_322"
     },
@@ -78,7 +78,7 @@ def start_container(container_name):
         return container
 
 
-class ThuGEnv(gym.Env):
+class ExcytinEnv(gym.Env):
     def __init__(
             self,
             attack: Union[str, int],
@@ -391,7 +391,7 @@ class ThuGEnv(gym.Env):
 
 
 if __name__ == "__main__":
-    env = ThuGEnv(attack=1, noise_level=0)
+    env = ExcytinEnv(attack=1, noise_level=0)
     # print(env.get_table_names())
 
     query = """SELECT *

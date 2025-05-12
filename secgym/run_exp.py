@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Union
 import os
-from secgym.env.ThuGEnv import ThuGEnv, ATTACKS
+from secgym.env.ThuGEnv import ExcytinEnv, ATTACKS
 from secgym.env.evaluator import LLMEvaluator, Evaluator
 from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
@@ -13,7 +13,7 @@ from secgym.agents import BaselineAgent, PromptSauceAgent, MultiModelBaselineAge
 
 def run_experiment(
         agent,
-        thug_env: ThuGEnv,
+        thug_env: ExcytinEnv,
         save_agent_file: str,
         num_test: Union[int, None] = None,
         num_trials: int = 1,
@@ -237,7 +237,7 @@ if __name__ == "__main__":
         save_agent_file = f"{base_dir}/{sub_dir}/agent_{attack}.json" 
         save_env_file = f"{base_dir}/{sub_dir}/env_{attack}.json"
 
-        thug_env = ThuGEnv(
+        thug_env = ExcytinEnv(
             attack=attack,
             evaluator=llmevaluator,
             save_file=save_env_file,
