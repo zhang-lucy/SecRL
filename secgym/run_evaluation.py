@@ -102,14 +102,6 @@ def run_evaluation(
             json.dump(new_env_log, f, indent=4)
 
 
-# check if submit
-# no submit -> 0
-
-# data
-# data['reward']
-# if data['info'] doesn't exist -> data['info']['1'] or data['info']['0'] find info 
-# 
-
 def filter_config_list(config_list, model_name):
     config_list = autogen.filter_config(config_list, {'tags': [model_name]})
     if len(config_list) == 0:
@@ -145,17 +137,6 @@ if __name__ == "__main__":
         "MultiModelBaselineAgent_master_o3_mini_slave_gpt-4o_c100_alert_level_t0_s25_trial1",
     ]
 
-    # consider_rerun = [
-    #      "PromptSauceAgent_4o-mini_c73_alert_level_t0_s25_trial1",# rerun 3 trials
-    #      "PromptSauceAgent_gpt-4o_c72_alert_level_t0_s25_trial1", # rerun 3 trials
-    #      "PromptSauceAgent_4o-mini_c79_alert_level_t0_s15_trial2", # no need to run
-    #      "PromptSauceAgent_gpt-4o_c83_alert_level_t0_s15_trial2", # no need to run
-    # ] # On Hold
-    # reflections = [
-    #     "ReflexionAgent_gpt-4o_c101_alert_level_t0_s15_trial3_train",
-    #     "ReflexionAgent_gpt-4o_c82_alert_level_t0_s15_trial3",
-    #     "ReflexionAgent_4o-mini_c80_alert_level_t0_s15_trial3",
-    # ] # On Hold
 
     for base_file in base_files:
         print(f"Running evaluation for {base_file}")
