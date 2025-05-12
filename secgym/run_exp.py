@@ -79,6 +79,7 @@ def run_experiment(
                 try:
                     action, submit = agent.act(observation)
                 except Exception as e:
+                    raise e
                     print(f"Error: {e}")
                     info = {}
                     reward = 0
@@ -143,7 +144,7 @@ def get_args():
     parser.add_argument("--max_steps", type=int, default=15, help="Maximum number of steps for the agent")
     parser.add_argument("--layer", type=str, default="alert", help="Layer to use for the agent")
     #parser.add_argument("--step_checking", action="store_true", help="Evaluate each step")
-    parser.add_argument("--agent", type=str, default="react", help="Agent to use for the experiment")
+    parser.add_argument("--agent", type=str, default="baseline", help="Agent to use for the experiment")
     parser.add_argument("--num_trials", type=int, default=1, help="Number of trials to run for each question if not solved")
     parser.add_argument("--split", type=str, default="test", help="Split to use for the experiment")
     parser.add_argument("--full_db", action="store_true", help="Use full database for the experiment")

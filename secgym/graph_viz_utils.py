@@ -211,7 +211,7 @@ if __name__ == "__main__":
     from secgym.qagen.alert_graph import AlertGraph
     import os
     alert_graph = AlertGraph()
-    alert_graph.load_graph_from_graphml(filepath=f"./qagen/graph_files/incident_38.graphml")
+    alert_graph.load_graph_from_graphml(filepath=f"./qagen/graph_files/incident_322.graphml")
         
     # Generate PyVis visualization
     generate_pyvis(alert_graph.graph, outputfile="sample_graph.html")

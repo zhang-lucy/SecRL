@@ -223,7 +223,6 @@ class ThuGEnv(gym.Env):
         except Exception as e:
             return f"{e.__class__.__name__}: {e.__context__}", False
 
-
     def step(self, action: str, submit=False, stringify=True) -> Tuple[np.ndarray, float, bool, Dict]:
         """Take a step in the environment.
 

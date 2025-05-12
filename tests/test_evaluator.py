@@ -1,5 +1,5 @@
 import json
-from secgym.env.evaluation.evaluator import Evaluator
+from secgym.env.evaluator import LLMEvaluator
 
 with open("/Users/kevin/Downloads/SecRL/secgym/agent_experiment_logs/base_agent_experiments_4o/alert_level/incident_5_agent_log_gpt-4o_46_alert.json", "r") as f:
     agent_log = json.load(f)
@@ -12,7 +12,7 @@ config_list = [
     }
 ]
 
-evaluator = Evaluator(
+evaluator = LLMEvaluator(
     config_list=config_list, ans_check_reflection=False, sol_check_reflection=False)
 
 
