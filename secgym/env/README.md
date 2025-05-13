@@ -6,10 +6,12 @@ The data can be downloaded from the following sources:
 - Directly from Hugging Face
 - From Azure
 
-### Download from Hugging Face directly
+### 1. Download from Hugging Face or provided data source
+
+Please download the data from the proivided link.
 
 
-### Original Handling Process
+### 2. Original Handling Process
 1. Register an account at Alphine Ski House.
 2. Login in to the azure account.
 ```bash

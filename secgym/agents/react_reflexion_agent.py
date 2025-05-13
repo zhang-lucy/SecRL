@@ -131,16 +131,6 @@ class ReActReflexionAgent:
         {[f"Trial {i}, Reward: {replay['reward']}, Transcript: {replay['messages']}" for i,replay in enumerate(replays)]}
         Reflection:
         """
-        #print(REFLECT_PROMPT)
-        # try:
-        #     reflection = self._call_llm(messages=[msging(REFLECT_PROMPT)])
-        # except Exception as e:
-        #     if "context_length_exceeded" in str(e):
-        #         max_length = 127000  # adjust based on your model's token limit
-        #         truncated_prompt = REFLECT_PROMPT[:max_length]
-        #         reflection = self._call_llm(messages=[msging(truncated_prompt)])
-        #     else:
-        #         raise e
         
         reflection = self._call_llm(messages=[msging(REFLECT_PROMPT[:120000])])
         return reflection
