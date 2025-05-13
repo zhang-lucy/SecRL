@@ -6,7 +6,7 @@ import os
 import json
 import pandas as pd
 from process_logs import SEPARATOR
-from secgym.utils import LLM_call
+from secgym.utils.utils import LLM_call
 
 new_pii_prompt = """Given an input string, you will help create a new string that anonymizes the PII data in the input string.
 - For email addresses, don't change the domain name.

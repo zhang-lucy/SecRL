@@ -1,4 +1,4 @@
-# Enviroment Setup
+# Database Setup
 
 ## Data Download
 

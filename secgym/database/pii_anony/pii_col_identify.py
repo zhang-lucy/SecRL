@@ -1,6 +1,6 @@
 
-from secgym.utils import LLM_call
-from secgym.env.process_logs import SEPARATOR
+from secgym.utils.utils import LLM_call
+from secgym.database.process_logs import SEPARATOR
 from secgym.myconfig import config_list_4o
 import os
 import pandas as pd

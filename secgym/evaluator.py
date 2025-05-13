@@ -2,7 +2,7 @@ from autogen import OpenAIWrapper
 import json
 import re
 from secgym.myconfig import config_list_4o
-from secgym.utils import msging, get_full_question
+from secgym.utils.utils import msging, get_full_question
 from textwrap import dedent
 
 EVAL_ANSWER_TEMPLATE = dedent("""Question: {question}

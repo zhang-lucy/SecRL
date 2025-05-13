@@ -9,7 +9,7 @@ import pandas as pd
 # from secgym.utils import find_most_similar
 import argparse
 
-from secgym.env.process_logs import SEPARATOR, QUOTECHAR
+from secgym.database.process_logs import SEPARATOR, QUOTECHAR
 
 def to_abs_path(path):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), path)

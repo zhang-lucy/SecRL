@@ -8,8 +8,8 @@ import mysql.connector
 from datetime import datetime
 from time import sleep
 
-from secgym.utils import get_full_question
-from secgym.env.evaluator import LLMEvaluator
+from secgym.utils.utils import get_full_question
+from secgym.evaluator import LLMEvaluator
 
 # ATTACKS = {
 #     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
