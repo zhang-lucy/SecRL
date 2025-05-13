@@ -1,5 +1,4 @@
 import re
-from secgym.myconfig import config_list_4o, config_list_4_0125, config_list_4_turbo, config_list_35
 from autogen import OpenAIWrapper
 import time
 from typing import List

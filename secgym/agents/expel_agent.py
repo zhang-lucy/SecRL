@@ -1,6 +1,5 @@
 from autogen import OpenAIWrapper
 from secgym.agents.agent_utils import sql_parser, msging, call_llm
-# from tenacity import retry, wait_fixed
 from secgym.agents.expel_train.experience_recall import ExperiencePool
 import json
 BASE_PROMPT = """You are a security analyst. 

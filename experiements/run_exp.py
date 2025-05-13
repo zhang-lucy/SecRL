@@ -2,9 +2,9 @@ import json
 from datetime import datetime
 from typing import Union
 import os
-from secgym.env.excytin_env import ExcytinEnv, ATTACKS
-from secgym.env.evaluator import LLMEvaluator, Evaluator
-from secgym.myconfig import config_list_4o, config_list_4o_mini, CONFIG_LIST
+from secgym.excytin_env import ExcytinEnv, ATTACKS
+from secgym.evaluator import LLMEvaluator, Evaluator
+from secgym.myconfig import CONFIG_LIST
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
 from secgym.agents import BaselineAgent, PromptSauceAgent, MultiModelBaselineAgent, ReActAgent, PromptSauceReflexionAgent, ReActReflexionAgent, ExpelAgent
@@ -79,7 +79,7 @@ def run_experiment(
                 try:
                     action, submit = agent.act(observation)
                 except Exception as e:
-                    raise e
+                    raise e # comment this to continue on error
                     print(f"Error: {e}")
                     info = {}
                     reward = 0

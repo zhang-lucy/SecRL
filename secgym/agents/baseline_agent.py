@@ -2,7 +2,6 @@ from autogen import OpenAIWrapper
 from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_foundry, update_model_usage
 from azure.ai.inference import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential
-from secgym.config_key import api_key
 
 # from tenacity import retry, wait_fixed
 
@@ -73,6 +72,7 @@ class BaselineAgent:
             self.temperature = 1
         
         if "ai_foundry" in config_list[0].get('api_type'):
+            from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= config_list[0]['endpoint'],
             credential=AzureKeyCredential(api_key),
@@ -183,6 +183,7 @@ class BaselineAgent:
             self.cache_seed += 1
         
         if "ai_foundry" in self.config_list[0]['api_type']:
+            from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= self.config_list[0]['endpoint'],
             credential=AzureKeyCredential(api_key),

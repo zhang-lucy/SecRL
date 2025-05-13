@@ -1,4 +1,4 @@
-# python setup_database.py \
+# python secgym/database/setup_database.py \
 #     --csv data_anonymized/alphineskihouse \
 #     --port 3314 \
 #     --sql_file sql_files/alpineskihouse.sql \
@@ -6,7 +6,7 @@
 #     --respawn \
 #     --layer alert_only
 
-python setup_database.py \
+python secgym/database/setup_database.py \
   --csv data_anonymized/incidents/incident_5 \
   --port 3306 \
   --sql_file sql_files/incident_5.sql \
@@ -15,7 +15,7 @@ python setup_database.py \
   --layer alert_only
 
 
-python setup_database.py \
+python secgym/database/setup_database.py \
     --csv data_anonymized/incidents/incident_38 \
     --port 3307 \
     --sql_file sql_files/incident_38.sql \
@@ -23,7 +23,7 @@ python setup_database.py \
     --respawn \
     --layer alert_only
 
-python setup_database.py \
+python secgym/database/setup_database.py \
     --csv data_anonymized/incidents/incident_34 \
     --port 3308 \
     --sql_file sql_files/incident_34.sql \
@@ -31,7 +31,7 @@ python setup_database.py \
     --respawn \
     --layer alert_only
 
-python setup_database.py \
+python secgym/database/setup_database.py \
     --csv data_anonymized/incidents/incident_39 \
     --port 3309 \
     --sql_file sql_files/incident_39.sql \
@@ -39,7 +39,7 @@ python setup_database.py \
     --respawn \
     --layer alert_only
 
-python setup_database.py \
+python secgym/database/setup_database.py \
     --csv data_anonymized/incidents/incident_55 \
     --port 3310 \
     --sql_file sql_files/incident_55.sql \
@@ -47,7 +47,7 @@ python setup_database.py \
     --respawn \
     --layer alert_only
 
-python setup_database.py \
+python secgym/database/setup_database.py \
     --csv data_anonymized/incidents/incident_134 \
     --port 3311 \
     --sql_file sql_files/incident_134.sql \
@@ -55,7 +55,7 @@ python setup_database.py \
     --respawn \
     --layer alert_only
 
-python setup_database.py \
+python secgym/database/setup_database.py \
     --csv data_anonymized/incidents/incident_166 \
     --port 3312 \
     --sql_file sql_files/incident_166.sql \
@@ -63,7 +63,7 @@ python setup_database.py \
     --respawn \
     --layer alert_only
 
-python setup_database.py \
+python secgym/database/setup_database.py \
     --csv data_anonymized/incidents/incident_322 \
     --port 3313 \
     --sql_file sql_files/incident_322.sql \
