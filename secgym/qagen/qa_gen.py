@@ -1,10 +1,10 @@
-from secgym.utils import LLM_call
+from secgym.utils.utils import LLM_call
 import json
 import pandas as pd
 from secgym.qagen.alert_graph import AlertGraph
 import argparse
-from secgym.utils import process_entity_identifiers
-from secgym.qagen.qa_gen_prompts import REWRITE_PROMPT, SOLUTIN_GEN_PROMPT, QAGEN_PROMPT_NO_ENTRY, QAGEN_PROMPT_WITH_ENTRY, TWEAKED_QAGEN_PROMPT_ORIGIN
+from secgym.utils.utils import process_entity_identifiers
+from secgym.qagen.qa_gen_prompts import REWRITE_PROMPT, SOLUTIN_GEN_PROMPT, QAGEN_PROMPT_WITH_ENTRY, TWEAKED_QAGEN_PROMPT_ORIGIN
 import autogen
 
 class QAGen:
@@ -122,38 +122,6 @@ Description: {alert['Description']}
                 else:
                     prompt += "Connected Entities:\n" + self.get_entity_str(compelte_solution_path[i+1], omit_value=True)
         return prompt
-    
-
-#     def alert_with_entry(self, alert_node: int, entities:list):
-#             alert = json.loads(self.alert_graph.get_node(alert_node)['entry'])
-#             entity_str = ""
-#             #TODO:changing to read all entities instead of provided ones
-#             for n in entities:
-#                 entity = self.alert_graph.get_node(n)
-#                 entity_str += f"Type: {entity['node_type']}, Field: {entity['identifier_fields']}, Value: `{entity['value']}`\n"
-#             return f"""Time: {alert['TimeGenerated']}
-# Name: {alert['AlertName']}
-# Description: {alert['Description']}
-# Full Alert Entry: {alert}
-# Entities from this alert that are part of the alert-entity path used to generate the question:
-# {entity_str.strip()}
-# """
-#             #TODO: Add relevent fields from the alert
-#             #TODO: How entities are connected to the alert, edge information
-#             #Full Alert Entry: {alert}
-
-#     def qagen_prompt_with_entry(self, path_dict):
-#         compelte_solution_path = path_dict['shortest_alert_path'] + path_dict['end_entities']
-#         assert len(compelte_solution_path) % 2 == 0
-#         for i in range(0, len(compelte_solution_path), 2):
-#             if i == 0:
-#                 entity_str = "Start Alert:\n"
-#             elif i+2 < len(compelte_solution_path):
-#                 entity_str += "\n, Next Alert:\n"
-#             else:
-#                 entity_str += "\nEnd Alert:\n"
-#             entity_str += self.alert_with_entry(compelte_solution_path[i], [compelte_solution_path[i+1]])
-#         return entity_str
     
     def solution_prompt_format(self, path_dict):
         compelte_solution_path = path_dict['shortest_alert_path'] + path_dict['end_entities']
@@ -277,7 +245,7 @@ Description: {alert['Description']}
     def generate_qa(self, graph_path=None, qa_path=None):
         if graph_path:
             self.setup_graph(graph_path)
-        if self.qa_path and qa_path:
+        if qa_path:
             print(f"Updating QA path from {self.qa_path} to {qa_path}")
             self.qa_path = qa_path
         if self.graph_path is None:

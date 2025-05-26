@@ -1,6 +1,5 @@
 from autogen import OpenAIWrapper
 from secgym.agents.agent_utils import sql_parser, msging, call_llm
-# from tenacity import retry, wait_fixed
 from secgym.agents.expel_train.experience_recall import ExperiencePool
 import json
 BASE_PROMPT = """You are a security analyst. 
@@ -18,22 +17,6 @@ Action can be one of the following:
 (2) submit[<your answer>], which is the final answer to the question
 """
 
-BASE_SUMMARY_PROMPT = """You are a security analyst. 
-You need to answer a given security question by querying the database.
-The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
-Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
-
-Your response should always be a thought-action pair:
-Thought: <your reasoning>
-Action: <your SQL query>
-
-In Thought, you can analyse and reason about the current situation, 
-Action can be one of the following: 
-(1) execute[<your query>], which executes the SQL query
-(2) submit[<your answer>], which is the final answer to the question
-
-When submitting an answer, please summarize key information from intermediate steps that lead to your answer.
-"""
 
 O1_PROMPT = """You are a security analyst. 
 You need to answer a given security question by querying the database.

@@ -3,7 +3,6 @@ from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_fou
 import os
 from azure.ai.inference import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential
-from secgym.config_key import api_key
 curr_path = os.path.dirname(os.path.abspath(__file__))
 
 BASE_PROMPT = """You are a security analyst. 
@@ -68,6 +67,7 @@ class ReActAgent:
         self.cache_seed = cache_seed
 
         if "ai_foundry" in config_list[0]['api_type']:
+            from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= config_list[0]['endpoint'],
             credential=AzureKeyCredential(api_key),
@@ -168,6 +168,7 @@ class ReActAgent:
             self.cache_seed += 1
         
         if "ai_foundry" in self.config_list[0]['api_type']:
+            from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= self.config_list[0]['endpoint'],
             credential=AzureKeyCredential(api_key),

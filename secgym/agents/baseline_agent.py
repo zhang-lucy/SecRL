@@ -2,7 +2,6 @@ from autogen import OpenAIWrapper
 from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_foundry, update_model_usage
 from azure.ai.inference import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential
-from secgym.config_key import api_key
 
 # from tenacity import retry, wait_fixed
 
@@ -21,22 +20,6 @@ Action can be one of the following:
 (2) submit[<your answer>], which is the final answer to the question
 """
 
-BASE_SUMMARY_PROMPT = """You are a security analyst. 
-You need to answer a given security question by querying the database.
-The logs are stored in a MySQL database, you can use SQL queries to retrieve entries as needed.
-Note there are more than 20 tables in the database, so you may need to explore the schema or check example entries to understand the database structure.
-
-Your response should always be a thought-action pair:
-Thought: <your reasoning>
-Action: <your SQL query>
-
-In Thought, you can analyse and reason about the current situation, 
-Action can be one of the following: 
-(1) execute[<your query>], which executes the SQL query
-(2) submit[<your answer>], which is the final answer to the question
-
-When submitting an answer, please summarize key information from intermediate steps that lead to your answer.
-"""
 
 O1_PROMPT = """You are a security analyst. 
 You need to answer a given security question by querying the database.
@@ -87,8 +70,14 @@ class BaselineAgent:
 
         if "o4" in config_list[0]['model']:
             self.temperature = 1
-        
-        if "ai_foundry" in config_list[0].get('api_type'):
+        for i in range(len(config_list)):
+            if  config_list[i].get('api_type') is None:
+                config_list[i]['api_type'] = "openai"
+
+        if config_list[0].get('api_type') is None:
+            pass
+        elif "ai_foundry" in config_list[0].get('api_type'):
+            from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= config_list[0]['endpoint'],
             credential=AzureKeyCredential(api_key),
@@ -97,7 +86,7 @@ class BaselineAgent:
         else:
             self.client = OpenAIWrapper(config_list=config_list, cache_seed=cache_seed)
         
-        sys_prompt = BASE_SUMMARY_PROMPT if submit_summary else BASE_PROMPT
+        sys_prompt = BASE_PROMPT
         if "o1" in config_list[0]['model'] or "o3" in config_list[0]['model'] or "r1" in config_list[0]['model'] or "R1" in config_list[0]['model'] or "o4" in config_list[0]['model'] or "meta-llama" in config_list[0]['model'] :
             sys_prompt = O1_PROMPT
         self.messages = [{"role": "system", "content": sys_prompt}]
@@ -118,7 +107,6 @@ class BaselineAgent:
 
     def _call_llm(self, messages):
         # print(f"Messages: {self.config_list[0]}")
-
         if "ai_foundry" in self.config_list[0]['api_type']:
             response = call_llm_foundry(
                 client=self.client, 
@@ -141,6 +129,7 @@ class BaselineAgent:
                 temperature=self.temperature
             )
             update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
+        print(response)
         return response.choices[0].message.content
         
     def act(self, observation: str):
@@ -197,8 +186,10 @@ class BaselineAgent:
     def reset(self, change_seed=True):
         if change_seed:
             self.cache_seed += 1
-        
-        if "ai_foundry" in self.config_list[0]['api_type']:
+        if self.config_list[0].get('api_type') is None:
+            pass
+        elif "ai_foundry" in self.config_list[0]['api_type']:
+            from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= self.config_list[0]['endpoint'],
             credential=AzureKeyCredential(api_key),
@@ -208,7 +199,7 @@ class BaselineAgent:
             self.client = OpenAIWrapper(config_list=self.config_list, cache_seed=self.cache_seed)
 
         self.step_count = 0
-        sys_prompt = BASE_SUMMARY_PROMPT if self.submit_summary else BASE_PROMPT
+        sys_prompt = BASE_PROMPT
         if "o1" in self.config_list[0]['model'] or "o3" in self.config_list[0]['model'] or "o4" in self.config_list[0]['model'] or "meta-llama" in self.config_list[0]['model'] or "qwen3" in self.config_list[0]['model']:
             sys_prompt = O1_PROMPT
         elif "r1" in self.config_list[0]['model'] or "R1" in self.config_list[0]['model'] or "qwen3" in self.config_list[0]['model']:
