@@ -1,79 +1,70 @@
 # ExCyTIn-Bench: Evaluating LLM agents on Cyber Threat Investigation
 
+- Arxiv version of the paper will come soon!
+
 We present the first benchmark to test LLM-based agents on threat hunting in the form of security question-answering pairs.
 
-- The dataset (Q&As) is in `secgym/questions/tests` folder.
-- Checkout the incident reports in `incident_reports` folder.
-- Explore questions and graphs with jupyter notebooks in `notebooks` folder.
+The environment consists 2 main components:
+1. A MYSQL database where an agent can interact to retrieve information.
+2. A set of generated questions and answers for testing in `secgym/questions/tests` folder.
 
-## Data Download
-The data can be downloaded from the following sources: 1. Directly from Hugging Face. 2. rebuild from Azure.
 
-**Download from Hugging Face or provided data source**
-
-Please download the data from the proivided link.
-
-**Original Handling Process**
-1. Register an account at Alphine Ski House.
-2. Login in to the azure account.
-    ```bash
-    az login
-    ```
-3. Uncomment the code in `download_data.py` to download the Alphine Ski House data or for 8 different incidents.
-The `alphineskihouse` folder contains logs from Jun 20, 2024 to Jul 23, 2024. While each incident folder contains logs for that specific incident from the start of incident to the end of the incident.
-    ```bash
-    python download_logs.py
-    ```
-4. Run process_logs.py to process the data. This will change the some file's entry from double quotes to single quotes.
-    ```bash
-    python process_logs.py
-    ```
-5. To anonymize the data, please refer to `secgym/database/pii_anony/README.md` for the anonymization process.
-
+<!-- display pdf as image -->
+![ExCyTIn-Bench](./secgym/overview.png)
 
 
 ## Environment Setup
 
-1. We are using MYSQL docker container for the database. Please first install docker and docker-compose and then pull the mysql image:
+1. Download database from Hugging Face
+    Please download the data from the proivided link: https://huggingface.co/datasets/kevinwyr/excytin_database.
+    Put the folder `data_anonymized` under `secgym/database/`.
+
+2. We are using MYSQL docker container for the database. Please first install Docker Desktop and docker-compose and then pull the mysql image:
     ```bash
     docker pull mysql:9.0
     ```
 
-2. Make sure your docker is open, then run the following command to set up the mysql container for 8 different databases:
+3. Make sure your Docker Desktop is open, then run the following command to set up the mysql container for 8 different databases:
     ```bash
-    cd secgym/env
-    bash setup_docker.sh
+    bash scripts/setup_docker.sh
     ```
-    It will run this command: `python secgym/database/setup_database.py --csv <path_to_csv_folder> --port <port> --sql_file <path_to_sql_file> --container_name <container_name> `.
+    It will run this command: `python secgym/database/setup_database.py --csv <path_to_csv_folder> --port <port> --sql_file <path_to_sql_file> --container_name <container_name> ` for 8 times.
 
     This script will create 8 different containers. Note that these container are binded to the csv files in the `data_anonymized` folder. This will take up 10GB of disk space.
     Check out volumes with `docker system df -v`.
 
     To set docker for a database that contains all the data (all 8 attacks), please uncomment the first command in `setup_docker.sh`. Note that this will take up 33GB of disk space.
 
-3. Setup the environment using conda or venv and install the requirements:
+4. Setup the environment using conda or venv with Python=3.11 and install the requirements with `pip install -e .`.The following is an example using conda:
     ```bash
-    pip install -e .
+    conda create -n excytin python=3.11
+    conda activate excytin
+    pip install -e . -use-pep517
     ```
 
-4. LLM setup
+5. LLM setup
     We are using [AG2](https://docs.ag2.ai/latest/) for API calling. Setup your API key in the `secgym/myconfig.py` file. You can follow the instructions [here](https://autogen-ai.github.io/autogen/docs/notebooks/autogen_uniformed_api_calling#config-list-setup).
 
 
 ## Runs
 
-2. Run Baseline
+2. Run Baseline. `--trial_run` will run only 2 questions from 1 incident for testing purposes. The results will be saved in `experiments/final_results` folder.
     ```bash
-    python experiments/run_exp.py
+    python experiments/run_exp.py --trial_run
     ```
 
-## Rerun the question generation process
+## Question Generation Process
 
-Currently, we already have the questions generated for the 8 different incidents in the `secgym/questions/tests` folder. If you want to rerun the question generation process, please follow the steps below:
+All the questions are generated based on constructed graphs from the database.
+The generation process is as follows:
+1. The `SecurityIncident` and `SecurityAlert` logs are used to construct a graph for each incident, check out this [notebook](notebooks/extract_construct_graph.ipynb) for more details.
+2. We run train-test split on the constructed graph. Run the [question_split.ipynb](notebooks/question_split.ipynb) notebook to get the split (saved to `experiements/split_files`). The train and test are split based on a proposed path relavance score.
+2. We use LLM to generate questions based on the constructed graph. Currently, we already have the questions generated for the 8 different incidents in the `secgym/questions/tests` folder using OpenAI O1. If you want to rerun the question generation process, please use the following command:
 
-1. Run QA Gen
     ```bash
-    python experiments/run_qa_gen.py
+    python experiments/run_qa_gen.py --model gpt-4.1 --solution_model gpt-4.1 --relevant_type low_split --qa_path secgym/qagen/graph_files
     ```
+    Note here we use `gpt-4.1` as the model question and solution generation. 
+
+
 After all the questions are generated, you should expect new files in `secgym/questions` folder like `incident_<i>_qa.json` where `i` is the incident number.
-You can upload these files to the `secgym` repo. We already generated the questions there.

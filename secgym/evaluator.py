@@ -1,7 +1,6 @@
 from autogen import OpenAIWrapper
 import json
 import re
-from secgym.myconfig import config_list_4o
 from secgym.utils.utils import msging, get_full_question
 from textwrap import dedent
 

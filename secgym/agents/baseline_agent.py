@@ -70,8 +70,13 @@ class BaselineAgent:
 
         if "o4" in config_list[0]['model']:
             self.temperature = 1
-        
-        if "ai_foundry" in config_list[0].get('api_type'):
+        for i in range(len(config_list)):
+            if  config_list[i].get('api_type') is None:
+                config_list[i]['api_type'] = "openai"
+
+        if config_list[0].get('api_type') is None:
+            pass
+        elif "ai_foundry" in config_list[0].get('api_type'):
             from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= config_list[0]['endpoint'],
@@ -102,7 +107,6 @@ class BaselineAgent:
 
     def _call_llm(self, messages):
         # print(f"Messages: {self.config_list[0]}")
-
         if "ai_foundry" in self.config_list[0]['api_type']:
             response = call_llm_foundry(
                 client=self.client, 
@@ -125,6 +129,7 @@ class BaselineAgent:
                 temperature=self.temperature
             )
             update_model_usage(self.totoal_usage, model_name=response.model, usage_dict=response.usage.model_dump())
+        print(response)
         return response.choices[0].message.content
         
     def act(self, observation: str):
@@ -181,8 +186,9 @@ class BaselineAgent:
     def reset(self, change_seed=True):
         if change_seed:
             self.cache_seed += 1
-        
-        if "ai_foundry" in self.config_list[0]['api_type']:
+        if self.config_list[0].get('api_type') is None:
+            pass
+        elif "ai_foundry" in self.config_list[0]['api_type']:
             from secgym.config_key import api_key
             self.client = ChatCompletionsClient(
             endpoint= self.config_list[0]['endpoint'],

@@ -245,7 +245,7 @@ Description: {alert['Description']}
     def generate_qa(self, graph_path=None, qa_path=None):
         if graph_path:
             self.setup_graph(graph_path)
-        if self.qa_path and qa_path:
+        if qa_path:
             print(f"Updating QA path from {self.qa_path} to {qa_path}")
             self.qa_path = qa_path
         if self.graph_path is None:
