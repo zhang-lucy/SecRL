@@ -13,7 +13,7 @@ The environment consists 2 main components:
 ![ExCyTIn-Bench](./secgym/overview.png)
 
 
-## Environment Setup
+## 🛠️ Environment Setup
 
 1. Download database from Hugging Face
     Please download the data from the proivided link: https://huggingface.co/datasets/kevinwyr/excytin_database.
@@ -28,7 +28,7 @@ The environment consists 2 main components:
     ```bash
     bash scripts/setup_docker.sh
     ```
-    It will run this command: `python secgym/database/setup_database.py --csv <path_to_csv_folder> --port <port> --sql_file <path_to_sql_file> --container_name <container_name> ` for 8 times.
+    It will run this command: `python secgym/database/setup_database.py --csv <path_to_csv_folder> --port <port> --sql_file <path_to_sql_file> --container_name <container_name> ` for 8 different incidents.
 
     This script will create 8 different containers. Note that these container are binded to the csv files in the `data_anonymized` folder. This will take up 10GB of disk space.
     Check out volumes with `docker system df -v`.
@@ -46,14 +46,14 @@ The environment consists 2 main components:
     We are using [AG2](https://docs.ag2.ai/latest/) for API calling. Setup your API key in the `secgym/myconfig.py` file. You can follow the instructions [here](https://autogen-ai.github.io/autogen/docs/notebooks/autogen_uniformed_api_calling#config-list-setup).
 
 
-## Runs
+## 🏃‍♂️ Runs
 
-2. Run Baseline. `--trial_run` will run only 2 questions from 1 incident for testing purposes. The results will be saved in `experiments/final_results` folder.
+1. Run Baseline. `--trial_run` will run only 2 questions from 1 incident for testing purposes. The results will be saved in `experiments/final_results` folder.
     ```bash
     python experiments/run_exp.py --trial_run
     ```
 
-## Question Generation Process
+### 🤖 Question Generation Process
 
 All the questions are generated based on constructed graphs from the database.
 The generation process is as follows:
