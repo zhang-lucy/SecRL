@@ -53,7 +53,7 @@ The environment consists 2 main components:
     python experiments/run_exp.py --trial_run
     ```
 
-### 🤖 Question Generation Process
+## 🤖 Question Generation Process
 
 All the questions are generated based on constructed graphs from the database.
 The generation process is as follows:
@@ -70,11 +70,11 @@ The generation process is as follows:
 After all the questions are generated, you should expect new files in `secgym/questions` folder like `incident_<i>_qa.json` where `i` is the incident number.
 
 
-### 📊 Results
+## 📊 Results
 
 Below is the evaluation results of the LLM agents on the test questions. We set temperature = 0 and max_step = 25. GPT-4o is used for evaluation. The full evaluation logs can be downloaded from [this link](https://drive.google.com/file/d/1k6lJ50RUL1c03YL-VF4kLzsLuIvm9sxI/view?usp=sharing).
 
 ![ExCyTIn-Bench](./secgym/assets/eval_results.png)
 
-### 📝 Citation
+## 📝 Citation
 
