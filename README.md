@@ -10,7 +10,7 @@ The environment consists 2 main components:
 
 
 <!-- display pdf as image -->
-![ExCyTIn-Bench](./secgym/overview.png)
+![ExCyTIn-Bench](./secgym/assets/overview.png)
 
 
 ## 🛠️ Environment Setup
@@ -68,3 +68,13 @@ The generation process is as follows:
 
 
 After all the questions are generated, you should expect new files in `secgym/questions` folder like `incident_<i>_qa.json` where `i` is the incident number.
+
+
+### 📊 Results
+
+Below is the evaluation results of the LLM agents on the test questions. We set temperature = 0 and max_step = 25. GPT-4o is used for evaluation. The full evaluation logs can be downloaded from [this link](https://drive.google.com/file/d/1k6lJ50RUL1c03YL-VF4kLzsLuIvm9sxI/view?usp=sharing).
+
+![ExCyTIn-Bench](./secgym/assets/eval_results.png)
+
+### 📝 Citation
+
