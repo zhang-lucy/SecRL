@@ -72,7 +72,7 @@ After all the questions are generated, you should expect new files in `secgym/qu
 
 ## 📊 Results
 
-Below is the evaluation results of the LLM agents on the test questions. We set temperature = 0 and max_step = 25. GPT-4o is used for evaluation. The full evaluation logs can be downloaded from [this link](https://drive.google.com/file/d/1-tIsFJXztBVEbHTFbMXT6FcMhNLZ77f_/view?usp=sharing).
+Below is the evaluation results of the LLM agents on the test questions. We set temperature = 0 and max_step = 25. GPT-4o is used for evaluation. The full evaluation logs can be downloaded from [this link](https://pennstateoffice365-my.sharepoint.com/:u:/g/personal/ykw5399_psu_edu/EXOMtXyFSRNGvKsLZGPIAfwBZhkKMr11oROccOydbWyioA?e=XzpQLa).
 
 ![ExCyTIn-Bench](./secgym/assets/eval_results.png)
 
