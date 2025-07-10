@@ -35,14 +35,17 @@ The environment consists 2 main components:
 
     To set docker for a database that contains all the data (all 8 attacks), please uncomment the first command in `setup_docker.sh`. Note that this will take up 33GB of disk space.
 
-4. Setup the environment using conda or venv with Python=3.11 and install the requirements with `pip install -e .`.The following is an example using conda:
+4. Setup the environment using conda or venv with Python=3.11 and install the requirements with `pip install -e . --use-pep517`.The following is an example using conda:
     ```bash
     conda create -n excytin python=3.11
     conda activate excytin
-    pip install -e . -use-pep517
+    pip install -e . --use-pep517
     ```
 
-5. LLM setup
+If you find consistent errors with the installation (maybe be caused by updated version of some packages), you can try to install the requirements with `pip install -r requirements_freeze.txt`, which is the frozen version of the requirements.
+
+5. LLM setup.
+
     We are using [AG2](https://docs.ag2.ai/latest/) for API calling. Setup your API key in the `secgym/myconfig.py` file. You can follow the instructions [here](https://autogen-ai.github.io/autogen/docs/notebooks/autogen_uniformed_api_calling#config-list-setup).
 
 

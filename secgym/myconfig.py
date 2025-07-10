@@ -19,20 +19,18 @@ from azure.core.credentials import AzureKeyCredential
 #     }
 # ]
 # If qa_gen_model = "gpt-4o", the config_list for qa_gen will be only the first dictionary in the config_list
+# Similarly in run_exp.py, if you set --model gpt-4o, the config_list for the agent will be only the first dictionary in the config_list
 
 
 CONFIG_LIST = [
-    {
-        "model": "gpt-4.1-nano",
-        "api_key": open("/Users/kevin/Downloads/SecRL/keys/openaikey").read().strip(),
-        "tags": ["gpt-4.1-nano"],
-    },
-      {
-        "model": "gpt-4.1",
-        "api_key": open("/Users/kevin/Downloads/SecRL/keys/openaikey").read().strip(),
-        "tags": ["gpt-4.1"],
-    }
-    
+    # exmaple using openai
+    #   {
+    #     "model": "gpt-4.1",
+    #     "api_key": open("/Users/kevin/Downloads/SecRL/keys/openaikey").read().strip(),
+    #     "tags": ["gpt-4.1"],
+    # }
+  
+  # example of using azure openai
   # {
   #   "model": "gpt-4.1-nano",
   #   "base_url": "https://secphibench-aoai-eastus.openai.azure.com",
@@ -42,3 +40,6 @@ CONFIG_LIST = [
   #   "azure_ad_token_provider": token_provider
   # },
 ]
+
+if len(CONFIG_LIST) == 0:
+    print("Potential Error: No config set in CONFIG_LIST, please add your config list to the CONFIG_LIST variable in secgym/myconfig.py")
