@@ -42,7 +42,7 @@ The environment consists 2 main components:
     pip install -e . --use-pep517
     ```
 
-If you find consistent errors with the installation (maybe be caused by updated version of some packages), you can try to install the requirements with `pip install -r requirements_freeze.txt`, which is the frozen version of the requirements.
+    If you find consistent errors with the installation (maybe be caused by updated version of some packages), you can try to install the requirements with `pip install -r requirements_freeze.txt`, which is the frozen version of the requirements.
 
 5. LLM setup.
 
@@ -72,10 +72,12 @@ The generation process is as follows:
 
 After all the questions are generated, you should expect new files in `secgym/questions` folder like `incident_<i>_qa.json` where `i` is the incident number.
 
+Note: All results from the paper use the questions in `secgym/questions/tests` folder. The train questions under `secgym/questions/train` are only partial and used for Expel to collect new rules.
+
 
 ## 📊 Results
 
-Below is the evaluation results of the LLM agents on the test questions. We set temperature = 0 and max_step = 25. GPT-4o is used for evaluation. The full evaluation logs can be downloaded from [this link](https://pennstateoffice365-my.sharepoint.com/:u:/g/personal/ykw5399_psu_edu/EXOMtXyFSRNGvKsLZGPIAfwBZhkKMr11oROccOydbWyioA?e=XzpQLa).
+Below is the evaluation results of the LLM agents on the test questions. We set temperature = 0 and max_step = 25. GPT-4o is used for evaluation. The full evaluation logs can be downloaded from [this link](https://pennstateoffice365-my.sharepoint.com/:u:/g/personal/ykw5399_psu_edu/EXOMtXyFSRNGvKsLZGPIAfwBZhkKMr11oROccOydbWyioA?e=XzpQLa). If can also be found under this [branch](https://github.com/microsoft/SecRL/tree/before_cleanup_all_history) under `final_results` folder (along with the original code).
 
 ![ExCyTIn-Bench](./secgym/assets/eval_results.png)
 
