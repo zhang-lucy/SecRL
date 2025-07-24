@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd

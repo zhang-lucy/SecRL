@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 from .baseline_agent import BaselineAgent
 from .prompt_sauce_agent import PromptSauceAgent
 from .prompt_sauce_reflexion_agent import PromptSauceReflexionAgent

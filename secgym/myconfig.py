@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 from azure.identity import get_bearer_token_provider, AzureCliCredential
 from azure.ai.inference import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential

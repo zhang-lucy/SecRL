@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 
 from secgym.utils.utils import LLM_call
 from secgym.database.process_logs import SEPARATOR

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 from secgym.myconfig import CONFIG_LIST
 from secgym.qagen.qa_gen import QAGen
 import os

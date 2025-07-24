@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 from typing import List, Dict, Tuple, Any, Callable, Union
 from glob import glob
 import os

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 #TODO: Add incident info, how much to use?
 TWEAKED_QAGEN_PROMPT_ORIGIN = """
 

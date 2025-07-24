@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 
 from secgym.qagen.alert_graph import AlertGraph
 import os

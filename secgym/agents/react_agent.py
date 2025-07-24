@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 from autogen import OpenAIWrapper
 from secgym.agents.agent_utils import sql_parser, msging, call_llm, call_llm_foundry, update_model_usage
 import os
