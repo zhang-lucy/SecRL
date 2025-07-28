@@ -267,29 +267,3 @@ Description: {alert['Description']}
 
 if __name__ == "__main__":
     print("Please use run_qa.py to generate QA")
-    # parser = argparse.ArgumentParser(description="Run Alert QA Generation")
-    # parser.add_argument("--qa_path", "-q", type=str, default="newqa.json", help="Path to save the generated QA")
-    # parser.add_argument("--graph_path", "-g", type=str, default="sample_incident.graphml", help="Path to the alert graph")
-    # parser.add_argument("--cache_seed", type=int, default=41, help="Seed for the cache")
-    # parser.add_argument("--include_entry", action="store_true", help="Include full alert entry in the question prompt")
-    # parser.add_argument("--model", "-m", type=str, default="gpt-4o", help="Model to use for QA generation")
-    # parser.add_argument("--solution_model", "-s", type=str, default=None, help="Model to use for solution generation")
-    # args = parser.parse_args()
-
-    # from secgym.myconfig import config_list_4o
-
-    # if args.solution_model is None:
-    #     print(f"Warning: Solution model not provided, using the same model as QA generation: {args.model}")
-    #     args.solution_model = args.model
-
-    # qagenena = QAGen(
-    #     qa_path=args.qa_path,
-    #     graph_path=args.graph_path,
-    #     config_list=None, # set your config list here
-    #     qa_gen_model=args.model,
-    #     solution_gen_model=args.solution_model,
-    #     cache_seed=args.cache_seed,
-    #     include_entry=args.include_entry,
-    # )
-
-    # qagenena.generate_qa()

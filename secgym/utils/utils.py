@@ -249,14 +249,6 @@ def process_entity_identifiers(entities_json_string):
             #     # TODO: add method to check if url is absolute or not
                 #node_attributes['IsAbsoluteUrl'] = str(is_absolute_url(identifier_value))
             
-            # both cloud resource types extract the subscription id from the resource url
-            # elif type_value == "gcp-resource":
-
-            #     identifier_field = "RelatedAzureResourceIds"
-            #     resource_url = str(get_identifier_value(entity_dict, identifier_field)).lower()
-            #     match = re.search(r'(?<=subscriptions/)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', resource_url)
-            #     identifier_value = match.group() if match else ""
-            
             elif type_value == "azure-resource":
 
                 identifier_field = "ResourceId"

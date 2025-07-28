@@ -108,27 +108,6 @@ SEPARATOR = "❖"
 QUOTECHAR = '"'
 
 if __name__ == "__main__":
-    # folders = [
-    #     "./data/incidents/incident_5",
-    #     "./data/incidents/incident_38",
-    #     "./data/incidents/incident_34",
-    #     "./data/incidents/incident_39",
-    #     "./data/incidents/incident_55",
-    #     "./data/incidents/incident_122",
-    #     "./data/incidents/incident_134",
-    #     "./data/incidents/incident_166",
-    #     "./data/incidents/incident_322",
-    #     "./data/alphineskihouse",
-
-    #     # "./data/incidents/incident_55/DeviceRegistryEvents",
-    #     # "./data/alphineskihouse/DeviceRegistryEvents",
-    #     # "./data/alphineskihouse/DeviceFileEvents"
-    # ]
-    # for folder in folders:
-    #     print(f"Switching separator for {folder}")
-    #     # create_sql_file_from_csv_folder(folder, original_separator="¤", new_separator="❖") # ¤ ‽ ⸘ ❖
-    #     change_separator_in_csv_folder(folder, separator="❖", quotechar='"', new_separator=SEPARATOR) 
-    
 
     # convert double quotes for certain files
     need_conversion = [

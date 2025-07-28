@@ -100,36 +100,18 @@ class PromptSauceReflexionAgent:
             print("No replays to reflect on")
             return
 
-        #1. Random 5 samples
         previous_trials_count = 3#random.randint(1, 3)
         if len(self.replay_buffer) <= previous_trials_count:
             replays = self.replay_buffer
         else:
             replays = random.sample(self.replay_buffer, previous_trials_count)
         
-        #2. Sample based on question type
-        #replays = self.replay_buffer.sample(10, key=lambda x: x["question"] == )
-        
-        #extract reflective text from replays
-        #TODO: Add examples of reflective prompts Here are some examples:
-        #{examples}
-        #(END OF EXAMPLES)
         REFLECT_PROMPT = f"""You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a question to answer. You were unsuccessful in answering the question either because you guessed the wrong answer with submit[<answer>] or there is a phrasing discrepancy with your provided answer and the answer key. In a few sentences, Diagnose a possible reason for failure or phrasing discrepancy and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.
         Previous trials:
         {[f"Trial {i}, Reward: {replay['reward']}, Transcript: {replay['messages']}" for i,replay in enumerate(replays)]}
         Reflection:
         """
-        #print(REFLECT_PROMPT)
-        # try:
-        #     reflection = self._call_llm(messages=[msging(REFLECT_PROMPT)])
-        # except Exception as e:
-        #     if "context_length_exceeded" in str(e):
-        #         max_length = 127000  # adjust based on your model's token limit
-        #         truncated_prompt = REFLECT_PROMPT[:max_length]
-        #         reflection = self._call_llm(messages=[msging(truncated_prompt)])
-        #     else:
-        #         raise e
-        
+
         reflection = self._call_llm(messages=[msging(REFLECT_PROMPT[:120000])])
         return reflection
 

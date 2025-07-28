@@ -17,9 +17,6 @@ token_provider = get_bearer_token_provider(
     AzureCliCredential(), "https://cognitiveservices.azure.com/.default"
 )
 
-# aoai_endpoint = "https://medeina-openai-dev-011.openai.azure.com/"
-# aoai_emb_endpoint = "https://medeinaapi-dev-openai-san.openai.azure.com/"
-
 # Add argument parsing
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Extract insights from experience trajectories')
@@ -477,12 +474,7 @@ def main():
         # list_correct_incorrect_tasks = list_correct_incorrect_tasks[:CORRECT_INCORRECT_STEPS]
     if CORRECT_BATCH_STEPS is not None:
         list_batched_correct_prompts = list_batched_correct_prompts[:CORRECT_BATCH_STEPS]
-        # list_batched_correct_tasks = list_batched_correct_tasks[:CORRECT_BATCH_STEPS]
 
-    # client = OpenAI(
-    #     api_key=open("/Users/kevin/Desktop/AutoStates/key.txt", "r").read().strip(),
-    #     # base_url=OPENAI_API_BASE,
-    # )
     client = AzureOpenAI(
         api_version="2025-01-01-preview",
         azure_endpoint="https://metabase-aoi-eus2.openai.azure.com",

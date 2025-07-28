@@ -341,13 +341,11 @@ if __name__ == "__main__":
             print("Processing: ", file_name)
             if file_name.endswith(".csv"):
                 csv_files = [os.path.join(folder, file_name)]
-                # df = pd.read_csv(os.path.join(folder, file_name), sep=SEPARATOR, encoding='utf-8', on_bad_lines='skip', engine='python')
             elif os.path.isdir(os.path.join(folder, file_name)):
                 for f in os.listdir(os.path.join(folder, file_name)):
                     if f.endswith(".csv"):
                         csv_files.append(os.path.join(folder, file_name, f))
-                # csv_file = os.path.join(folder, file_name, f"{file_name}_0.csv")
-                # df = pd.read_csv(csv_file, sep=SEPARATOR, encoding='utf-8', on_bad_lines='skip', engine='python')
+
             else:
                 continue
             

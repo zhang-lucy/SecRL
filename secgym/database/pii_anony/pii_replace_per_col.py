@@ -222,26 +222,6 @@ def replace_pii_one_csv(filename:str, output_folder:str, input_folder, replace_d
     print(f"Processed and saved {filename} to {output_folder} in {time.time() - start_time:.2f} seconds")
     print("-" * 50) 
 
-
-
-# Processing AuditLogs.csv...
-# Processed and saved AuditLogs.csv to ./data_anonymized/incidents/incident_5 Time taken: 7.00 seconds
-# Processing EmailUrlInfo.csv...
-# Processed and saved EmailUrlInfo.csv to ./data_anonymized/incidents/incident_5 Time taken: 4.01 seconds
-# Processing IdentityDirectoryEvents.csv...
-# Processed and saved IdentityDirectoryEvents.csv to ./data_anonymized/incidents/incident_5 Time taken: 2.00 seconds
-# Processing AzureMetrics.csv...
-# Processed and saved AzureMetrics.csv to ./data_anonymized/incidents/incident_5 Time taken: 27.22 seconds
-# Processing AADNonInteractiveUserSignInLogs.csv...
-
-
-# NetworkMessageId,ReportId,Url,UrlLocation,UrlDomain,SourceSystem,Type,Processed and saved EmailUrlInfo.csv to ./test in 8.31 seconds
-
-# IdentityDirectoryEvents.csv to ./test in 23.83 seconds
-# aved AzureMetrics.csv to ./test in 48.66 seconds
-# saved AADNonInteractiveUserSignInLogs.csv to ./test in 398.63 
-
-
 # Call the function
 import json
 with open("./pii/final_filter.json", "r") as f:

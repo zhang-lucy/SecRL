@@ -14,12 +14,6 @@ from time import sleep
 from secgym.utils.utils import get_full_question
 from secgym.evaluator import LLMEvaluator
 
-# ATTACKS = {
-#     "Blitz_Ransomware" : "bliz_ransomware_qa.json",
-#     "AAD_Comprise": "aad_comprise/aad_comprise_qa.json",
-#     "Incident_322": "newqa.json",
-# }
-
 ATTACKS = {
     "incident_5": {
         "qafile": "test/incident_5_qa_incident_o1-ga_c42.json",
@@ -359,13 +353,6 @@ class ExcytinEnv(gym.Env):
         """Evaluate the answer and return the score.
         """
         eval_dict = self.evaluator.checking(self.curr_question, answer)
-        # try:
-        #     eval_dict = self.evaluator.checking(self.curr_question, answer)
-        # except Exception as e:
-        #     eval_dict = {
-        #         "reward": 0,
-        #         "error": str(e)
-        #     }
         return eval_dict
     
     def check_layer(self, layer: str) -> None:

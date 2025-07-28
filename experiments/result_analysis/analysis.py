@@ -80,11 +80,6 @@ def analysis(data:dict, verbose:bool=False, round_cut=-1):
             for i, m in enumerate(k['messages']):
                 content = m['content']
                 if m['role'] == "user":
-                    # if i>=1 and k['messages'][i-1]['role'] == "assistant":
-                    #     last_content = k['messages'][i-1]['content']
-                    #     if "Action: execute[" in last_content and "SELECT" in last_content \
-                    #         and (content == "[]" or content == "" or "ProgrammingError" in content or "DataError" in content):
-                    #         select_error_count += 1
                     if "ProgrammingError" in content or "DataError" in content:
                         error_query_count += 1
                         select_error_count += 1
@@ -395,11 +390,6 @@ def analysis_v2(data:dict, verbose:bool=False, round_cut=-1):
         for i, m in enumerate(k['messages']):
             content = m['content']
             if m['role'] == "user":
-                # if i>=1 and k['messages'][i-1]['role'] == "assistant":
-                #     last_content = k['messages'][i-1]['content']
-                #     if "Action: execute[" in last_content and "SELECT" in last_content \
-                #         and (content == "[]" or content == "" or "ProgrammingError" in content or "DataError" in content):
-                #         select_error_count += 1
                 if "ProgrammingError" in content or "DataError" in content:
                     error_query_count += 1
                     select_error_count += 1

@@ -308,15 +308,6 @@ def print_file_size(
 
     print(f"Total size: {round(total_size/1024/1024, 3)} MB   (GB: {round(total_size/1024/1024/1024, 3)})")
 
-# FirstActivityTime [UTC]                            8/1/2024, 12:26:22.000 PM
-# LastActivityTime [UTC]                             8/1/2024, 12:37:30.277 PM
-# extract 3 hours containing the attack
-# attacks = {
-#     322: {
-#         "start_time": datetime(2024, 8, 1, 11, 0, 0, 0, tzinfo=timezone.utc),
-#         "end_time": datetime(2024, 8, 1, 14, 0, 0, 0, tzinfo=timezone.utc),
-#     },
-# }
 
 attacks = {55: {'start_time': datetime(2024, 7, 1, 15, 1, 28, tzinfo=timezone.utc),
   'end_time': datetime(2024, 7, 7, 0, 1, 1, 21452, tzinfo=timezone.utc)},
@@ -345,12 +336,6 @@ def get_new_times(start_time, end_time):
 def download_logs(workspace_id, table_names, start_time, end_time, file_path):
     os.makedirs(file_path, exist_ok=True)
     for table in table_names:
-        # if table already exists, skip
-        # if os.path.exists(os.path.join(file_path, f"{table}.csv")) or os.path.exists(os.path.join(file_path, table)):
-        #     print(f"Table {table} already exists. Skipping.")
-        #     continue
-        # if table != "AzureDiagnostics":
-        #     continue
         try :
             query_and_save_data(workspace_id, table, (start_time, end_time), file_path, verbose=True, append=False)
         except HttpResponseError as e:

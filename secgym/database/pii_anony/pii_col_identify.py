@@ -13,11 +13,8 @@ import json
 import numpy as np
 
 # iterate over all csvs in the directory
-
-
 # for each csv, load the column names and some examples of the data
 # call LLM to determine if it is a PII, or contains PII information
-
 # collect and save repetitive column names
 
 
@@ -50,18 +47,6 @@ str_matcher = {
         "regex_pattern": r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b",
     },
 }
-
-# test match for IP
-# tests = [
-#     "10.23.343.1",
-#     "hefia32489dfni32,.werwer23 [10.23.343.1] 10.23.343.1",
-#     "11.11111111111.1asdf43f",
-# ]
-
-# for t in tests:
-#     # use regex to match
-#     print(t, re.findall(str_matcher["IP"]["regex_pattern"], t))
-
 
 def identify_pii(csv_file, save_file):
     df = pd.read_csv(csv_file, sep=SEPARATOR, encoding='utf-8', on_bad_lines='skip', engine='python')
@@ -182,93 +167,6 @@ Please use JSON format for your response:
         "pii_fields": ["<field_1>", "<field_2>"],
 }
 """
-
-# with open(save_file, "r") as f:
-#     columns = json.load(f)
-
-# has_pii = []
-# for k, val in columns.items():
-#     if val['is_pii']:
-#         # print(k, val)
-#         has_pii.append(k)
-
-# second_filter_file = "second_filter.json"
-
-# if os.path.exists(second_filter_file):
-#     with open(second_filter_file, "r") as f:
-#         second_filter_columns = json.load(f)
-# else:
-#     second_filter_columns = {}
-
-# for file_name in os.listdir(folder):
-#     if file_name.endswith(".csv"):
-#         df = pd.read_csv(os.path.join(folder, file_name), sep=SEPARATOR, encoding='utf-8', on_bad_lines='skip', engine='python')
-#     elif os.path.isdir(os.path.join(folder, file_name)):
-#         # get the first csv file
-#         csv_file = os.path.join(folder, file_name, f"{file_name}_0.csv")
-#         df = pd.read_csv(csv_file, sep=SEPARATOR, encoding='utf-8', on_bad_lines='skip', engine='python')
-#     else:
-#         continue
-
-#     print("Identifying PII for file: ", file_name)
-
-#     # iterated over columns of df to see if it is in has_pii
-#     for column in df.columns:
-#         if column in has_pii:
-#             if column in second_filter_columns:
-#                 continue
-#             print("Column: ", column)
-#             u = df[column].unique().tolist()
-#             print(f"Len of unique values: {len(u)} / {len(df)}")
-
-#             examples = u[:min(5, len(u))]
-#             # convert to string
-#             examples = [str(e) for e in examples]
-#             if len("".join(examples)) > 1500:
-#                 examples = examples[:3]
-
-#             task = f"Column Name: {column}\nExamples: " + '\n'.join(examples)
-#             for i in range(5):
-#                 print("-" * 10, "Input Prompt", "-" * 10)
-#                 print(task)
-#                 response = LLM_call(
-#                     instruction=second_extraction,
-#                     task=task,
-#                     config_list=config_list_4o,
-#                     response_format = {"type": "json_object"},
-#                     cache_seed=41,
-#                 )
-#                 print("-" * 10, "Response", "-" * 10)
-#                 print(response)
-
-#                 try:
-#                     response = json.loads(response)
-#                 except:
-#                     print("Error parsing response")
-#                     response = {}
-#                     continue
-#                 if not (column in response or "is_pii" in response[column]):
-#                     print("Invalid response")
-#                     response = {}
-#                     continue
-#                 break
-
-#             # wait for user input to double check input
-
-#             if response != {}:
-#                 user_input = input("Do you think this is correct? (y/n, enter nothing is also yes): ")
-                
-#                 if user_input.lower() == "y" or user_input == "":
-#                     # do nothing
-#                     pass
-#                 else:
-#                     # toggle is_pii
-#                     response[column]["is_pii"] = not response[column]["is_pii"]
-                
-#             second_filter_columns[column] = response[column]
-#             with open(second_filter_file, "w") as f:
-#                 json.dump(second_filter_columns, f)
-#             print("-" * 50)
 
 
 save_file = "second_filter.json"

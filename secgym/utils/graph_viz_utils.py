@@ -87,29 +87,7 @@ def get_hover_attributes(node_id, node_dict):
     
     def format_values(content):
         max_length_per_line = 100
-        
-
         lines = []
-
-        # This logic will split the attribute value on white space characters.
-        # It does not work well for values with no whitespace, like long URLs
-        # or json objects without whitespace.
-        # words = content.split(' ')
-        # current_line = ''
-        # for word in words:
-        #     word = word.strip()
-        #     if word == '': continue
-        #     if len(current_line) > max_length_per_line:
-        #         lines.append(current_line)
-        #         current_line = ''
-        #     else:
-        #         current_line = current_line + ' ' + word
-        
-        # if current_line != '':
-        #     lines.append(current_line)
-
-        # This logic just restrictions property values to a maximum line length
-        # causing some words to be split between lines.
         for i in range(len(content)//max_length_per_line + 1):
             line_start = i  * max_length_per_line
             line_end = (i + 1) * max_length_per_line
@@ -117,19 +95,6 @@ def get_hover_attributes(node_id, node_dict):
         
         return '\n'.join(lines)
     
-    # if 'Recommendation' in node_dict:
-    #     return format_attributes(['Value','PathSummary'])
-
-    # node_type = node_dict['node_type']
-    # if node_type == 'securityincident':
-    #     return format_attributes(['Title', 'Description', 'Severity', 'ProviderName','CreatedTime'])
-    # elif node_type == 'securityalert':
-    #     return format_attributes(['AlertDisplayName', 'Description', 'AlertSeverity', 'AlertProviderName', 'Tactics', 'Techniques','StartTime'])
-    # elif node_type == 'SkillInvocationId':
-    #     return format_attributes(['SkillName'])
-    # elif node_type == 'PromptId':
-    #     return format_attributes(['Prompt'])
-    # else:
     
     return format_hover_attribs(node_dict)
 def generate_pyvis(subgraph, outputfile="graph.html"):
