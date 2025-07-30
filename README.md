@@ -1,6 +1,7 @@
 # ExCyTIn-Bench: Evaluating LLM agents on Cyber Threat Investigation
 
-- Arxiv version of the paper will come soon!
+[![Paper](https://img.shields.io/badge/paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2507.14201) 
+
 
 We present the first benchmark to test LLM-based agents on threat hunting in the form of security question-answering pairs.
 
@@ -83,3 +84,13 @@ Below is the evaluation results of the LLM agents on the test questions. We set 
 
 ## 📝 Citation
 
+If you find this work useful, please cite our paper:
+
+```bibtex
+@article{wu2025excytin,
+  title={ExCyTIn-Bench: Evaluating LLM agents on Cyber Threat Investigation},
+  author={Wu, Yiran and Velazco, Mauricio and Zhao, Andrew and Luj{\'a}n, Manuel Ra{\'u}l Mel{\'e}ndez and Movva, Srisuma and Roy, Yogesh K and Nguyen, Quang and Rodriguez, Roberto and Wu, Qingyun and Albada, Michael and others},
+  journal={arXiv preprint arXiv:2507.14201},
+  year={2025}
+}
+```
