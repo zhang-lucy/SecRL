@@ -17,7 +17,7 @@ The environment consists 2 main components:
 ## 🛠️ Environment Setup
 
 1. Download database from Hugging Face
-    Please download the data from the proivided link: https://huggingface.co/datasets/kevinwyr/excytin_database.
+    Please download the data from the proivided link: https://huggingface.co/datasets/anandmudgerikar/excytin-bench.
     Put the folder `data_anonymized` under `secgym/database/`.
 
 2. We are using MYSQL docker container for the database. Please first install Docker Desktop and docker-compose and then pull the mysql image:
