@@ -80,7 +80,7 @@ Note: All results from the paper use the questions in `secgym/questions/tests` f
 
 Below is the evaluation results of the LLM agents on the test questions. We set temperature = 0 and max_step = 25. GPT-4o is used for evaluation. The full evaluation logs can be downloaded from [this link](https://pennstateoffice365-my.sharepoint.com/:u:/g/personal/ykw5399_psu_edu/EXOMtXyFSRNGvKsLZGPIAfwBZhkKMr11oROccOydbWyioA?e=XzpQLa). If can also be found under this [branch](https://github.com/microsoft/SecRL/tree/before_cleanup_all_history) under `final_results` folder (along with the original code).
 
-![ExCyTIn-Bench](./secgym/assets/eval_results.png)
+![ExCyTIn-Bench](./secgym/assets/updated_eval_results_09_25.png)
 
 ## 📝 Citation
 
